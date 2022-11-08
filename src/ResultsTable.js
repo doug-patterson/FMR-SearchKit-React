@@ -116,11 +116,18 @@ let HeaderMenu = ({
   )
 }
 
-const renderCell = ({ row, field, schema, idx }) => _.get(`properties.${field}.display`, schema) ? _.get(`properties.${field}.display`, schema)(
-  _.get(field, row),
-  row,
-  idx
-) : _.get(field, row)
+const renderCell = ({ row, field, schema, idx }) => {
+  let val = _.get(`properties.${field}.display`, schema) ? _.get(`properties.${field}.display`, schema)(
+    _.get(field, row),
+    row,
+    idx
+  ) : _.get(field, row)
+
+  console.log(`HERE IS THE RENDERED VALUE FOR FIELD ${field}:`)
+  console.log(val)
+
+  return "test"
+  }
 
 export default ({
   include,
