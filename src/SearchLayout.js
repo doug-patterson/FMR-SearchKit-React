@@ -143,6 +143,40 @@ export default ({
   return (
     <UIComponents.Box>
       <UIComponents.Grid columns="1fr 5fr" gap={10}>
+        <UIComponents.Box>
+          {children}
+          {mapIndexed((filter, idx) => {
+            let Component = getFilterComponent(filter.type)
+            return (
+              <Component
+                key={filter.key}
+                onChange={patch => {
+                  updateFilter(idx)(patch)
+                  setPage(1)
+                }}
+                title={filter.key}
+                {...filter}
+                options={_.get(
+                  'options',
+                  _.find({ key: filter.key }, filterOptions)
+                )}
+                display={schema.properties[filter.field].display}
+                UIComponents={UIComponents}
+              />
+            )
+          }, filters)}
+          <UIComponents.Button
+            onClick={() => {
+              setSortField(initialSearch.sortField)
+              setSortDir(initialSearch.sortDir)
+              setFilters(initialSearch.filters)
+              setPageSize(initialSearch.pageSize)
+              setInclude(
+                _.get('include', initialSearch) || _.keys(schema.properties)
+              )
+            }}
+          >Reset Search</UIComponents.Button>
+        </UIComponents.Box>
         <UIComponents.Box style={{ overflowY: 'scroll', paddingBottom: 120 }}>
           <Results
             {...{
