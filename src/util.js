@@ -8,6 +8,8 @@ export let arrayToObject = _.curry((key, val, arr) =>
   _.flow(_.keyBy(key), _.mapValues(val))(arr)
 )
 
+const defaultKeyValueDisplay = obj => <div>{mapValuesIndexed((v, k) => <div><span>{k}</span>: <span>{v}</span></div>,  obj)}</div>
+
 const defaultDisplay = prop => {
   let fn = val => val ? `${val}` : ''
 
@@ -19,7 +21,11 @@ const defaultDisplay = prop => {
       fn = date => format(new Date(date), 'MM/dd/yyyy KK:mm:ss bb')
       break
     case 'object':
-      fn = obj => <div>{mapValuesIndexed((v, k) => <div><span>{k}</span>: <span>{v}</span></div>,  obj)}</div>
+      fn = defaultKeyValueDisplay
+      break
+    case 'array':
+      fn = _.map(obj => <div>{defaultKeyValueDisplay(obj)}</div>)
+      break
     default:
       break
   }
