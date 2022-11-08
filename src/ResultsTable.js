@@ -122,11 +122,7 @@ const renderCell = ({ row, field, schema, idx }) => {
     row,
     idx
   )
-  if (_.isObject(display)) {
-    console.error('DISPLAY RESULT IS OBJECT')
-    console.log(display)
-    return "FAIL"
-  }
+
   return [display]
 }
 
