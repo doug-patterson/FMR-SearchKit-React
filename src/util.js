@@ -24,7 +24,7 @@ const defaultDisplay = prop => {
       fn = defaultKeyValueDisplay
       break
     case 'array':
-      fn = _.map(obj => <div>{defaultKeyValueDisplay(obj)}</div>)
+      fn = arr => <div>{_.map(defaultKeyValueDisplay(obj))}</div>
       break
     default:
       break
