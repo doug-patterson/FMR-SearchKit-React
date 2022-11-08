@@ -8,7 +8,7 @@ export let arrayToObject = _.curry((key, val, arr) =>
   _.flow(_.keyBy(key), _.mapValues(val))(arr)
 )
 
-const defaultKeyValueDisplay = obj => <div>{mapValuesIndexed((v, k) => <div><span>{k}</span>: <span>{`${$v}`}</span></div>,  obj)}</div>
+const defaultKeyValueDisplay = obj => <div>{mapValuesIndexed((v, k) => <div><span>{k}</span>: <span>{`${v}`}</span></div>,  obj)}</div>
 
 const defaultDisplay = prop => {
   let fn = val => val ? <span>{`${val}`}</span> : ''
