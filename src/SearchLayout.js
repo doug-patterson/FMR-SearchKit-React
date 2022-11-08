@@ -143,7 +143,24 @@ export default ({
   return (
     <UIComponents.Box>
       <UIComponents.Grid columns="1fr 5fr" gap={10}>
-        
+        <UIComponents.Box style={{ overflowY: 'scroll', paddingBottom: 120 }}>
+          <Results
+            {...{
+              include: _.without(initialSearch.omitFromResults, include),
+              setInclude,
+              setSortField,
+              setSortDir,
+              schema: _.update('properties', _.omit(initialSearch.omitFromResults), schema),
+              rows,
+              resultsCount,
+              pageSize,
+              setPageSize,
+              page,
+              setPage,
+              UIComponents
+            }}
+          />
+        </UIComponents.Box>
       </UIComponents.Grid>
     </UIComponents.Box>
   )
