@@ -116,6 +116,18 @@ let HeaderMenu = ({
   )
 }
 
+const renderCell = ({ row, field, schema }) => {
+  console.log('RENDER CELL FOR Field')
+  console.log({ schema, row, field, prop: _.get(`properties.${field}`, schema), rendered: _.get(`properties.${field}.display`, schema) ? _.get(`properties.${field}.display`, schema)(
+    _.get(field, row),
+    row,
+    idx
+  ) : _.get(field, row) })
+
+  return 'test'
+}
+
+
 export default ({
   include,
   setInclude,
@@ -160,11 +172,7 @@ export default ({
               {_.map(
                 field => (
                   <UIComponents.TableCell key={field}>
-                    {_.get(`properties.${field}.display`, schema) ? _.get(`properties.${field}.display`, schema)(
-                      _.get(field, row),
-                      row,
-                      idx
-                    ) : _.get(field, row)}
+                    {renderCell({ row, field, schema })}
                   </UIComponents.TableCell>
                 ),
                 include
