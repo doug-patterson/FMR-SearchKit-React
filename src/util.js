@@ -10,6 +10,8 @@ export let arrayToObject = _.curry((key, val, arr) =>
 
 const defaultKeyValueDisplay = obj => <div>{mapValuesIndexed((v, k) => <div><span>{k}</span>: <span>{`${v}`}</span></div>,  obj)}</div>
 
+const arrayValueDisplay = val => _.isObject(val) ? defaultKeyValueDisplay(val) : `${val}`
+
 const defaultDisplay = prop => {
   let fn = val => val ? <span>`${val}`</span> : <span>{''}</span>
 
@@ -24,7 +26,7 @@ const defaultDisplay = prop => {
       fn = defaultKeyValueDisplay
       break
     case 'array':
-      fn = arr => <div>{_.map(defaultKeyValueDisplay, arr)}</div>
+      fn = arr => <div>{_.map(arrayValueDisplay, arr)}</div>
       break
     default:
       break
