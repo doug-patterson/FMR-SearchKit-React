@@ -13,7 +13,7 @@ const defaultDisplay = prop => {
 
   switch (prop.bsonType) {
     case 'date':
-      fn = date => format(date, 'MM/dd/yyyy KK:mm:ss bb')
+      fn = date => format(new Date(date), 'MM/dd/yyyy KK:mm:ss bb')
       break
     case 'object':
       fn = obj => <div>{mapValuesIndexed((v, k) => <div><span>{k}</span>: <span>{v}</span></div>,  obj)}</div>
