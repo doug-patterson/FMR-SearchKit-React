@@ -12,6 +12,9 @@ const defaultDisplay = prop => {
   let fn = val => val ? `${val}` : ''
 
   switch (prop.bsonType) {
+    case 'bool':
+      fn = bool => bool ? 'Yes' : 'No'
+      break
     case 'date':
       fn = date => format(new Date(date), 'MM/dd/yyyy KK:mm:ss bb')
       break
@@ -24,6 +27,9 @@ const defaultDisplay = prop => {
   return fn
 }
 
-const defaultDisplays = _.mapValues(val => ({ display: defaultDisplay(val), ...val }))
+const defaultDisplays = schema => ({
+  ...schema,
+  properties: _.mapValues(prop => ({ display: defaultDisplay(prop), ...prop }), schema.properties)
+}) 
 
 export let addDefaultDisplays = _.mapValues(defaultDisplays)
