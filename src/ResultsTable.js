@@ -128,9 +128,9 @@ const renderCell = ({ row, field, schema, idx }) => {
     renderedValue: val
   })
 
-  val = (typeof val === 'object') ? 'objekt' : val
+  val = (typeof val === 'object') ? JSON.stringify(val) : val
 
-  return "test"
+  return val
 }
 
 export default ({
