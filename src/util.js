@@ -11,14 +11,14 @@ export let arrayToObject = _.curry((key, val, arr) =>
 const defaultKeyValueDisplay = obj => <div>{mapValuesIndexed((v, k) => <div><span>{k}</span>: <span>{`${v}`}</span></div>,  obj)}</div>
 
 const defaultDisplay = prop => {
-  let fn = val => val ? <span>{`${val}`}</span> : ''
+  let fn = val => val ? `${val}` : ''
 
   switch (prop.bsonType) {
     case 'bool':
-      fn = bool => bool ? <span>{'Yes'}</span> : <span>{'No'}</span>
+      fn = _.constant('BOOL')//bool => bool ? <span>{'Yes'}</span> : <span>{'No'}</span>
       break
     case 'date':
-      fn = date => <span>{format(new Date(date), 'MM/dd/yyyy KK:mm:ss bb')}</span>
+      fn = _.constant('DATE')//date => <span>{format(new Date(date), 'MM/dd/yyyy KK:mm:ss bb')}</span>
       break
     case 'object':
       fn = _.constant('OBJECT')
