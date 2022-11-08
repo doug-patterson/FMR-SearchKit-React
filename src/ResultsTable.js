@@ -127,7 +127,7 @@ const renderCell = ({ row, field, schema, idx }) => {
     console.log(display)
     return "FAIL"
   }
-  return display
+  return [display]
 }
 
 export default ({
