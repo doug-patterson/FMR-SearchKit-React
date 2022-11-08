@@ -128,6 +128,8 @@ const renderCell = ({ row, field, schema, idx }) => {
     renderedValue: val
   })
 
+  val = (typeof val === 'object') ? 'cannot display value' : val
+
   return val
 }
 
