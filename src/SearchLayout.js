@@ -184,15 +184,7 @@ export default ({
               setInclude,
               setSortField,
               setSortDir,
-              schema: {
-                ...schema,
-                properties: _.flow(
-                  _.keys,
-                  keys => _.difference(keys, initialSearch.omitFromResults),
-                  arrayToObject(_.identity, k => schema.properties[k])
-                )(schema.properties),
-              },
-              collection,
+              schema: _.update('properties', _.omit(initialSearch.omitFromResults), schema),
               rows,
               resultsCount,
               pageSize,

@@ -122,7 +122,6 @@ export default ({
   setSortField,
   setSortDir,
   schema,
-  collection,
   rows,
   UIComponents
 }) => (
