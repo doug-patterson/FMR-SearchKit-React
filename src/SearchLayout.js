@@ -2,7 +2,7 @@ import React from 'react'
 import * as DefaultUIComponents from './DefaultUIComponents'
 
 import _ from 'lodash/fp'
-import { mapIndexed, mapValuesIndexed, arrayToObject } from './util'
+import { mapIndexed, mapValuesIndexed, arrayToObject, addDefaultDisplays } from './util'
 
 import BooleanFilter from './BooleanFilter'
 import Facet from './Facet'
@@ -61,6 +61,7 @@ export default ({
   if (!schema) {
     return 'Schema not found'
   }
+  schema = defaultDisplays(schema)
   storageKey = storageKey || collection
 
   let localStorageSearch =

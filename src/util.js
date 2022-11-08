@@ -1,3 +1,4 @@
+import React from 'react'
 import _ from 'lodash/fp'
 import { format } from 'date-fns'
 
@@ -8,10 +9,9 @@ export let arrayToObject = _.curry((key, val, arr) =>
 )
 
 const defaultDisplay = prop => {
-  let propType = typeof prop
-  let fn = _.identity
+  let fn = val => val ? `${val}` : ''
 
-  switch (propType) {
+  switch (prop.bsonType) {
     case 'date':
       fn = date => format(date, 'MM/dd/yyyy KK:mm:ss bb')
       break
@@ -26,10 +26,4 @@ const defaultDisplay = prop => {
 
 const defaultDisplays = _.mapValues(defaultDisplay)
 
-export let addDisplays = (schemas, displays) => _.mapValues(_.flow(
-  defaultDisplays,
-  schema => {
-    _.assign(schema, displays[schema.collection])
-    return schema
-  }
-), schemas)
+export let addDefaultDisplays = _.mapValues(defaultDisplays)
