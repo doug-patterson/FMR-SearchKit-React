@@ -58,6 +58,7 @@ export default ({
 }) => {
   let UIComponents = _.defaults(DefaultUIComponents, ThemeComponents)
   schemas = addDefaultDisplays(schemas)
+  console.log({ schemas })
   let schema = schemas[collection]
   if (!schema) {
     return 'Schema not found'
