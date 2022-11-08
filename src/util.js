@@ -21,10 +21,10 @@ const defaultDisplay = prop => {
       fn = date => <span>{format(new Date(date), 'MM/dd/yyyy KK:mm:ss bb')}</span>
       break
     case 'object':
-      fn = defaultKeyValueDisplay
+      fn = _.constant('OBJECT')
       break
     case 'array':
-      fn = arr => <div>{_.map(defaultKeyValueDisplay, arr)}</div>
+      fn = _.constant("ARRAY")
       break
     default:
       break
