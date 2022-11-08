@@ -61,7 +61,7 @@ export default ({
   if (!schema) {
     return 'Schema not found'
   }
-  schema = defaultDisplays(schema)
+  schema = addDefaultDisplays(schema)
   storageKey = storageKey || collection
 
   let localStorageSearch =
