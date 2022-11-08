@@ -23,7 +23,7 @@ const defaultDisplay = prop => {
       fn = date => <span>{date ? format(new Date(date), 'MM/dd/yyyy KK:mm:ss bb') : ''}</span>
       break
     case 'object':
-      fn = defaultKeyValueDisplay
+      fn = arr => 'OBJECT'//defaultKeyValueDisplay
       break
     case 'array':
       fn = arr => 'ARRAY'// <div>{_.map(val => <div>{arrayValueDisplay(val)}</div>, arr)}</div>
