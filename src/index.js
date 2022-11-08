@@ -1,3 +1,3 @@
-import Search from './SearchLayout'
+import SearchLayout from './SearchLayout'
 
-export let SearchLayout = Search
+export default SearchLayout
