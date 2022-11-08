@@ -130,7 +130,7 @@ const renderCell = ({ row, field, schema, idx }) => {
 
   val = (typeof val === 'object') ? 'cannot display value' : val
 
-  return val
+  return 'test'
 }
 
 export default ({
