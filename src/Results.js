@@ -10,7 +10,6 @@ export default ({
   setSortDir,
   schema,
   collection,
-  displays,
   rows,
   resultsCount,
   pageSize,
@@ -29,7 +28,6 @@ export default ({
         setSortDir,
         collection,
         schema,
-        displays,
         rows,
         UIComponents
       }}

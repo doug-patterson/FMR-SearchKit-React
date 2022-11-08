@@ -2,26 +2,17 @@ import React from 'react'
 import _ from 'lodash/fp'
 import { mapIndexed } from './util'
 
-// it will be more composable to make the action an override on some field and then
-// get it in the right place on the card by ordering the includes. Right now the need
-// for the handling of the extra "action" prop is janky
-
-let DefaultCardBody = ({ row, include, displays, collection, UIComponents }) => (
+let DefaultCardBody = ({ row, include, schema, collection, UIComponents }) => (
   <>
     <UIComponents.CardHeader pad="small">{_.capitalize(row.type)}</UIComponents.CardHeader>
     <UIComponents.CardBody pad="small">
       <UIComponents.Grid columns="1fr">
         {_.map(
-          field => (
-            <div key={field}>
-              {(_.get(
-                field === 'content'
-                  ? [row.type, 'content']
-                  : [collection, field],
-                displays
-              ) || (x => `${x}`))(_.get(field === 'content' ? `content.content` : field, row), row)}
-            </div>
-          ),
+          field => _.get(`${collection}.properties.${field}.display`, schema) ? _.get(`${collection}.properties.${field}.display`, schema)(
+            _.get(field, row),
+            row,
+            idx
+          ) : _.get(field, row),
           include
         )}
       </UIComponents.Grid>
@@ -32,7 +23,7 @@ let DefaultCardBody = ({ row, include, displays, collection, UIComponents }) => 
 export default ({
   include,
   collection,
-  displays,
+  schema,
   rows,
   columns = `1fr 1fr`,
   action = _.noop,
@@ -48,7 +39,7 @@ export default ({
             rowIdx={idx}
             include={include}
             collection={collection}
-            displays={displays}
+            schema={schema}
             action={action}
           />
           <UIComponents.CardFooter

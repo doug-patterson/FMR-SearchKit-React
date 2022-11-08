@@ -1,7 +1,5 @@
-import SearchLayout from './SearchLayout'
+import Search from './SearchLayout'
 import { addDisplays } from './util'
 
-export default {
-  SearchLayout,
-  addDisplays
-}
+export let SearchLayout = Search
+export let addDisplays = displays

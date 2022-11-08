@@ -49,7 +49,6 @@ export default ({
   collection,
   initialSearch,
   initialResults = {},
-  displays,
   children,
   storageKey,
   searchVersion,
@@ -161,7 +160,7 @@ export default ({
                   'options',
                   _.find({ key: filter.key }, filterOptions)
                 )}
-                display={displays[collection][filter.field]}
+                display={schema[collection].properties[filter.field].display}
                 UIComponents={UIComponents}
               />
             )
@@ -194,7 +193,6 @@ export default ({
                 )(schema.properties),
               },
               collection,
-              displays,
               rows,
               resultsCount,
               pageSize,

@@ -123,7 +123,6 @@ export default ({
   setSortDir,
   schema,
   collection,
-  displays,
   rows,
   UIComponents
 }) => (
@@ -162,7 +161,7 @@ export default ({
               {_.map(
                 field => (
                   <UIComponents.TableCell key={field}>
-                    {_.get([collection, field], displays) ? _.get([collection, field], displays)(
+                    {_.get(`${collection}.properties.${field}.display`, schema) ? _.get(`${collection}.properties.${field}.display`, schema)(
                       _.get(field, row),
                       row,
                       idx
