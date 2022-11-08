@@ -8,7 +8,7 @@ let DefaultCardBody = ({ row, include, schema, collection, UIComponents }) => (
     <UIComponents.CardBody pad="small">
       <UIComponents.Grid columns="1fr">
         {_.map(
-          field => _.get(`${collection}.properties.${field}.display`, schema) ? _.get(`${collection}.properties.${field}.display`, schema)(
+          field => _.get(`properties.${field}.display`, schema) ? _.get(`properties.${field}.display`, schema)(
             _.get(field, row),
             row,
             idx

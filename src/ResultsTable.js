@@ -161,7 +161,7 @@ export default ({
               {_.map(
                 field => (
                   <UIComponents.TableCell key={field}>
-                    {_.get(`${collection}.properties.${field}.display`, schema) ? _.get(`${collection}.properties.${field}.display`, schema)(
+                    {_.get(`properties.${field}.display`, schema) ? _.get(`properties.${field}.display`, schema)(
                       _.get(field, row),
                       row,
                       idx

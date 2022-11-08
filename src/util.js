@@ -24,6 +24,6 @@ const defaultDisplay = prop => {
   return fn
 }
 
-const defaultDisplays = _.mapValues(defaultDisplay)
+const defaultDisplays = _.mapValues(val => ({ display: defaultDisplay(val), ...val }))
 
 export let addDefaultDisplays = _.mapValues(defaultDisplays)
