@@ -116,11 +116,19 @@ let HeaderMenu = ({
   )
 }
 
-const renderCell = ({ row, field, schema, idx }) => [_.get(`properties.${field}.display`, schema)(
-  _.get(field, row),
-  row,
-  idx
-)]
+const renderCell = ({ row, field, schema, idx }) => {
+  let display = _.get(`properties.${field}.display`, schema)(
+    _.get(field, row),
+    row,
+    idx
+  )
+  if (_.isObject(display)) {
+    console.error('DISPLAY RESULT IS OBJECT')
+    console.log(display)
+    return "FAIL"
+  }
+  return display
+}
 
 export default ({
   include,

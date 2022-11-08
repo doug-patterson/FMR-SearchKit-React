@@ -13,20 +13,20 @@ const defaultKeyValueDisplay = obj => <div>{mapValuesIndexed((v, k) => <div><spa
 const arrayValueDisplay = val => _.isObject(val) ? defaultKeyValueDisplay(val) : `${val}`
 
 const defaultDisplay = prop => {
-  let fn = val => 'nothing'//val ? <span>{`${val}`}</span> : <span>{''}</span>
+  let fn = val => val ? <span>{`${val}`}</span> : <span>{''}</span>
 
   switch (prop.bsonType) {
     case 'bool':
-      fn = bool => 'bool'//bool ? <span>{'Yes'}</span> : <span>{'No'}</span>
+      fn = bool => bool ? <span>{'Yes'}</span> : <span>{'No'}</span>
       break
     case 'date':
-      fn = date => 'date'//<span>{date ? format(new Date(date), 'MM/dd/yyyy KK:mm:ss bb') : ''}</span>
+      fn = date => <span>{date ? format(new Date(date), 'MM/dd/yyyy KK:mm:ss bb') : ''}</span>
       break
     case 'object':
-      fn = arr => 'OBJECT'//defaultKeyValueDisplay
+      fn = defaultKeyValueDisplay
       break
     case 'array':
-      fn = arr => 'ARRAY'// <div>{_.map(val => <div>{arrayValueDisplay(val)}</div>, arr)}</div>
+      fn = arr => <div>{_.map(val => <div>{arrayValueDisplay(val)}</div>, arr)}</div>
       break
     default:
       break
