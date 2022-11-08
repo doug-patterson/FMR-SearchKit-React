@@ -18,7 +18,7 @@ const defaultDisplay = prop => {
       fn = bool => bool ? <span>{'Yes'}</span> : <span>{'No'}</span>
       break
     case 'date':
-      fn = date => <span>{format(new Date(date), 'MM/dd/yyyy KK:mm:ss bb')}</span>
+      fn = date => <span>{date ? format(new Date(date), 'MM/dd/yyyy KK:mm:ss bb') : ''}</span>
       break
     case 'object':
       fn = defaultKeyValueDisplay
