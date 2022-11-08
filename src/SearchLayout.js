@@ -57,11 +57,11 @@ export default ({
   execute
 }) => {
   let UIComponents = _.defaults(DefaultUIComponents, ThemeComponents)
+  schemas = addDefaultDisplays(schemas)
   let schema = schemas[collection]
   if (!schema) {
     return 'Schema not found'
   }
-  schema = addDefaultDisplays(schema)
   storageKey = storageKey || collection
 
   let localStorageSearch =
@@ -150,8 +150,6 @@ export default ({
               <Component
                 key={filter.key}
                 onChange={patch => {
-                  console.log('ONCHANGE')
-                  console.log(patch)
                   updateFilter(idx)(patch)
                   setPage(1)
                 }}
@@ -161,7 +159,7 @@ export default ({
                   'options',
                   _.find({ key: filter.key }, filterOptions)
                 )}
-                display={schema[collection].properties[filter.field].display}
+                display={schema.properties[filter.field].display}
                 UIComponents={UIComponents}
               />
             )
