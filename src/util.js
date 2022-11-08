@@ -11,20 +11,20 @@ export let arrayToObject = _.curry((key, val, arr) =>
 const defaultKeyValueDisplay = obj => <div>{mapValuesIndexed((v, k) => <div><span>{k}</span>: <span>{`${v}`}</span></div>,  obj)}</div>
 
 const defaultDisplay = prop => {
-  let fn = val => val ? `${val}` : ''
+  let fn = val => val ? <span>`${val}`</span> : <span>{''}</span>
 
   switch (prop.bsonType) {
     case 'bool':
-      fn = _.constant('BOOL')//bool => bool ? <span>{'Yes'}</span> : <span>{'No'}</span>
+      fn = bool => bool ? <span>{'Yes'}</span> : <span>{'No'}</span>
       break
     case 'date':
-      fn = _.constant('DATE')//date => <span>{format(new Date(date), 'MM/dd/yyyy KK:mm:ss bb')}</span>
+      fn = date => <span>{format(new Date(date), 'MM/dd/yyyy KK:mm:ss bb')}</span>
       break
     case 'object':
-      fn = _.constant('OBJECT')
+      fn = defaultKeyValueDisplay
       break
     case 'array':
-      fn = _.constant("ARRAY")
+      fn = arr => <div>{_.map(defaultKeyValueDisplay, arr)}</div>
       break
     default:
       break
