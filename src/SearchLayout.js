@@ -2,7 +2,7 @@ import React from 'react'
 import * as DefaultUIComponents from './DefaultUIComponents'
 
 import _ from 'lodash/fp'
-import { mapIndexed, mapValuesIndexed, arrayToObject, addDefaultDisplays } from './util'
+import { mapIndexed, mapValuesIndexed, addDefaultDisplays } from './util'
 
 import BooleanFilter from './BooleanFilter'
 import Facet from './Facet'
@@ -54,15 +54,17 @@ export default ({
   searchVersion,
   UIComponents: ThemeComponents,
   schemas,
-  execute
+  execute,
+  overrides
 }) => {
   let UIComponents = _.defaults(DefaultUIComponents, ThemeComponents)
+
   schemas = addDefaultDisplays(schemas)
-  console.log({ schemas })
   let schema = schemas[collection]
   if (!schema) {
     return 'Schema not found'
   }
+
   storageKey = storageKey || collection
 
   let localStorageSearch =
@@ -99,46 +101,55 @@ export default ({
   )
   let [rows, setRows] = React.useState(initialResults?.results || [])
   let [resultsCount, setResultsCount] = React.useState(initialResults?.resultsCount || '')
-  let updateFilter = updateFilters(filters, setFilters)
+
+  let runSearch = async () => {
+    let search = {
+      ...initialSearch,
+      filters,
+      collection,
+      sortField,
+      sortDir,
+      include,
+      page,
+      pageSize,
+    }
+
+    localStorage.setItem(
+      storageKey,
+      JSON.stringify({
+        searchVersion,
+        search,
+      })
+    )
+
+    let { results, resultsCount, ...filterResults } = await execute({
+        ...search,
+        include: _.concat(include, initialSearch.omitFromResults),
+      })
+
+    setRows(results)
+    setResultsCount(_.get('count', _.first(resultsCount)) || 0)
+    let newFilterOptions = _.map(
+      ({ key }) => ({
+        key,
+        options: filterResults[key],
+      }),
+      filters
+    )
+    setFilterOptions(newFilterOptions)
+  }
 
   React.useEffect(() => {
-    let runSearch = async () => {
-      let search = {
-        collection,
-        filters,
-        sortField,
-        sortDir,
-        include,
-        page,
-        pageSize,
-        lookup: initialSearch.lookup,
-      }
-  
-      localStorage.setItem(
-        storageKey,
-        JSON.stringify({
-          searchVersion,
-          search,
-        })
-      )
-  
-      let { results, resultsCount, ...filterResults } = await execute({
-          ...search,
-          include: _.concat(include, initialSearch.omitFromResults),
-        })
-      setRows(results)
-      let newFilterOptions = _.map(
-        ({ key }) => ({
-          key,
-          options: filterResults[key],
-        }),
-        filters
-      )
-      setResultsCount(_.get('count', _.first(resultsCount)) || 0)
-      setFilterOptions(newFilterOptions)
-    }
     runSearch()
-  }, [sortField, sortDir, include, page, pageSize, filters])
+  }, [
+    filters,
+    collection,
+    sortField,
+    sortDir,
+    include,
+    page,
+    pageSize
+  ])
 
   return (
     <UIComponents.Box>
@@ -150,7 +161,8 @@ export default ({
             return (
               <Component
                 key={filter.key}
-                onChange={patch => {
+                onChange={async patch => {
+                  let updateFilter = updateFilters(filters, setFilters)
                   updateFilter(idx)(patch)
                   setPage(1)
                 }}

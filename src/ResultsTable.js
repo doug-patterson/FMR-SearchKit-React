@@ -136,7 +136,7 @@ export default ({
   UIComponents
 }) => (
   <UIComponents.Box style={{ width: '100%', overflowX: 'auto' }}>
-    <UIComponents.Table className="results-table" key={_.uniqueId()}>
+    <UIComponents.Table className="results-table">
       <UIComponents.TableHeader style={{ borderTop: '1px solid #eee' }}>
         <UIComponents.TableRow elevation="medium">
           {_.map(
@@ -163,13 +163,13 @@ export default ({
         {mapIndexed(
           (row, idx) => (
             <UIComponents.TableRow
-              key={_.uniqueId()}
+              key={row._id}
               id={row._id}
               style={idx % 2 === 0 ? { backgroundColor: '#eee' } : {}}
             >
               {_.map(
                 field => (
-                  <UIComponents.TableCell key={field}>
+                  <UIComponents.TableCell key={_.uniqueId()}>
                     {renderCell({ row, field, schema })}
                   </UIComponents.TableCell>
                 ),
