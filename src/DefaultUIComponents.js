@@ -68,7 +68,7 @@ export let Menu = ({ label, open, items }) => {
       style={{
         position: 'absolute'
       }}
-    >{_.map(item => <button onClick={item.onClick} className="fmr-button">{item.label}</button>, items)}</div>}
+    >{_.map(item => <button key={item.label} onClick={item.onClick} className="fmr-button">{item.label}</button>, items)}</div>}
   </div>
 }
 
