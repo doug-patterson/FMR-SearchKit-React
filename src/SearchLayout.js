@@ -55,7 +55,6 @@ export default ({
   UIComponents: ThemeComponents,
   schemas,
   execute,
-  overrides
 }) => {
   let UIComponents = _.defaults(DefaultUIComponents, ThemeComponents)
 
@@ -101,6 +100,7 @@ export default ({
   )
   let [rows, setRows] = React.useState(initialResults?.results || [])
   let [resultsCount, setResultsCount] = React.useState(initialResults?.resultsCount || '')
+  let [chartData, setChartData] = React.useState(initialResults.charts)
 
   let runSearch = async () => {
     let search = {
@@ -122,7 +122,7 @@ export default ({
       })
     )
 
-    let { results, resultsCount, ...filterResults } = await execute({
+    let { results, resultsCount, charts, ...filterResults } = await execute({
         ...search,
         include: _.concat(include, initialSearch.omitFromResults),
       })
@@ -137,6 +137,7 @@ export default ({
       filters
     )
     setFilterOptions(newFilterOptions)
+    setChartData(charts)
   }
 
   React.useEffect(() => {
@@ -172,7 +173,7 @@ export default ({
                   'options',
                   _.find({ key: filter.key }, filterOptions)
                 )}
-                display={schema.properties[filter.field].display}
+                display={console.log({ schema, filter}) || schema.properties[filter.field].display}
                 UIComponents={UIComponents}
               />
             )
@@ -190,6 +191,13 @@ export default ({
           >Reset Search</UIComponents.Button>
         </UIComponents.Box>
         <UIComponents.Box style={{ overflowY: 'scroll', paddingBottom: 120 }}>
+          <UIComponents.Box>
+            {_.map(chart => {
+              let Component = UIComponents[_.upperFirst(chart.type)] || _.constant(JSON.stringify(chart))
+
+              return <Component key={chart.key} {...chart} data={chartData[chart.key]} />
+            }, initialSearch.charts)}
+          </UIComponents.Box>
           <Results
             {...{
               include: _.without(initialSearch.omitFromResults, include),

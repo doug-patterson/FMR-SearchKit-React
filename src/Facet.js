@@ -18,11 +18,9 @@ export default ({ title, options, values, onChange, display, UIComponents }) => 
                 label={lookup ? display({ ...lookup, _id }) : _.startCase(_id)}
                 checked={checked}
                 onChange={checked => {
-                  console.log({ values })
                   let newValues = checked
                     ? _.concat(values, _id)
                     : _.without([_id], values)
-                  console.log({ newValues })
                   onChange({ values: newValues })
                 }}
               />
