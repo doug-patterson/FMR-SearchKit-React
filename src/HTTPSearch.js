@@ -1,8 +1,8 @@
 import React from 'react'
-import { SearchLayoutStateless } from '../fmr-searchkit-react-temp/src'
+import SearchLayoutStateless from './SearchLayoutStateless'
 import _ from 'lodash/fp'
 
-import overrides from './overrides'
+import overrides from '../../app/overrides'
 
 export default props => {
   

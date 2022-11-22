@@ -1,4 +1,4 @@
-import HTTPSearch from '../fmr-searchkit-react-temp/src/HTTPSearch'
+import HTTPSearch from './HTTPSearch'
 import { cookies } from 'next/headers'
 import _ from 'lodash/fp'
 
