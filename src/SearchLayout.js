@@ -195,7 +195,7 @@ export default ({
             {_.map(chart => {
               let Component = UIComponents[_.upperFirst(chart.type)] || _.constant(JSON.stringify(chart))
 
-              return <Component key={chart.key} {...chart} data={chartData[chart.key]} />
+              return <div style={{ height: initialSearch.chartHeight || 320 }}><Component key={chart.key} {...chart} data={chartData[chart.key]} /></div>
             }, initialSearch.charts)}
           </UIComponents.Box>
           <Results
