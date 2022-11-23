@@ -9,7 +9,9 @@ export default async props => {
 
   const initialSearch = props.initialSearch ? { ...props.initialSearch, includeSchema: true } : { collection: props.collection, includeSchema: true }
 
-  const initialResponse = await fetch('http://localhost:3030/search', {
+  // we should check a flag for not running data for the charts
+  // since some chart solutions aren't server renderable
+  const initialResponse = await fetch(props.url || 'http://localhost:3030/search', {
     method: 'post',
     headers: {
       'Content-Type': 'application/json',

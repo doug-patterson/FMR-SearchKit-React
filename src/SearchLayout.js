@@ -2,36 +2,14 @@ import React from 'react'
 import * as DefaultUIComponents from './DefaultUIComponents'
 
 import _ from 'lodash/fp'
-import { mapIndexed, mapValuesIndexed, addDefaultDisplays } from './util'
+import { addDefaultDisplays } from './util'
 
-import BooleanFilter from './BooleanFilter'
-import Facet from './Facet'
-import NumericFilter from './NumericFilter'
+import DefaultLayout from './DefaultLayout'
 import Results from './Results'
+import Charts from './Charts'
+import Filters from './Filters'
 
-let NoComponent = () => 'no filter found'
-let Hidden = () => ''
-let getFilterComponent = type =>
-  ({
-    none: NoComponent,
-    facet: Facet,
-    arrayElementPropFacet: Facet,
-    hidden: Hidden,
-    numeric: NumericFilter,
-    boolean: BooleanFilter,
-    arraySize: NumericFilter,
-  }[type || 'none'])
-
-let updateFilters = (filters, setFilters) => idx => patch =>
-  setFilters([
-    ..._.slice(0, idx, filters),
-    mapValuesIndexed(
-      (v, k) => (_.has(k, patch) ? _.get(k, patch) : v),
-      _.clone(filters[idx])
-    ),
-    ..._.slice(idx + 1, Infinity, filters),
-  ])
-
+// move local storage handling up in the component hierarchy
 let getLocalStorageSearch = (storageKey, searchVersion) => {
   let item = localStorage.getItem(storageKey)
   let search
@@ -51,12 +29,15 @@ export default ({
   initialResults = {},
   children,
   storageKey,
-  searchVersion,
+  //searchVersion,
   UIComponents: ThemeComponents,
   schemas,
   execute,
+  layoutStyle
 }) => {
   let UIComponents = _.defaults(DefaultUIComponents, ThemeComponents)
+
+  let Layout = ({ children }) => <DefaultLayout style={layoutStyle}>{children}</DefaultLayout>
 
   schemas = addDefaultDisplays(schemas)
   let schema = schemas[collection]
@@ -66,67 +47,29 @@ export default ({
 
   storageKey = storageKey || collection
 
-  let localStorageSearch =
-    _.isNumber(searchVersion) && getLocalStorageSearch(storageKey, searchVersion)
-
-  let [sortField, setSortField] = React.useState(
-    _.get('sortField', localStorageSearch || initialSearch) || 'createdAt'
-  )
-  let [sortDir, setSortDir] = React.useState(
-    _.get('sortDir', localStorageSearch || initialSearch) || 'desc'
-  )
-  let [include, setInclude] = React.useState(
-    _.get(
-      'include',
-      localStorageSearch || initialSearch
-    ) || _.keys(schema.properties)
-  )
-
-  let [page, setPage] = React.useState(_.get('page', initialSearch) || 1)
-  let [pageSize, setPageSize] = React.useState(
-    _.get('pageSize', localStorageSearch || initialSearch) || 20
-  )
-  let [filters, setFilters] = React.useState(
-    (localStorageSearch || initialSearch).filters
-  )
+  let [search, setSearch] = React.useState(initialSearch)
   let [filterOptions, setFilterOptions] = React.useState(
     _.map(
       ({ key }) => ({
         key,
         options: initialResults[key],
       }),
-      filters
+      initialSearch.filters
     ) || _.map(_.pick('key'), initialSearch.filters)
   )
   let [rows, setRows] = React.useState(initialResults?.results || [])
   let [resultsCount, setResultsCount] = React.useState(initialResults?.resultsCount || '')
   let [chartData, setChartData] = React.useState(initialResults.charts)
 
-  let runSearch = async () => {
-    let search = {
-      ...initialSearch,
-      filters,
-      collection,
-      sortField,
-      sortDir,
-      include,
-      page,
-      pageSize,
+  let runSearch = async patch => {
+    let updatedSearch = {
+      ...search,
+      ...patch
     }
 
-    localStorage.setItem(
-      storageKey,
-      JSON.stringify({
-        searchVersion,
-        search,
-      })
-    )
+    let { results, resultsCount, charts, ...filterResults } = await execute(updatedSearch)
 
-    let { results, resultsCount, charts, ...filterResults } = await execute({
-        ...search,
-        include: _.concat(include, initialSearch.omitFromResults),
-      })
-
+    setSearch(updatedSearch)
     setRows(results)
     setResultsCount(_.get('count', _.first(resultsCount)) || 0)
     let newFilterOptions = _.map(
@@ -134,88 +77,38 @@ export default ({
         key,
         options: filterResults[key],
       }),
-      filters
+      search.filters
     )
     setFilterOptions(newFilterOptions)
     setChartData(charts)
   }
 
-  React.useEffect(() => {
-    runSearch()
-  }, [
-    filters,
-    collection,
-    sortField,
-    sortDir,
-    include,
-    page,
-    pageSize
-  ])
-
   return (
     <UIComponents.Box>
-      <UIComponents.Grid columns="1fr 5fr" gap={10}>
-        <UIComponents.Box>
-          {children}
-          {mapIndexed((filter, idx) => {
-            let Component = getFilterComponent(filter.type)
-            return (
-              <Component
-                key={filter.key}
-                onChange={async patch => {
-                  let updateFilter = updateFilters(filters, setFilters)
-                  updateFilter(idx)(patch)
-                  setPage(1)
-                }}
-                title={filter.key}
-                {...filter}
-                options={_.get(
-                  'options',
-                  _.find({ key: filter.key }, filterOptions)
-                )}
-                display={console.log({ schema, filter}) || schema.properties[filter.field].display}
-                UIComponents={UIComponents}
-              />
-            )
-          }, filters)}
-          <UIComponents.Button
-            onClick={() => {
-              setSortField(initialSearch.sortField)
-              setSortDir(initialSearch.sortDir)
-              setFilters(initialSearch.filters)
-              setPageSize(initialSearch.pageSize)
-              setInclude(
-                _.get('include', initialSearch) || _.keys(schema.properties)
-              )
-            }}
-          >Reset Search</UIComponents.Button>
-        </UIComponents.Box>
-        <UIComponents.Box style={{ overflowY: 'scroll', paddingBottom: 120 }}>
-          <UIComponents.Box>
-            {_.map(chart => {
-              let Component = UIComponents[_.upperFirst(chart.type)] || _.constant(JSON.stringify(chart))
-
-              return <div style={{ height: initialSearch.chartHeight || 320 }}><Component key={chart.key} {...chart} data={chartData[chart.key]} /></div>
-            }, initialSearch.charts)}
-          </UIComponents.Box>
-          <Results
-            {...{
-              include: _.without(initialSearch.omitFromResults, include),
-              setInclude,
-              setSortField,
-              setSortDir,
-              schema: _.update('properties', _.omit(initialSearch.omitFromResults), schema),
-              rows,
-              resultsCount,
-              pageSize,
-              setPageSize,
-              page,
-              setPage,
-              UIComponents
-            }}
-          />
-        </UIComponents.Box>
-      </UIComponents.Grid>
+      <Layout>
+        <Filters
+          filters={search.filters}
+          filterOptions={filterOptions}
+          runSearch={runSearch}
+          schema={schema}
+          UIComponents={UIComponents}
+        >{children}</Filters>
+        <Charts
+          initialSearch={initialSearch}
+          UIComponents={UIComponents}
+          chartData={chartData}
+        />
+        <Results
+          include={_.keys(schema.properties)}
+          schema={_.update('properties', _.omit(initialSearch.omitFromResults), schema)}
+          rows={rows}
+          resultsCount={resultsCount}
+          pageSize={search.pageSize}
+          page={search.page}
+          UIComponents={UIComponents}
+          runSearch={runSearch}
+        />
+      </Layout>
     </UIComponents.Box>
   )
 }

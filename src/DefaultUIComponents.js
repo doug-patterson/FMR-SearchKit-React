@@ -99,7 +99,7 @@ export let DateLineSingle = ({ data, x, y }) => <Line
   data={data}
   width={960}
   height={320}
-  curve="natural"
+  curve="linear"
   colors={{ scheme: 'paired' }}
   margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
   xScale={{ type: 'point' }} // need to figure point v linear somehow

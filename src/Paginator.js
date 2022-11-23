@@ -9,7 +9,7 @@ export default ({ page, setPage, pageSize, resultsCount, UIComponents }) => {
       <UIComponents.NavItem
         disabled={page === 1}
         onClick={page > 1 ? () => setPage(1) : _.noop}
-        icon={<UIComponents.IconBack  />}
+        icon={<UIComponents.IconBack />}
       />
       <UIComponents.NavItem
         disabled={page === 1}
