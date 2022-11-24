@@ -16,7 +16,7 @@ export default ({ page, setPage, pageSize, resultsCount, UIComponents }) => {
         onClick={page > 1 ? () => setPage(page - 1) : _.noop}
         icon={<UIComponents.IconPrevious />}
       />
-      <div>
+      <div style={{ paddingTop: 6 }}>
         {page} of {totalPages}
       </div>
       <UIComponents.NavItem

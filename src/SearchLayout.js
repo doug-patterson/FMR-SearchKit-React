@@ -58,7 +58,7 @@ export default ({
     ) || _.map(_.pick('key'), initialSearch.filters)
   )
   let [rows, setRows] = React.useState(initialResults?.results || [])
-  let [resultsCount, setResultsCount] = React.useState(initialResults?.resultsCount || '')
+  let [resultsCount, setResultsCount] = React.useState(initialResults?.resultsCount?.count || 0)
   let [chartData, setChartData] = React.useState(initialResults.charts)
 
   let runSearch = async patch => {
