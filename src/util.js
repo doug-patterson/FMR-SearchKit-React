@@ -26,7 +26,7 @@ const defaultDisplay = prop => {
       fn = defaultKeyValueDisplay
       break
     case 'array':
-      fn = arr => <div>{_.map(val => <div key={val._id}>{arrayValueDisplay(val)}</div>, arr)}</div>
+      fn = arr => <div>{_.map(val => <div key={val?._id}>{arrayValueDisplay(val)}</div>, arr)}</div>
       break
     default:
       break

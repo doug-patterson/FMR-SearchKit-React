@@ -67,11 +67,12 @@ export default ({
       ...patch
     }
 
-    let { results, resultsCount, charts, ...filterResults } = await execute(updatedSearch)
+    let { results, resultsCount: newResultsCount, charts, ...filterResults } = await execute(updatedSearch)
 
+
+    setResultsCount(_.get('count', newResultsCount) || 0)
     setSearch(updatedSearch)
     setRows(results)
-    setResultsCount(_.get('count', _.first(resultsCount)) || 0)
     let newFilterOptions = _.map(
       ({ key }) => ({
         key,
@@ -102,7 +103,7 @@ export default ({
           include={_.keys(schema.properties)}
           schema={_.update('properties', _.omit(initialSearch.omitFromResults), schema)}
           rows={rows}
-          resultsCount={resultsCount}
+          resultsCount={resultsCount || 0}
           pageSize={search.pageSize}
           page={search.page}
           UIComponents={UIComponents}
