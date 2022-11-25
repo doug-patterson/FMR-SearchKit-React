@@ -5,6 +5,7 @@ import _ from 'lodash/fp'
 import { ResponsiveLine } from '@nivo/line'
 import { ResponsiveCalendar } from '@nivo/calendar'
 import { ResponsivePie } from '@nivo/pie'
+import { flattenObject } from './util'
 
 export let DateLineSingle = ({ data, x, y }) => <ResponsiveLine
 data={data}
@@ -75,156 +76,182 @@ legends={[
 />
 
 export let QuantityByPeriodCalendar = ({ data, x, y }) => <ResponsiveCalendar
-data={data}
-from={_.flow(_.first, _.get('day'))(data)}
-to={_.flow(_.last, _.get('day'))(data)}
-emptyColor="#eeeeee"
-colors={[ '#61cdbb', '#97e3d5', '#e8c1a0', '#f47560' ]}
-margin={{ top: 0, right: 40, bottom: 0, left: 40 }}
-yearSpacing={40}
-monthBorderColor="#ffffff"
-dayBorderWidth={2}
-dayBorderColor="#ffffff"
-legends={[
-    {
-        anchor: 'bottom-right',
-        direction: 'row',
-        translateY: 36,
-        itemCount: 4,
-        itemWidth: 42,
-        itemHeight: 36,
-        itemsSpacing: 14,
-        itemDirection: 'right-to-left'
-    }
-]}
+  data={data}
+  from={_.flow(_.first, _.get('day'))(data)}
+  to={_.flow(_.last, _.get('day'))(data)}
+  emptyColor="#eeeeee"
+  colors={[ '#61cdbb', '#97e3d5', '#e8c1a0', '#f47560' ]}
+  margin={{ top: 0, right: 40, bottom: 0, left: 40 }}
+  yearSpacing={40}
+  monthBorderColor="#ffffff"
+  dayBorderWidth={2}
+  dayBorderColor="#ffffff"
+  legends={[
+      {
+          anchor: 'bottom-right',
+          direction: 'row',
+          translateY: 36,
+          itemCount: 4,
+          itemWidth: 42,
+          itemHeight: 36,
+          itemsSpacing: 14,
+          itemDirection: 'right-to-left'
+      }
+  ]}
 />
 
-export let TopNPie = ({ data }) => <ResponsivePie
-data={data}
-margin={{ top: 0, right: 80, bottom: 80, left: 0 }}
-innerRadius={0.5}
-padAngle={0.7}
-cornerRadius={3}
-activeOuterRadiusOffset={8}
-borderWidth={1}
-borderColor={{
-    from: 'color',
-    modifiers: [
-        [
-            'darker',
-            0.2
-        ]
-    ]
-}}
-arcLinkLabelsSkipAngle={10}
-arcLinkLabelsTextColor="#333333"
-arcLinkLabelsThickness={2}
-arcLinkLabelsColor={{ from: 'color' }}
-arcLabelsSkipAngle={10}
-arcLabelsTextColor={{
-    from: 'color',
-    modifiers: [
-        [
-            'darker',
-            2
-        ]
-    ]
-}}
-defs={[
-    {
-        id: 'dots',
-        type: 'patternDots',
-        background: 'inherit',
-        color: 'rgba(255, 255, 255, 0.3)',
-        size: 4,
-        padding: 1,
-        stagger: true
-    },
-    {
-        id: 'lines',
-        type: 'patternLines',
-        background: 'inherit',
-        color: 'rgba(255, 255, 255, 0.3)',
-        rotation: -45,
-        lineWidth: 6,
-        spacing: 10
+let uniqueIdMaker = ids => label => {
+  if (!ids[label]) {
+    ids[label] = 1
+    return label
+  } else {
+    ids[label]++
+    return `${label} (${_.size(ids[label])})`
+  }
+}
+
+export let TopNPie = ({ data, chartKey, field, schema }) => {
+  let getId = uniqueIdMaker({})
+
+  data = _.map(datum => {
+    let display = _.get(['properties', chartKey, 'properties', field, 'display'], schema)
+    let label =  (datum.lookup && display) ? display(datum) : datum.label
+    let id = label//getId(label)
+
+    return  {
+      ..._.omit('lookup', datum),
+      id,
+      label: id
     }
-]}
-fill={[
-    {
-        match: {
-            id: 'ruby'
+  }, data)
+
+  return <ResponsivePie
+    data={data}
+    margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
+    innerRadius={0.5}
+    padAngle={0.7}
+    cornerRadius={3}
+    activeOuterRadiusOffset={8}
+    borderWidth={1}
+    borderColor={{
+        from: 'color',
+        modifiers: [
+            [
+                'darker',
+                0.2
+            ]
+        ]
+    }}
+    arcLinkLabelsSkipAngle={10}
+    arcLinkLabelsTextColor="#333333"
+    arcLinkLabelsThickness={2}
+    arcLinkLabelsColor={{ from: 'color' }}
+    arcLabelsSkipAngle={10}
+    arcLabelsTextColor={{
+        from: 'color',
+        modifiers: [
+            [
+                'darker',
+                2
+            ]
+        ]
+    }}
+    defs={[
+        {
+            id: 'dots',
+            type: 'patternDots',
+            background: 'inherit',
+            color: 'rgba(255, 255, 255, 0.3)',
+            size: 4,
+            padding: 1,
+            stagger: true
         },
-        id: 'dots'
-    },
-    {
-        match: {
-            id: 'c'
+        {
+            id: 'lines',
+            type: 'patternLines',
+            background: 'inherit',
+            color: 'rgba(255, 255, 255, 0.3)',
+            rotation: -45,
+            lineWidth: 6,
+            spacing: 10
+        }
+    ]}
+    fill={[
+        {
+            match: {
+                id: 'ruby'
+            },
+            id: 'dots'
         },
-        id: 'dots'
-    },
-    {
-        match: {
-            id: 'go'
+        {
+            match: {
+                id: 'c'
+            },
+            id: 'dots'
         },
-        id: 'dots'
-    },
-    {
-        match: {
-            id: 'python'
+        {
+            match: {
+                id: 'go'
+            },
+            id: 'dots'
         },
-        id: 'dots'
-    },
-    {
-        match: {
-            id: 'scala'
+        {
+            match: {
+                id: 'python'
+            },
+            id: 'dots'
         },
-        id: 'lines'
-    },
-    {
-        match: {
-            id: 'lisp'
+        {
+            match: {
+                id: 'scala'
+            },
+            id: 'lines'
         },
-        id: 'lines'
-    },
-    {
-        match: {
-            id: 'elixir'
+        {
+            match: {
+                id: 'lisp'
+            },
+            id: 'lines'
         },
-        id: 'lines'
-    },
-    {
-        match: {
-            id: 'javascript'
+        {
+            match: {
+                id: 'elixir'
+            },
+            id: 'lines'
         },
-        id: 'lines'
-    }
-]}
-legends={[
-    {
-        anchor: 'right',
-        direction: 'column',
-        justify: false,
-        translateX: 0,
-        translateY: 56,
-        itemsSpacing: 0,
-        itemWidth: 100,
-        itemHeight: 18,
-        itemTextColor: '#999',
-        itemDirection: 'left-to-right',
-        itemOpacity: 1,
-        symbolSize: 18,
-        symbolShape: 'circle',
-        effects: [
-            {
-                on: 'hover',
-                style: {
-                    itemTextColor: '#000'
+        {
+            match: {
+                id: 'javascript'
+            },
+            id: 'lines'
+        }
+    ]}
+    legends={[
+        {
+            anchor: 'right',
+            direction: 'column',
+            justify: false,
+            translateX: 0,
+            translateY: 56,
+            itemsSpacing: 0,
+            itemWidth: 100,
+            itemHeight: 18,
+            itemTextColor: '#999',
+            itemDirection: 'left-to-right',
+            itemOpacity: 1,
+            symbolSize: 18,
+            symbolShape: 'circle',
+            effects: [
+                {
+                    on: 'hover',
+                    style: {
+                        itemTextColor: '#000'
+                    }
                 }
-            }
-        ]
-    }
-]}
-/>
+            ]
+        }
+    ]}
+  />
+}
 
 

@@ -98,6 +98,7 @@ export default ({
           initialSearch={initialSearch}
           UIComponents={UIComponents}
           chartData={chartData}
+          schema={_.update('properties', _.omit(initialSearch.omitFromResults), schema)}
         />
         <Results
           include={_.keys(schema.properties)}

@@ -29,7 +29,7 @@ export default props => {
 
   if (override) {
     for (let prop in override.properties) {
-      Object.assign(props.schemas[props.collection].properties[prop], override.properties[prop])
+      props.schemas = _.update(`${props.collection}.properties.${prop}`, field => ({ ...field, ...override.properties[prop] }), props.schemas)
     }
   }
 
