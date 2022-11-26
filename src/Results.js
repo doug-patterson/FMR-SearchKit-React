@@ -22,7 +22,7 @@ export default ({
     <UIComponents.Box>
       <ResultsComponent
         {...{
-          include,
+          include: include || _.keys(schema.properties),
           setInclude: newInclude => runSearch({ include: newInclude, page: 1 }),
           setSortField: newSortField => runSearch({ sortField: newSortField, page: 1}),
           setSortDir: newSortDir => runSearch({ sortDir: newSortDir, page: 1}),
