@@ -101,7 +101,7 @@ export default ({
           schema={_.update('properties', _.omit(initialSearch.omitFromResults), schema)}
         />
         <Results
-          include={_.keys(schema.properties)}
+          include={search.include}
           schema={_.update('properties', _.omit(initialSearch.omitFromResults), schema)}
           rows={rows}
           resultsCount={resultsCount || 0}

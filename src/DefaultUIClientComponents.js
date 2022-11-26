@@ -116,7 +116,7 @@ export let TopNPie = ({ data, chartKey, field, schema }) => {
   data = _.map(datum => {
     let display = _.get(['properties', chartKey, 'properties', field, 'display'], schema)
     let label =  (datum.lookup && display) ? display(datum) : datum.label
-    let id = label//getId(label)
+    let id = getId(label)
 
     return  {
       ..._.omit('lookup', datum),
