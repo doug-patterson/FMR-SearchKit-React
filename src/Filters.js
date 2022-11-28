@@ -35,9 +35,6 @@ export default ({ children, filters, filterOptions, schema, UIComponents, runSea
   <div key={_.join(',', _.keys(schema.properties))} style={{ gridArea: 'filters' }}>
     {children}
     {mapIndexed((filter, idx) => {
-      console.log("RENDER FILTER")
-      console.log(schema.properties)
-      console.log({ fuckingFilterField: filter.field })
       let Component = getFilterComponent(filter.type)
       return (
         <Component
