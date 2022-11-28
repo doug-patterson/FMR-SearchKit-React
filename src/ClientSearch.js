@@ -1,41 +1,42 @@
-'use client';
+'use client'
 
 import React from 'react'
 import SearchLayout from './SearchLayout'
-import app from '../../feathersClient'
+import getApp, { getSchemas } from '../../feathersClient'
 import _ from 'lodash/fp'
 import overrides from '../../app/overrides'
 
-// it isn't actually necessary to always do this, is it? we should have a system,
-// probably with a React hook, where we can re-use the feathers client on the front end
-let authenticate = async (accessToken, setAuthenticated) => {
-  const { user } = await app.service('authentication').create({ strategy: 'jwt', accessToken })
-  if (user) {
-    setAuthenticated(true)
+let initApp = async (setApp, setInitialResults, initialSearch) => {
+  let app = await getApp()
+  if (setInitialResults) {
+    setInitialResults(await app.service('search').create(initialSearch))
   }
+  setApp(app)
+  // handle localStorage search here
 }
 
-export default props => {
-  let [authenticated, setAuthenticated] = React.useState(false)
-  // need to authenticate before passing this into the SearchLayout - use props.jwt
-  const execute = (...args) => app.service('search').create(...args)
-  
-  React.useEffect(() => {
-    authenticate(props.jwt, setAuthenticated)
-  }, [])
-
+export default (props) => {
+  let [app, setApp] = React.useState(null)
+  let schemas = props.schemas || getSchemas()
+  let [initialResults, setInitialResults] = React.useState(null)
 
   let override = overrides[props.collection]
 
   if (override) {
     for (let prop in override.properties) {
-      props.schemas = _.update(`${props.collection}.properties.${prop}`, field => ({ ...field, ...override.properties[prop] }), props.schemas)
+      schemas = _.update(`${props.collection}.properties.${prop}`, field => ({ ...field, ...override.properties[prop] }), schemas)
     }
   }
 
-  return authenticated && <SearchLayout
-    execute={execute}
-    initialSearch={{ collection: props.collection }}
+  React.useEffect(() => {
+    initApp(setApp, props.runOnMount ? setInitialResults : null, props.initialSearch)
+  }, [])
+
+  return app && <SearchLayout
+    execute={(...args) => app.service('search').create(...args)}
+    initialSearch={{ collection: props?.collection}}
     {...props}
+    {...(initialResults ? { initialResults } : {})}
+    schemas={schemas}
   />
-} 
+}

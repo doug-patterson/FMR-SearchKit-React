@@ -165,7 +165,7 @@ export let DateLineSingle = ({ data, x, y }) => <Line
   ]}
 />
 
-export let QuantityByPeriodCalendar = ({ data, x, y }) => console.log({ data, x, y }) || <Calendar
+export let QuantityByPeriodCalendar = ({ data, x, y }) => <Calendar
   data={data}
   width={960}
   height={320}

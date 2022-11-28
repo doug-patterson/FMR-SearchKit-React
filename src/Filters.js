@@ -32,9 +32,12 @@ let updateFilters = filters => idx => patch =>
 
 
 export default ({ children, filters, filterOptions, schema, UIComponents, runSearch }) => 
-  <div style={{ gridArea: 'filters' }}>
+  <div key={_.join(',', _.keys(schema.properties))} style={{ gridArea: 'filters' }}>
     {children}
     {mapIndexed((filter, idx) => {
+      console.log("RENDER FILTER")
+      console.log(schema.properties)
+      console.log({ fuckingFilterField: filter.field })
       let Component = getFilterComponent(filter.type)
       return (
         <Component
@@ -49,7 +52,7 @@ export default ({ children, filters, filterOptions, schema, UIComponents, runSea
             'options',
             _.find({ key: filter.key }, filterOptions)
           )}
-          display={filter.prop ? schema.properties[filter.field].items.properties[filter.prop].display : schema.properties[filter.field].display}
+          display={filter.prop ? schema.properties[filter.field].items.properties[filter.prop].display : schema.properties[filter.field]?.display}
           UIComponents={UIComponents}
         />
       )

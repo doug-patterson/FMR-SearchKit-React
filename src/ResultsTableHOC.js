@@ -170,7 +170,7 @@ const Component = ({
             >
               {_.map(
                 field => (
-                  <UIComponents.TableCell>
+                  <UIComponents.TableCell key={field}>
                     {renderCell({ row, field, schema })}
                   </UIComponents.TableCell>
                 ),
