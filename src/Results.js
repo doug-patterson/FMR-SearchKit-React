@@ -8,44 +8,42 @@ import _ from 'lodash/fp'
 
 export default ({
   include,
-  setInclude,
-  setSortField,
-  setSortDir,
+  runSearch,
   schema,
   rows,
   resultsCount,
   pageSize,
-  setPageSize,
   page = 1,
-  setPage,
   ResultsComponent = ResultsTable,
   stateless,
   UIComponents
 }) => (
-  <UIComponents.Box>
-    <ResultsComponent
-      {...{
-        include,
-        setInclude,
-        setSortField,
-        setSortDir,
-        schema,
-        rows,
-        UIComponents
-      }}
-    />
-    <UIComponents.Grid
-      columns="auto 1fr auto"
-      style={{ padding: 10, backgroundColor: '#f8f8f8' }}
-    >
-      {stateless ? <div /> : <UIComponents.Select
-        options={[10, 20, 50, 100]}
-        value={pageSize}
-        onChange={option => setPageSize(_.toNumber(option))}
-        style={{ backgroundColor: 'white' }}
-      />}
-      <div />
-      {stateless ? <div /> : <Paginator {...{ page, setPage, resultsCount, pageSize, UIComponents }} />}
-    </UIComponents.Grid>
-  </UIComponents.Box>
+  <div style={{ gridArea: 'results' }}>
+    <UIComponents.Box>
+      <ResultsComponent
+        {...{
+          include,
+          setInclude: newInclude => runSearch({ include: newInclude, page: 1 }),
+          setSortField: newSortField => runSearch({ sortField: newSortField, page: 1}),
+          setSortDir: newSortDir => runSearch({ sortDir: newSortDir, page: 1}),
+          schema,
+          rows,
+          UIComponents
+        }}
+      />
+      <UIComponents.Grid
+        columns="auto 1fr auto"
+        style={{ padding: 10, backgroundColor: '#f8f8f8' }}
+      >
+        {stateless ? <div /> : <UIComponents.Select
+          options={[10, 20, 50, 100]}
+          value={pageSize}
+          onChange={option => runSearch({ pageSize: _.toNumber(option) })}
+          style={{ backgroundColor: 'white' }}
+        />}
+        <div />
+        {stateless ? <div /> : <Paginator {...{ page, setPage: newPage => runSearch({ page: newPage }), resultsCount, pageSize, UIComponents }} />}
+      </UIComponents.Grid>
+    </UIComponents.Box>
+  </div>
 )
