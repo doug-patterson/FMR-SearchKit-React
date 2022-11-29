@@ -6,7 +6,7 @@ import { mapIndexed } from './util'
 // and also only pass in the schema for the collection we're rendering
 
 let moveColumn = ({ include, setInclude, field, increment }) => {
-  let currentIdx = _.findIndex(f => f === field, include)
+  let currentIdx = _.findIndex((f) => f === field, include)
   let newIdx = currentIdx + increment
   let otherField = _.get([newIdx], include)
   let newInclude = _.flow(
@@ -23,10 +23,10 @@ let getAddOpts = ({ include, schema, field, setInclude, setIsAdding }) => {
   let addableFields = _.difference(schemaFields(schema), include)
   return [
     ..._.map(
-      f => ({
+      (f) => ({
         label: _.startCase(f),
         onClick: () => {
-          let idx = _.findIndex(ff => ff === field, include)
+          let idx = _.findIndex((ff) => ff === field, include)
           setInclude([
             ..._.slice(0, idx, include),
             f,
@@ -52,7 +52,7 @@ let DefaultHeaderMenu = ({
   setSortField,
   setSortDir,
   schema,
-  UIComponents
+  UIComponents,
 }) => {
   let [isAdding, setIsAdding] = React.useState(false)
   return (
@@ -86,12 +86,13 @@ let DefaultHeaderMenu = ({
                   setSortDir('desc')
                 },
               },
-              _.findIndex(f => f === field, include) > 0 && {
+              _.findIndex((f) => f === field, include) > 0 && {
                 label: 'Move Left',
                 onClick: () =>
                   moveColumn({ include, setInclude, field, increment: -1 }),
               },
-              _.findIndex(f => f === field, include) < _.size(include) - 1 && {
+              _.findIndex((f) => f === field, include) <
+                _.size(include) - 1 && {
                 label: 'Move Right',
                 onClick: () =>
                   moveColumn({ include, setInclude, field, increment: 1 }),
@@ -103,7 +104,7 @@ let DefaultHeaderMenu = ({
               {
                 label: 'Remove Column',
                 onClick: () => {
-                  let idx = _.findIndex(f => f === field, include)
+                  let idx = _.findIndex((f) => f === field, include)
                   setInclude([
                     ..._.slice(0, idx, include),
                     ..._.slice(idx + 1, Infinity, include),
@@ -138,10 +139,10 @@ const Component = ({
 }) => (
   <UIComponents.Box style={{ width: '100%', overflowX: 'auto' }}>
     <UIComponents.Table className="results-table">
-      <UIComponents.TableHeader style={{ borderTop: '1px solid #eee' }}>
+      <UIComponents.TableHeader>
         <UIComponents.TableRow elevation="medium">
           {_.map(
-            field => (
+            (field) => (
               <UIComponents.TableCell key={field}>
                 <HeaderMenu
                   {...{
@@ -151,7 +152,7 @@ const Component = ({
                     setSortField,
                     setSortDir,
                     schema,
-                    UIComponents
+                    UIComponents,
                   }}
                 />
               </UIComponents.TableCell>
@@ -162,15 +163,11 @@ const Component = ({
       </UIComponents.TableHeader>
       <UIComponents.TableBody>
         {mapIndexed(
-          (row, idx) => (
-            <UIComponents.TableRow
-              key={row._id}
-              id={row._id}
-              style={idx % 2 === 0 ? { backgroundColor: '#eee' } : {}}
-            >
+          (row) => (
+            <UIComponents.TableRow key={row._id} id={row._id}>
               {_.map(
-                field => (
-                  <UIComponents.TableCell key={field}>
+                (field) => (
+                  <UIComponents.TableCell>
                     {renderCell({ row, field, schema })}
                   </UIComponents.TableCell>
                 ),
@@ -185,4 +182,4 @@ const Component = ({
   </UIComponents.Box>
 )
 
-export default props => <Component {...props} />
+export default (props) => <Component {...props} />
