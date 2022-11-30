@@ -52,7 +52,7 @@ let DefaultHeaderMenu = ({
   setSortField,
   setSortDir,
   schema,
-  UIComponents
+  UIComponents,
 }) => {
   let [isAdding, setIsAdding] = React.useState(false)
   return (
@@ -138,7 +138,7 @@ const Component = ({
 }) => (
   <UIComponents.Box style={{ width: '100%', overflowX: 'auto' }}>
     <UIComponents.Table className="results-table">
-      <UIComponents.TableHeader style={{ borderTop: '1px solid #eee' }}>
+      <UIComponents.TableHeader>
         <UIComponents.TableRow elevation="medium">
           {_.map(
             field => (
@@ -151,7 +151,7 @@ const Component = ({
                     setSortField,
                     setSortDir,
                     schema,
-                    UIComponents
+                    UIComponents,
                   }}
                 />
               </UIComponents.TableCell>
@@ -162,15 +162,11 @@ const Component = ({
       </UIComponents.TableHeader>
       <UIComponents.TableBody>
         {mapIndexed(
-          (row, idx) => (
-            <UIComponents.TableRow
-              key={row._id}
-              id={row._id}
-              style={idx % 2 === 0 ? { backgroundColor: '#eee' } : {}}
-            >
+          row => (
+            <UIComponents.TableRow key={row._id} id={row._id}>
               {_.map(
                 field => (
-                  <UIComponents.TableCell key={field}>
+                  <UIComponents.TableCell>
                     {renderCell({ row, field, schema })}
                   </UIComponents.TableCell>
                 ),

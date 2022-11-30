@@ -1,17 +1,22 @@
 import React from 'react'
 import _ from 'lodash/fp'
 
-export default ({ title, options, values, onChange, display, UIComponents }) => (
+export default ({
+  title,
+  options,
+  values,
+  onChange,
+  display,
+  UIComponents,
+}) => (
   <UIComponents.Card>
-    <UIComponents.CardHeader>
-      {_.startCase(title)}
-    </UIComponents.CardHeader>
+    <UIComponents.CardHeader>{_.startCase(title)}</UIComponents.CardHeader>
     <UIComponents.CardBody>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {_.map(
           ({ _id, checked, count, lookup }) => (
             <div
-              style={{ display: 'grid', gridTemplateColumns: 'auto 1fr 1fr' }}
+              style={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto' }}
               key={`${_id}-${checked ? 'checked' : 'unchecked'}`}
             >
               <UIComponents.CheckBox
@@ -24,7 +29,9 @@ export default ({ title, options, values, onChange, display, UIComponents }) => 
                   onChange({ values: newValues })
                 }}
               />
-              <span style={{ textAlign: 'right' }}>{count}</span>
+              <span style={{ textAlign: 'right', justifySelf: 'end' }}>
+                {count}
+              </span>
             </div>
           ),
           options
