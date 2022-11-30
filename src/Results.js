@@ -23,12 +23,10 @@ export default ({
       <ResultsComponent
         {...{
           include,
-          setInclude: (newInclude) =>
-            runSearch({ include: newInclude, page: 1 }),
-          setSortField: (newSortField) =>
+          setInclude: newInclude => runSearch({ include: newInclude, page: 1 }),
+          setSortField: newSortField =>
             runSearch({ sortField: newSortField, page: 1 }),
-          setSortDir: (newSortDir) =>
-            runSearch({ sortDir: newSortDir, page: 1 }),
+          setSortDir: newSortDir => runSearch({ sortDir: newSortDir, page: 1 }),
           schema,
           rows,
           UIComponents,
@@ -41,7 +39,7 @@ export default ({
           <UIComponents.Select
             options={[10, 20, 50, 100]}
             value={pageSize}
-            onChange={(option) => runSearch({ pageSize: _.toNumber(option) })}
+            onChange={option => runSearch({ pageSize: _.toNumber(option) })}
             style={{ backgroundColor: 'white' }}
           />
         )}
@@ -52,7 +50,7 @@ export default ({
           <Paginator
             {...{
               page,
-              setPage: (newPage) => runSearch({ page: newPage }),
+              setPage: newPage => runSearch({ page: newPage }),
               resultsCount,
               pageSize,
               UIComponents,

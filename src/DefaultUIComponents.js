@@ -42,12 +42,12 @@ export let SubmitButton = ({ children, ...props }) => (
 export let Select = ({ value, options, onChange, ...props }) => (
   <select
     className="fmr-select"
-    onChange={(e) => e && e.target && onChange(e.target.value)}
+    onChange={e => e && e.target && onChange(e.target.value)}
     value={value}
     {...props}
   >
     {_.map(
-      (option) => (
+      option => (
         <option key={option.value || option} value={option.value || option}>
           {option.label || option}
         </option>
@@ -60,7 +60,7 @@ export let Select = ({ value, options, onChange, ...props }) => (
 export let Input = ({ type, value, placeholder, onChange, ...props }) => (
   <input
     className="fmr-input"
-    onChange={(e) => e && e.target && onChange(e.target.value)}
+    onChange={e => e && e.target && onChange(e.target.value)}
     placeholder={placeholder}
     value={value}
     type={type}
@@ -79,7 +79,7 @@ export let CheckBox = ({ checked, label, onChange }) => {
         id={id}
         className="fmr-checkbox"
         {...(onChange
-          ? { onChange: (e) => e.target && onChange(e.target.checked) }
+          ? { onChange: e => e.target && onChange(e.target.checked) }
           : {})}
       />
       <label htmlFor={id}>{label}</label>
@@ -109,7 +109,7 @@ export let Menu = ({ label, open, items }) => {
           }}
         >
           {_.map(
-            (item) => (
+            item => (
               <button
                 key={item.label}
                 onClick={_.over([item.onClick, () => setIsOpen(false)])}

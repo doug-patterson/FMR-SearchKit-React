@@ -22,7 +22,7 @@ export default ({
               <UIComponents.CheckBox
                 label={lookup ? display({ ...lookup, _id }) : _.startCase(_id)}
                 checked={checked}
-                onChange={(checked) => {
+                onChange={checked => {
                   let newValues = checked
                     ? _.concat(values, _id)
                     : _.without([_id], values)
