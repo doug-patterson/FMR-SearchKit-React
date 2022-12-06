@@ -3,6 +3,7 @@ import _ from 'lodash/fp'
 
 export default ({
   title,
+  idPath,
   options,
   values,
   onChange,
@@ -14,13 +15,13 @@ export default ({
     <UIComponents.CardBody>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {_.map(
-          ({ _id, checked, count, lookup }) => (
+          ({ _id, checked, count, value, lookup }) => (
             <div
               style={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto' }}
               key={`${_id}-${checked ? 'checked' : 'unchecked'}`}
             >
               <UIComponents.CheckBox
-                label={lookup ? display({ ...lookup, _id }) : _.startCase(_id)}
+                label={(idPath || lookup) ? display({ ...value, ...lookup, _id }) : _.startCase(_id)}
                 checked={checked}
                 onChange={checked => {
                   let newValues = checked

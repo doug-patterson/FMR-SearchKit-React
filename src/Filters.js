@@ -15,6 +15,7 @@ let getFilterComponent = type =>
     facet: Facet,
     arrayElementPropFacet: Facet,
     hidden: Hidden,
+    hiddenExists: Hidden,
     numeric: NumericFilter,
     boolean: BooleanFilter,
     arraySize: NumericFilter,

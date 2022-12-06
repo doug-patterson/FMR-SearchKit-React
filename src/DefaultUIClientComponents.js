@@ -75,8 +75,24 @@ legends={[
 ]}
 />
 
+let addLeadingZeros = finishedLength => str => {
+  let zeros = _.join('', _.times(_.constant('0'), finishedLength))
+  let fixed = `${zeros}${str}`
+  return fixed.substr(0 - finishedLength)
+}
+
+let fixDate = str => {
+  let [year, month, day] = _.split('-', str)
+  let fixedPieces = [year, addLeadingZeros(2)(month), addLeadingZeros(2)(day)]
+  let totallyFixed =  _.join('-', fixedPieces)
+  console.log({ str, totallyFixed })
+  return totallyFixed
+}
+
+let fixDates = _.map(datum => ({ ...datum, day: fixDate(datum.day) }))
+
 export let QuantityByPeriodCalendar = ({ data, x, y }) => <ResponsiveCalendar
-  data={data}
+  data={fixDates(data)}
   from={_.flow(_.first, _.get('day'))(data)}
   to={_.flow(_.last, _.get('day'))(data)}
   emptyColor="#eeeeee"
@@ -115,7 +131,8 @@ export let TopNPie = ({ data, chartKey, field, schema }) => {
 
   data = _.map(datum => {
     let display = _.get(['properties', chartKey, 'properties', field, 'display'], schema)
-    let label =  (datum.lookup && display) ? display(datum) : datum.label
+    let label =  display ? display(datum) : datum.label
+    console.log({ label })
     let id = getId(label)
 
     return  {
