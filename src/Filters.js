@@ -18,6 +18,7 @@ let getFilterComponent = type =>
     hiddenExists: Hidden,
     numeric: NumericFilter,
     boolean: BooleanFilter,
+    fieldHasTruthyValue: BooleanFilter,
     arraySize: NumericFilter,
   }[type || 'none'])
 
