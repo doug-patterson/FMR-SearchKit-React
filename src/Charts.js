@@ -8,6 +8,7 @@ export default ({ initialSearch, schema, chartData, UIComponents }) => <>
       key={chart.key}
       style={{ height: initialSearch.chartHeight || 320, gridArea: chart.key }}
     >
+      <h2>{_.startCase(chart.key)}</h2>
       <Component {...chart} chartKey={chart.key} data={chartData[chart.key] || []} schema={schema} />
     </div>
   }, initialSearch.charts)}

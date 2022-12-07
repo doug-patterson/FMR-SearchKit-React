@@ -5,10 +5,19 @@ import _ from 'lodash/fp'
 import { ResponsiveLine } from '@nivo/line'
 import { ResponsiveCalendar } from '@nivo/calendar'
 import { ResponsivePie } from '@nivo/pie'
-import { flattenObject } from './util'
 
-export let DateLineSingle = ({ data, x, y }) => <ResponsiveLine
-data={data}
+// someday we'll need to be smarter than this about this. We'll also
+// need to set up to pass the currency formatter into the library.
+const formatCurrency = _.map(({ data, id }) => ({
+  id,
+  data: _.map(datum => ({
+    ...datum,
+    y: datum.y / 100
+  }), data)
+}))
+
+export let DateLineSingle = ({ data, x, y, isCurrency }) => <ResponsiveLine
+data={isCurrency ? formatCurrency(data) : data}
 curve="linear"
 colors={{ scheme: 'paired' }}
 margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
@@ -20,7 +29,7 @@ yScale={{
     stacked: true,
     reverse: false
 }}
-yFormat=" >-.2f"
+yFormat=""
 axisTop={null}
 axisRight={null}
 axisBottom={{
@@ -85,7 +94,6 @@ let fixDate = str => {
   let [year, month, day] = _.split('-', str)
   let fixedPieces = [year, addLeadingZeros(2)(month), addLeadingZeros(2)(day)]
   let totallyFixed =  _.join('-', fixedPieces)
-  console.log({ str, totallyFixed })
   return totallyFixed
 }
 
@@ -132,7 +140,6 @@ export let TopNPie = ({ data, chartKey, field, schema }) => {
   data = _.map(datum => {
     let display = _.get(['properties', chartKey, 'properties', field, 'display'], schema)
     let label =  display ? display(datum) : datum.label
-    console.log({ label })
     let id = getId(label)
 
     return  {
