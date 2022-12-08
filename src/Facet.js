@@ -15,13 +15,13 @@ export default ({
     <UIComponents.CardBody>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {_.map(
-          ({ _id, checked, count, value, lookup }) => (
+          ({ _id, checked, count, value, lookup, include }) => (
             <div
               style={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto' }}
               key={`${_id}-${checked ? 'checked' : 'unchecked'}`}
             >
               <UIComponents.CheckBox
-                label={(idPath || lookup) ? display({ ...value, ...lookup, _id }) : _.startCase(_id)}
+                label={(include || lookup || _.isObject(value))  ? (display({ ...value, ...lookup, _id }) || _id) : _id}
                 checked={checked}
                 onChange={checked => {
                   let newValues = checked

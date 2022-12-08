@@ -5,6 +5,7 @@ import { mapIndexed, mapValuesIndexed } from './util'
 import BooleanFilter from './BooleanFilter'
 import Facet from './Facet'
 import NumericFilter from './NumericFilter'
+import DateTimeInterval from './DateTimeInterval'
 
 let NoComponent = () => 'no filter found'
 let Hidden = () => ''
@@ -20,6 +21,7 @@ let getFilterComponent = type =>
     boolean: BooleanFilter,
     fieldHasTruthyValue: BooleanFilter,
     arraySize: NumericFilter,
+    dateTimeInterval: DateTimeInterval
   }[type || 'none'])
 
 let updateFilters = filters => idx => patch =>
