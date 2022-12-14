@@ -36,7 +36,7 @@ const defaultKeyValueDisplay = obj => <div>{mapIndexed((v, k) => [<div><span>{k}
 const arrayValueDisplay = val => _.isObject(val) ? defaultKeyValueDisplay(val) : `${val}`
 
 const defaultDisplay = prop => {
-  let fn = val => val ? <span>{`${val}`}</span> : <span>{''}</span>
+  let fn = val => val ? <span>{`${val._id || val}`}</span> : <span>{''}</span>
 
   switch (prop.bsonType) {
     case 'bool':
