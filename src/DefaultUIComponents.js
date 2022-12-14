@@ -414,3 +414,17 @@ export let TopNPie = ({ data }) => (
     ]}
   />
 )
+
+export let SummaryTable = ({ data, isCurrency }) => {
+  let rows = _.first(data)
+  
+  return <dl className="fmr-searchkit-summary-table" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr'}}>
+    {_.map(label => <>
+      <dt style={{ fontWeight: 'bold' }}>{_.startCase(label)}</dt>
+      <dd style={{ textAlign: 'right' }}>{isCurrency ? `$${rows[label] / 100}`  : rows[label]}</dd>
+    </>, _.keys(rows))}
+  </dl>
+} 
+
+export let GroupedTotals = ({ data }) => JSON.stringify(data, 0, 2)
+

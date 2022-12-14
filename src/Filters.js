@@ -53,7 +53,7 @@ export default ({ children, filters, filterOptions, schema, UIComponents, runSea
             'options',
             _.find({ key: filter.key }, filterOptions)
           )}
-          display={filter.prop ? schema.properties[filter.field].items.properties[filter.prop].display : schema.properties[filter.field]?.display}
+          display={filter.prop ? _.get(filter.prop, _.get(filter.field, schema.properties)?.items.properties)?.display : _.get(filter.field, schema.properties)?.display}
           UIComponents={UIComponents}
         />
       )
