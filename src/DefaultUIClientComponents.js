@@ -327,19 +327,20 @@ export let TopNPie = ({ data, chartKey, field, schema }) => {
   />
 }
 
-export let DayOfWeekSummaryBars = ({ data, x, y }) => (
+export let DayOfWeekSummaryBars = ({ data, x, y, xLabel, yLabel, group }) => (
   <ResponsiveBar
-      data={_.sortBy('id', data)}
+      data={data}
       keys={_.flow(
         _.map(_.keys),
         _.flatten,
         _.uniq,
         _.without(['id'])
       )(data)}
-      margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+      margin={{ top: 50, right: group ? 130 : 80, bottom: 50, left: 80 }}
       padding={0.3}
       xScale={{ type: 'linear' }}
-      colors={{ scheme: 'nivo' }}
+      colors={{ scheme: 'set2' }}
+      valueFormat=">-$.2r"
       borderColor={{
           from: 'color',
           modifiers: [
@@ -354,8 +355,8 @@ export let DayOfWeekSummaryBars = ({ data, x, y }) => (
       axisBottom={{
           tickSize: 5,
           tickPadding: 5,
-          tickRotation: 0,
-          legend: x,
+          tickRotation: -20,
+          legend: xLabel || x,
           legendPosition: 'middle',
           legendOffset: 32
       }}
@@ -363,10 +364,11 @@ export let DayOfWeekSummaryBars = ({ data, x, y }) => (
           tickSize: 5,
           tickPadding: 5,
           tickRotation: 0,
-          legend: y,
+          legend: yLabel || y,
           legendPosition: 'middle',
-          legendOffset: -40
+          legendOffset: -70
       }}
+
       labelSkipWidth={12}
       labelSkipHeight={12}
       labelTextColor={{
@@ -378,30 +380,30 @@ export let DayOfWeekSummaryBars = ({ data, x, y }) => (
               ]
           ]
       }}
-      legends={[
-          {
-              dataFrom: 'keys',
-              anchor: 'bottom-right',
-              direction: 'column',
-              justify: false,
-              translateX: 120,
-              translateY: 0,
-              itemsSpacing: 2,
-              itemWidth: 100,
-              itemHeight: 20,
-              itemDirection: 'left-to-right',
-              itemOpacity: 0.85,
-              symbolSize: 20,
-              effects: [
-                  {
-                      on: 'hover',
-                      style: {
-                          itemOpacity: 1
-                      }
-                  }
-              ]
-          }
-      ]}
+      {...(group ? { legends: [
+        {
+            dataFrom: 'keys',
+            anchor: 'bottom-right',
+            direction: 'column',
+            justify: false,
+            translateX: 120,
+            translateY: 0,
+            itemsSpacing: 2,
+            itemWidth: 100,
+            itemHeight: 20,
+            itemDirection: 'left-to-right',
+            itemOpacity: 0.85,
+            symbolSize: 20,
+            effects: [
+                {
+                    on: 'hover',
+                    style: {
+                        itemOpacity: 1
+                    }
+                }
+            ]
+        }
+      ] } : {})}
       role="application"
       ariaLabel="a11y"
       barAriaLabel={function(e){return e.id+": "+e.formattedValue+" in country: "+e.indexValue}}

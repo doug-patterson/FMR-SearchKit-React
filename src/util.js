@@ -64,3 +64,19 @@ const defaultDisplays = schema => ({
 }) 
 
 export let addDefaultDisplays = _.mapValues(defaultDisplays)
+
+const breakpoints = [
+  [1000000000000, 'T'],
+  [1000000000, 'B'],
+  [1000000, 'M'],
+  [1000, 'K'],
+]
+
+export const shortNum = val => {
+  for (let breakpoint of breakpoints) {
+    if (val > breakpoint[0]) {
+      return `${(val/breakpoint[0]).toFixed(2)}${breakpoint[1]}`
+    }
+  }
+  return val
+}
