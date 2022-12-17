@@ -7,30 +7,33 @@ import { ResponsiveCalendar } from '@nivo/calendar'
 import { ResponsivePie } from '@nivo/pie'
 import { ResponsiveBar } from '@nivo/bar'
 
-// someday we'll need to be smarter than this about this. We'll also
-// need to set up to pass the currency formatter into the library.
-const formatCurrency = _.map(({ data, id }) => ({
+const americanDate = _.flow(
+  _.split('/'),
+  values => _.size(values) < 3 ? [values[0], '', values[1]] : values,
+  ([day, month, year]) => `${month || ''}${month ? '/' : ''}${day || ''}${day ? '/' : ''}${year}`
+)
+
+const americanDates = _.map(({ id, data }) => ({
   id,
-  data: _.map(datum => ({
-    ...datum,
-    y: datum.y / 100
-  }), data)
+  data: _.map(({ x, y }) => ({ x: americanDate(x), y }), data)
 }))
 
-export let DateLineSingle = ({ data, x, y, isCurrency }) => <ResponsiveLine
-data={isCurrency ? formatCurrency(data) : data}
+export let DateLineSingle = ({ data, x, y, xLabel, yLabel, isCurrency }) => <ResponsiveLine
+data={americanDates(data)}
 curve="linear"
-colors={{ scheme: 'paired' }}
-margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
+colors={{ scheme: 'set2' }}
+margin={{ top: 50, right: 60, bottom: 50, left: 60 }}
 xScale={{ type: 'point' }} // need to figure point v linear somehow
 yScale={{
     type: 'linear',
-    min: 'auto',
+    min: _.minBy('y', data?.results),
     max: 'auto',
     stacked: true,
     reverse: false
 }}
-yFormat=""
+enableArea={true}
+enablePoints={false}
+yFormat={`>-${isCurrency ? '$' : ''},.2r`}
 axisTop={null}
 axisRight={null}
 axisBottom={{
@@ -38,7 +41,7 @@ axisBottom={{
     tickSize: 5,
     tickPadding: 5,
     tickRotation: -20,
-    legend: _.startCase(x),
+    legend: xLabel || _.startCase(x),
     legendOffset: 36,
     legendPosition: 'middle'
 }}
@@ -47,7 +50,7 @@ axisLeft={{
     tickSize: 5,
     tickPadding: 5,
     tickRotation: 0,
-    legend: _.startCase(y),
+    legend: yLabel || _.startCase(y),
     legendOffset: -50,
     legendPosition: 'middle'
 }}
@@ -57,40 +60,15 @@ pointBorderWidth={2}
 pointBorderColor={{ from: 'serieColor' }}
 pointLabelYOffset={-12}
 useMesh={true}
-legends={[
-    {
-        anchor: 'bottom-right',
-        direction: 'column',
-        justify: false,
-        translateX: 100,
-        translateY: 0,
-        itemsSpacing: 0,
-        itemDirection: 'left-to-right',
-        itemWidth: 80,
-        itemHeight: 20,
-        itemOpacity: 0.75,
-        symbolSize: 12,
-        symbolShape: 'circle',
-        symbolBorderColor: 'rgba(0, 0, 0, .5)',
-        effects: [
-            {
-                on: 'hover',
-                style: {
-                    itemBackground: 'rgba(0, 0, 0, .03)',
-                    itemOpacity: 1
-                }
-            }
-        ]
-    }
-]}
+tooltip={({ point }) => <div style={{ padding: 4, backgroundColor: 'white' }}><b>{point?.data?.x}</b>: {isCurrency ? '$' : ''}{point?.data?.y}</div>}
 />
 
-export let DateTimeLine = ({ data, x, y, isCurrency }) => <ResponsiveLine
+export let DateTimeLine = ({ data, x, y, isCurrency, xLabel, yLabel }) => <ResponsiveLine
 data={isCurrency ? formatCurrency(data) : data}
 curve="linear"
 colors={{ scheme: 'paired' }}
 margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
-xScale={{ type: 'point' }} // need to figure point v linear somehow
+xScale={{ type: 'point' }}
 yScale={{
     type: 'linear',
     min: 'auto',
@@ -106,7 +84,7 @@ axisBottom={{
     tickSize: 5,
     tickPadding: 5,
     tickRotation: -20,
-    legend: _.startCase(x),
+    legend: xLabel || _.startCase(x),
     legendOffset: 36,
     legendPosition: 'middle'
 }}
@@ -115,7 +93,7 @@ axisLeft={{
     tickSize: 5,
     tickPadding: 5,
     tickRotation: 0,
-    legend: _.startCase(y),
+    legend: yLabel || _.startCase(y),
     legendOffset: -50,
     legendPosition: 'middle'
 }}
@@ -168,7 +146,12 @@ let fixDate = str => {
 
 let fixDates = _.map(datum => ({ ...datum, day: fixDate(datum.day) }))
 
-export let QuantityByPeriodCalendar = ({ data, x, y }) => <ResponsiveCalendar
+let americanDate2 = _.flow(
+  _.split('-'),
+  ([year, month, day]) => `${month || ''}${month ? '/' : ''}${day || ''}${day ? '/' : ''}${year}`
+)
+
+export let QuantityByPeriodCalendar = ({ data, isCurrency, onClick }) => <ResponsiveCalendar
   data={fixDates(data)}
   from={_.flow(_.first, _.get('day'))(data)}
   to={_.flow(_.last, _.get('day'))(data)}
@@ -176,21 +159,16 @@ export let QuantityByPeriodCalendar = ({ data, x, y }) => <ResponsiveCalendar
   colors={[ '#61cdbb', '#97e3d5', '#e8c1a0', '#f47560' ]}
   margin={{ top: 0, right: 40, bottom: 0, left: 40 }}
   yearSpacing={40}
+  //monthSpacing={10}
   monthBorderColor="#ffffff"
   dayBorderWidth={2}
+  // using this you could wire up a click handler to set the dates on a
+  // date range filter in a search to startOfDay and endOfDay for the clicked day
+  onClick={onClick}
   dayBorderColor="#ffffff"
-  legends={[
-      {
-          anchor: 'bottom-right',
-          direction: 'row',
-          translateY: 36,
-          itemCount: 4,
-          itemWidth: 42,
-          itemHeight: 36,
-          itemsSpacing: 14,
-          itemDirection: 'right-to-left'
-      }
-  ]}
+  tooltip={({ day, value }) => <div style={{ backgroundColor: 'white', padding: 4 }}>
+    <b>{americanDate2(day)}</b>: {isCurrency ? '$' : ''}{isCurrency ? _.toNumber(value).toFixed(2) : value}
+  </div>}
 />
 
 let uniqueIdMaker = ids => label => {
@@ -203,7 +181,7 @@ let uniqueIdMaker = ids => label => {
   }
 }
 
-export let TopNPie = ({ data, chartKey, field, schema }) => {
+export let TopNPie = ({ data, chartKey, field, schema, legend }) => {
   let getId = uniqueIdMaker({})
 
   data = _.map(datum => {
@@ -249,57 +227,7 @@ export let TopNPie = ({ data, chartKey, field, schema }) => {
             ]
         ]
     }}
-    fill={[
-        {
-            match: {
-                id: 'ruby'
-            },
-            id: 'dots'
-        },
-        {
-            match: {
-                id: 'c'
-            },
-            id: 'dots'
-        },
-        {
-            match: {
-                id: 'go'
-            },
-            id: 'dots'
-        },
-        {
-            match: {
-                id: 'python'
-            },
-            id: 'dots'
-        },
-        {
-            match: {
-                id: 'scala'
-            },
-            id: 'lines'
-        },
-        {
-            match: {
-                id: 'lisp'
-            },
-            id: 'lines'
-        },
-        {
-            match: {
-                id: 'elixir'
-            },
-            id: 'lines'
-        },
-        {
-            match: {
-                id: 'javascript'
-            },
-            id: 'lines'
-        }
-    ]}
-    legends={[
+    legends={legend ? [
         {
             anchor: 'right',
             direction: 'column',
@@ -323,11 +251,11 @@ export let TopNPie = ({ data, chartKey, field, schema }) => {
                 }
             ]
         }
-    ]}
+    ] : []}
   />
 }
 
-export let DayOfWeekSummaryBars = ({ data, x, y, xLabel, yLabel, group }) => (
+export let DayOfWeekSummaryBars = ({ data, x, y, xLabel, yLabel, group, isCurrency }) => (
   <ResponsiveBar
       data={data}
       keys={_.flow(
@@ -340,7 +268,7 @@ export let DayOfWeekSummaryBars = ({ data, x, y, xLabel, yLabel, group }) => (
       padding={0.3}
       xScale={{ type: 'linear' }}
       colors={{ scheme: 'set2' }}
-      valueFormat=">-$.2r"
+      valueFormat={`>-${isCurrency ? '$' : ''},.2r`}
       borderColor={{
           from: 'color',
           modifiers: [
@@ -358,7 +286,7 @@ export let DayOfWeekSummaryBars = ({ data, x, y, xLabel, yLabel, group }) => (
           tickRotation: -20,
           legend: xLabel || x,
           legendPosition: 'middle',
-          legendOffset: 32
+          legendOffset: 36
       }}
       axisLeft={{
           tickSize: 5,
@@ -410,17 +338,29 @@ export let DayOfWeekSummaryBars = ({ data, x, y, xLabel, yLabel, group }) => (
   />
 )
 
-const sortX = _.map(({ id, data }) => ({
+const addZeroHours = hours => _.map(x => _.find({ x }, hours) || ({ x, y: 0 }), [..._.range(1, 24), 0])
+
+const decorateHour = hour => {
+  if (hour === 0) { return 'Midnight' }
+  if (hour === 12) { return 'Noon' }
+
+  return (hour < 12 ? `${hour} AM` : `${hour - 12} PM`)
+}
+
+const includeAllHours = _.map(({ id, data }) => ({
   id,
-  data: _.sortBy('x', data)
+  data: _.flow(
+    addZeroHours,
+    _.map(({ x, y }) => ({ x: decorateHour(x), y }))
+  )(data)
 }))
 
-export let HourOfDaySummaryLine = ({ data, x, y, isCurrency }) => <ResponsiveLine
-  data={isCurrency ? sortX(data) : sortX(data)}
+export let HourOfDaySummaryLine = ({ data, x, y, isCurrency, xLabel, yLabel, group }) => <ResponsiveLine
+  data={includeAllHours(data)}
   curve="linear"
   colors={{ scheme: 'paired' }}
-  margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
-  xScale={{ type: 'linear' }}
+  margin={{ top: 50, right: group ? 130 : 80, bottom: 50, left: 80 }}
+  xScale={{ type: 'point' }}
   yScale={{
       type: 'linear',
       min: 'auto',
@@ -428,16 +368,18 @@ export let HourOfDaySummaryLine = ({ data, x, y, isCurrency }) => <ResponsiveLin
       stacked: true,
       reverse: false
   }}
-  yFormat=""
+  enableArea={true}
+  enablePoints={false}
+  yFormat={`>-${isCurrency ? '$' : ''},.2r`}
   axisTop={null}
   axisRight={null}
   axisBottom={{
       orient: 'bottom',
       tickSize: 5,
       tickPadding: 5,
-      tickRotation: -20,
-      legend: _.startCase(x),
-      legendOffset: 36,
+      tickRotation: -45,
+      legend: xLabel || _.startCase(x),
+      legendOffset: 40,
       legendPosition: 'middle'
   }}
   axisLeft={{
@@ -445,17 +387,12 @@ export let HourOfDaySummaryLine = ({ data, x, y, isCurrency }) => <ResponsiveLin
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: _.startCase(y),
+      legend: yLabel || _.startCase(y),
       legendOffset: -50,
       legendPosition: 'middle'
   }}
-  pointSize={10}
-  pointColor={{ theme: 'background' }}
-  pointBorderWidth={2}
-  pointBorderColor={{ from: 'serieColor' }}
-  pointLabelYOffset={-12}
   useMesh={true}
-  legends={[
+  {...(group  ? {legends: [
       {
           anchor: 'bottom-right',
           direction: 'column',
@@ -480,5 +417,5 @@ export let HourOfDaySummaryLine = ({ data, x, y, isCurrency }) => <ResponsiveLin
               }
           ]
       }
-  ]}
+  ]} : {})}
 />

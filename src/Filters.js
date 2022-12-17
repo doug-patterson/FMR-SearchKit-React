@@ -57,7 +57,7 @@ export default ({ children, filters, filterOptions, schema, UIComponents, runSea
           UIComponents={UIComponents}
         />
       )
-    }, filters)}
+    }, _.reject('hide', filters))}
     <UIComponents.Button
       onClick={() => runSearch({})}
     >Reset Search</UIComponents.Button>
