@@ -15,24 +15,32 @@ let initApp = async (setApp, setInitialResults, initialSearch) => {
   // handle localStorage search here
 }
 
-export default (props) => {
-  let [app, setApp] = React.useState(null)
-  let schemas = props.schemas || getSchemas()
-  let [initialResults, setInitialResults] = React.useState(null)
+const setUpSchemas = async (setSchemas, fullOverrides) => {
+  let schemas = await getSchemas()
 
-  let override = overrides[props.collection]
-
-  if (override) {
+  let collections = _.keys(fullOverrides)
+  for (let key of collections) {
+    let override = fullOverrides[key]
     for (let prop in override.properties) {
-      schemas = _.update(`${props.collection}.properties.${prop}`, field => ({ ...field, ...override.properties[prop] }), schemas)
+      schemas = _.update(`${key}.properties.${prop}`, field => ({ ...field, ...override.properties[prop] }), schemas)
     }
   }
 
+  setSchemas(schemas)
+}
+
+export default (props) => {
+  let [app, setApp] = React.useState(null)
+  let [schemas, setSchemas] = React.useState(null)
+  let [initialResults, setInitialResults] = React.useState(null)
+
   React.useEffect(() => {
     initApp(setApp, props.runOnMount ? setInitialResults : null, props.initialSearch)
+    // we should also allow for per-instance overrides here
+    setUpSchemas(setSchemas, overrides)
   }, [])
 
-  return app && <SearchLayout
+  return app && schemas && <SearchLayout
     execute={(...args) => app.service('search').create(...args)}
     initialSearch={{ collection: props?.collection}}
     {...props}

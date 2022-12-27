@@ -1,6 +1,6 @@
 {
   "name": "fmr-searchkit-react",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "React components for building search interfaces that use your FMR-SearchKit FeathersJS search service",
   "main": "index.js",
   "scripts": {

@@ -48,7 +48,7 @@ export default ({ children, filters, filterOptions, schema, UIComponents, runSea
             page: 1
           })}
           title={filter.key}
-          {...filter}
+          {..._.omit(['key'], filter)}
           options={_.get(
             'options',
             _.find({ key: filter.key }, filterOptions)

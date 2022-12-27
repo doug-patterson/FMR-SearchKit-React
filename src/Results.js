@@ -17,7 +17,7 @@ export default ({
   ResultsComponent = ResultsTable,
   stateless,
   UIComponents,
-}) => (
+}) => console.log({ page }) || (
   <div style={{ gridArea: 'results' }}>
     <UIComponents.Box>
       <ResultsComponent

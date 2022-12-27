@@ -43,8 +43,6 @@ let getAddOpts = ({ include, schema, field, setInclude, setIsAdding }) => {
   ]
 }
 
-// setSortField, setSortDir
-
 let DefaultHeaderMenu = ({
   field,
   include,
@@ -117,7 +115,7 @@ let DefaultHeaderMenu = ({
 }
 
 const renderCell = ({ row, field, schema, idx }) => {
-  let display = (_.get(`properties.${field}.tableCellDisplay`, schema) || _.get(`properties.${field}.display`, schema))(
+  let display = (_.get(`properties.${field}.tableCellDisplay`, schema) || _.get(`properties.${field}.display`, schema) || _.identity)(
     _.get(field, row),
     row,
     idx

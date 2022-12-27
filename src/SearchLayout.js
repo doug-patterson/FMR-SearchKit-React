@@ -69,7 +69,6 @@ export default ({
 
     let { results, resultsCount: newResultsCount, charts, ...filterResults } = await execute(updatedSearch)
 
-
     setResultsCount(_.get('count', newResultsCount) || 0)
     setSearch(updatedSearch)
     setRows(results)
@@ -95,12 +94,21 @@ export default ({
           UIComponents={UIComponents}
         >{children}</Filters>
         <Charts
-          initialSearch={initialSearch}
+          initialSearch={search}
           UIComponents={UIComponents}
           chartData={chartData}
+          updateChartSearch={idx => updatedChartProps => {
+            let updatedSearch = _.update(
+              `charts.${idx}`,
+              chartProps => ({ ...chartProps, ...updatedChartProps }),
+              search
+            )
+            runSearch({ charts: updatedSearch.charts })
+          }}
+          schemas={schemas}
           schema={_.update('properties', _.omit(initialSearch.omitFromResults), schema)}
         />
-        <Results
+        {search.pageSize !== 0 && <Results
           include={_.without(initialSearch.omitFromResults, search.include || _.keys(schema.properties))}
           schema={_.update('properties', _.omit(initialSearch.omitFromResults), schema)}
           rows={rows}
@@ -109,7 +117,7 @@ export default ({
           page={search.page}
           UIComponents={UIComponents}
           runSearch={runSearch}
-        />
+        />}
       </Layout>
     </UIComponents.Box>
   )
