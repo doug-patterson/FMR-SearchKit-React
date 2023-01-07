@@ -1,7 +1,7 @@
 import React from 'react'
 import _ from 'lodash/fp'
 
-export default ({ title, from, to, disableFrom, disableTo, onChange, UIComponents }) => (
+export default ({ title, from, to, disableFrom, disableTo, onChange, name, UIComponents }) => (
   <UIComponents.Card>
     <UIComponents.CardHeader>
       {_.startCase(title)}
@@ -14,17 +14,27 @@ export default ({ title, from, to, disableFrom, disableTo, onChange, UIComponent
         {!disableFrom && (
           <UIComponents.Input
             type="number"
-            value={from || ''}
             placeholder={'Min'}
-            onChange={val => onChange({ from: val && _.toNumber(val) }) }
+            {...(onChange ? {
+              onChange: val => onChange({ from: val && _.toNumber(val) }),
+              value: from || ''
+            } : {
+              name: `${name}[from]`,
+              defaultValue: from || ''
+            } )}
           />
         )}
         {!disableTo && (
           <UIComponents.Input
             type="number"
-            value={to || ''}
             placeholder={'Max'}
-            onChange={val => onChange({ to: val && _.toNumber(val) }) }
+            {...(onChange ? {
+              onChange: val => onChange({ to: val && _.toNumber(val) }),
+              value: to || ''
+            } : {
+              name: `${name}[to]`,
+              defaultValue: to || ''
+            } )}
           />
         )}
       </UIComponents.Grid>

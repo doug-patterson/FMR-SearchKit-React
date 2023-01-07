@@ -23,12 +23,16 @@ export default ({
               <UIComponents.CheckBox
                 label={display({ ...value, ...lookup, _id })}
                 checked={checked}
-                onChange={checked => {
-                  let newValues = checked
-                    ? _.concat(values, _id)
-                    : _.without([_id], values)
-                  onChange({ values: newValues })
-                }}
+                {...(onChange ? {
+                  onChange: checked => {
+                    let newValues = checked
+                      ? _.concat(values, _id)
+                      : _.without([_id], values)
+                    onChange({ values: newValues })
+                  }
+                } : {
+                  name: `${title}[${_id}]`
+                })}
               />
               <span style={{ textAlign: 'right', justifySelf: 'end' }}>
                 {count}

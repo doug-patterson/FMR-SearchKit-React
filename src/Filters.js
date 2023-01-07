@@ -35,17 +35,27 @@ let updateFilters = filters => idx => patch =>
   ]
 
 
+// we need to handle the search button better - needs to move up to the main
+// layout and potentially be accompanied by sort controls and column pickers
+
 export default ({ children, filters, filterOptions, schema, UIComponents, runSearch }) => 
   <div key={_.join(',', _.keys(schema.properties))} style={{ gridArea: 'filters' }}>
+    {!runSearch && <UIComponents.Button
+      type="submit"
+    >Search</UIComponents.Button>}
     {children}
     {mapIndexed((filter, idx) => {
       let Component = getFilterComponent(filter.type)
       return (
         <Component
           key={filter.key}
-          onChange={async patch => runSearch({
-            filters: updateFilters(filters)(idx)(patch),
-            page: 1
+          {...(runSearch ? {
+            onChange: async patch => runSearch({
+              filters: updateFilters(filters)(idx)(patch),
+              page: 1
+            })
+          } : {
+            name: filter.key
           })}
           title={filter.key}
           {..._.omit(['key'], filter)}
@@ -58,7 +68,7 @@ export default ({ children, filters, filterOptions, schema, UIComponents, runSea
         />
       )
     }, _.reject('hide', filters))}
-    <UIComponents.Button
+    {runSearch && <UIComponents.Button
       onClick={() => runSearch({})}
-    >Reset Search</UIComponents.Button>
+    >Reset Search</UIComponents.Button>}
   </div>

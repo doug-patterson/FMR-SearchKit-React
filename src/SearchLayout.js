@@ -33,7 +33,8 @@ export default ({
   UIComponents: ThemeComponents,
   schemas,
   execute,
-  layoutStyle
+  layoutStyle,
+  mode = 'feathers'
 }) => {
   let UIComponents = _.defaults(DefaultUIComponents, ThemeComponents)
 
@@ -67,7 +68,11 @@ export default ({
       ...patch
     }
 
-    let { results, resultsCount: newResultsCount, charts, ...filterResults } = await execute(updatedSearch)
+    let { results, resultsCount: newResultsCount, charts, ...filterResults } = await execute(updatedSearch) || {}
+
+    if (mode === 'route') {
+      return
+    }
 
     setResultsCount(_.get('count', newResultsCount) || 0)
     setSearch(updatedSearch)

@@ -1,5 +1,5 @@
 import React from 'react'
-import Paginator from './Paginator'
+import DefaultPaginator from './Paginator'
 import ResultsTable from './ResultsTableHOC'
 import _ from 'lodash/fp'
 
@@ -15,9 +15,9 @@ export default ({
   pageSize,
   page = 1,
   ResultsComponent = ResultsTable,
-  stateless,
+  Paginator = DefaultPaginator,
   UIComponents,
-}) => console.log({ page }) || (
+}) => (
   <div style={{ gridArea: 'results' }}>
     <UIComponents.Box>
       <ResultsComponent
@@ -33,30 +33,27 @@ export default ({
         }}
       />
       <UIComponents.Grid columns="auto 1fr auto">
-        {stateless ? (
-          <div />
-        ) : (
-          <UIComponents.Select
+        <UIComponents.Select
             options={[10, 20, 50, 100]}
-            value={pageSize}
-            onChange={option => runSearch({ pageSize: _.toNumber(option) })}
+            {...(runSearch ? {
+              onChange: option => runSearch({ pageSize: _.toNumber(option) }),
+              value: pageSize
+            } : {
+              name: 'pageSize',
+              defaultValue: pageSize
+            })}
             style={{ backgroundColor: 'white' }}
           />
-        )}
         <div />
-        {stateless ? (
-          <div />
-        ) : (
-          <Paginator
-            {...{
-              page,
-              setPage: newPage => runSearch({ page: newPage }),
-              resultsCount,
-              pageSize,
-              UIComponents,
-            }}
-          />
-        )}
+        <Paginator
+          {...{
+            page,
+            ...(runSearch ? { setPage: newPage => runSearch({ page: newPage }) } : { name: 'page' }),
+            resultsCount,
+            pageSize,
+            UIComponents,
+          }}
+        />
       </UIComponents.Grid>
     </UIComponents.Box>
   </div>

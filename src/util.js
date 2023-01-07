@@ -31,7 +31,7 @@ export const flattenObject = (input, paths) =>
     input
   )
 
-const defaultKeyValueDisplay = obj => <div>{mapIndexed((v, k) => [<div><span>{k}</span>: <span>{`${v}`}</span></div>], obj)}</div>
+const defaultKeyValueDisplay = obj => <div>{mapIndexed((v, k) => [<div key={`${k}`}><span>{k}</span>: <span>{`${v}`}</span></div>], obj)}</div>
 
 const arrayValueDisplay = val => _.isObject(val) ? defaultKeyValueDisplay(val) : `${val}`
 
@@ -80,3 +80,100 @@ export const shortNum = val => {
   }
   return val
 }
+
+export const setUpSchemas = async (fullOverrides, schemas) => {
+  let collections = _.keys(schemas)
+  for (let key of collections) {
+    let override = fullOverrides[key]
+    if (override) {
+      for (let prop in override.properties) {
+        schemas = _.update(`${key}.properties.${prop}`, field => ({ ...field, ...override.properties[prop] }), schemas)
+      }
+    }
+  }
+
+  return schemas
+}
+
+const urlEncode = typeof encodeURIComponent === 'function' ? encodeURIComponent : _.identity
+
+const filterToQueryElements = ({ key, to, interval, from, values, checked }) => {
+  let elements = _.pickBy(_.identity, { to, from, interval, [key]: checked ? 'on' : null })
+
+  let valueElements = _.size(values) ? _.flow(
+    _.map(val => [val, 'on']),
+    _.fromPairs
+  )(values) : {}
+
+  elements = _.mapKeys(k => k === key ? k : `${key}[${k}]`, {
+    ...elements,
+    ...valueElements
+  })
+
+  let queryArray = []
+  for (let key in elements) {
+    queryArray.push(`${urlEncode(key)}=${urlEncode(elements[key])}`)
+  }
+
+  let query = _.join('&', queryArray)
+
+  return query
+}
+
+export const buildRoute = (search, currentUrl) => {
+  let filterQueries = _.compact(_.map(filterToQueryElements, search.filters))
+  return `${currentUrl.split('?')[0]}?${_.join('&', filterQueries)}`
+}
+
+const facetValues = _.flow(
+  _.map(_.flow(
+    _.split('['),
+    _.last,
+    val => val.replace(']', '')
+  )),
+  values => ({ values })
+)
+
+// we need to do more to handle what happens when the initialSearch
+// for a layout has a filter that already has values - basically, 
+// if we have anything in the query string we should NOT use any default
+// values from the initialSearch since we know the query string was
+// produced by a user changing theinitial layout.
+//
+// we could require layout users to specify `initalValues` separately
+// in the few cases they're wanted. Then when hydrating the search here
+// what we do is if there is a non-empty query string we use the values
+// from that and ignore initialValues, otherwise we use initialValues
+// where they're found. 
+// 
+// that's a clunky API though. Better to let users set `values` directly
+// and then if we find a query, for any filter not mentioned in the query
+// we need to unset any initial value it might have.
+
+const setFilterValues = type => ({
+  facet: facetValues,
+  arrayElementPropFacet: facetValues,
+  boolean: (keys, values) => ({ checked: _.get(_.first(keys), values) === 'on' }),
+  numeric: (keys, values) => _.pickBy(_.identity, {
+    from: _.get(_.find(_.includes('from'), keys), values),
+    to: _.get(_.find(_.includes('to'), keys), values)
+  }),
+  dateTimeInterval: (keys, values) => _.pickBy(_.identity, {
+    interval: _.get(_.find(_.includes('interval'), keys), values),
+    from: _.get(_.find(_.includes('from'), keys), values),
+    to: _.get(_.find(_.includes('to'), keys), values)
+  }),
+}[type] || (() => ({})))
+
+export const includeSubmittedSearch = (initialSearch, values) =>  _.update(
+  'filters', 
+  _.map(filter => ({
+    ...filter,
+    ...setFilterValues(filter.type)(..._.flow(
+      _.keys,
+      _.filter(_.startsWith(filter.key)),
+      filterValueKeys => [filterValueKeys, _.pick(filterValueKeys, values)]
+    )(values))
+  })), initialSearch)
+
+

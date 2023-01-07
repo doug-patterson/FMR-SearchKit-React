@@ -3,6 +3,8 @@ import { cookies } from 'next/headers'
 import _ from 'lodash/fp'
 import * as DefaultUIClientComponents from './DefaultUIClientComponents'
 
+// remove and sub in the new version
+
 export default async props => {
   const nextJSCookies = await cookies()
   const jwt = nextJSCookies.get('feathersJWT')

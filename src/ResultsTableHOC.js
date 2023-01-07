@@ -137,7 +137,7 @@ const Component = ({
   <UIComponents.Box style={{ width: '100%', overflowX: 'auto' }}>
     <UIComponents.Table className="results-table">
       <UIComponents.TableHeader>
-        <UIComponents.TableRow elevation="medium">
+        <UIComponents.TableRow>
           {_.map(
             field => (
               <UIComponents.TableCell key={field}>
@@ -164,7 +164,7 @@ const Component = ({
             <UIComponents.TableRow key={row._id} id={row._id}>
               {_.map(
                 field => (
-                  <UIComponents.TableCell>
+                  <UIComponents.TableCell key={field}>
                     {renderCell({ row, field, schema })}
                   </UIComponents.TableCell>
                 ),

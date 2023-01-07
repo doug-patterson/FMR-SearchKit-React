@@ -18,6 +18,36 @@ const americanDates = _.map(({ id, data }) => ({
   data: _.map(({ x, y }) => ({ x: americanDate(x), y }), data)
 }))
 
+export let CheckBox = ({ checked, label, onChange }) => {
+  let id = _.uniqueId('fmr-checkbox-')
+
+  return (
+    <>
+      <input
+        type="checkbox"
+        checked={checked}
+        id={id}
+        className="fmr-checkbox"
+        {...(onChange
+          ? { onChange: e => e.target && onChange(e.target.checked) }
+          : {})}
+      />
+      <label htmlFor={id}>{label}</label>
+    </>
+  )
+}
+
+export let Input = ({ type, value, placeholder, onChange, ...props }) => (
+  <input
+    className="fmr-input"
+    onChange={e => e && e.target && onChange(e.target.value)}
+    placeholder={placeholder}
+    value={value}
+    type={type}
+    {...props}
+  />
+)
+
 export let DateLineSingle = ({ data, x, y, xLabel, yLabel, isCurrency }) => <ResponsiveLine
 data={americanDates(data)}
 curve="linear"

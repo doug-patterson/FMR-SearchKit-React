@@ -47,8 +47,6 @@ export default ({
   let resultsCount = _.flow(_.first, _.get('resultsCount'))(data)
   data = _.map(_.omit(['resultsCount']), data)
 
-  console.log({ schemas, valueSchema })
-
   return <Results
     {...props}
     runSearch={updateChartSearch}

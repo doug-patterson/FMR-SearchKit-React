@@ -1,9 +1,15 @@
 'use client'
 
+// DELETE - HOC is now where it's at
+
 import React from 'react'
 import SearchLayout from './SearchLayout'
 import getApp, { getSchemas } from '../../feathersClient'
 import _ from 'lodash/fp'
+
+// convert to an HOC that receives this as a prop
+// then make a component in the project that feeds
+// in the project overrides
 import overrides from '../../app/overrides'
 
 let initApp = async (setApp, setInitialResults, initialSearch) => {

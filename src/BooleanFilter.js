@@ -1,7 +1,7 @@
 import React from 'react'
 import _ from 'lodash/fp'
 
-export default ({ title, checked, onChange, UIComponents }) => (
+export default ({ title, checked, onChange, name, UIComponents }) => (
   <UIComponents.Card>
     <UIComponents.CardHeader>
       {_.startCase(title)}
@@ -9,8 +9,12 @@ export default ({ title, checked, onChange, UIComponents }) => (
     <UIComponents.CardBody>
       <UIComponents.CheckBox
         checked={checked}
-        label={'True'}
-        onChange={checked => onChange({ checked })}
+        label={'Yes'}
+        {...(onChange ? {
+          onChange: val => onChange({ checked: val }),
+        }: {
+          name
+        })}
       />
     </UIComponents.CardBody>
   </UIComponents.Card>

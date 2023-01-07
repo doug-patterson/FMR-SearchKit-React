@@ -23,8 +23,9 @@ export default ({ title, from, to, interval, disableFrom, disableTo, disableInte
         {!disableInterval && (
           <UIComponents.Select
             label={'Interval'}
-            options={_.map(label => ({ label, value: label }), [
-              'Select',
+            value={interval || ''}
+            options={[
+              '',
               'Today',
               'Current Week',
               'Current Month',
@@ -47,25 +48,38 @@ export default ({ title, from, to, interval, disableFrom, disableTo, disableInte
               'Previous Full Month',
               'Previous Full Quarter',
               'Previous Full Year',*/
-            ])}
-            onChange={val => onChange(val === 'Select' ? null : { interval: val, from: null, to: null, offset: null })}
-            value={interval}
+            ]}
+            {...(onChange ? {
+              onChange: val => onChange(val === 'Select' ? null : { interval: val, from: null, to: null, offset: null })
+            } : {
+              name: `${title}[interval]`
+            })}
           ></UIComponents.Select>
         )}
         {!disableFrom && (
           <UIComponents.Input
             type="datetime-local"
-            value={from || ''}
             placeholder={'Start'}
-            onChange={val => onChange({ from: val, interval: null, offset: new Date().getTimezoneOffset()  }) }
+            {...onChange ? {
+              onChange: val => onChange({ from: val, interval: null, offset: new Date().getTimezoneOffset()  }),
+              value: from || ''
+            } : {
+              name: `${title}[from]`,
+              defaultValue: from || ''
+            }}
           />
         )}
         {!disableTo && (
           <UIComponents.Input
             type="datetime-local"
-            value={to || ''}
             placeholder={'End'}
-            onChange={val => onChange({ to: val, interval: null, offset: new Date().getTimezoneOffset() }) }
+            {...onChange ? {
+              onChange: val => onChange({ to: val, interval: null, offset: new Date().getTimezoneOffset() }),
+              value: to || ''
+            } : {
+              name: `${title}[to]`,
+              defaultValue: to || ''
+            }}
           />
         )}
       </UIComponents.Grid>

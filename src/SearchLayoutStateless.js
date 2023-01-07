@@ -1,50 +1,28 @@
 import React from 'react'
 import * as DefaultUIComponents from './DefaultUIComponents'
 
+import DefaultLayout from './DefaultLayout'
 import _ from 'lodash/fp'
-import { mapIndexed, mapValuesIndexed, addDefaultDisplays } from './util'
+import { addDefaultDisplays } from './util'
 
-import BooleanFilter from './BooleanFilter'
-import Facet from './Facet'
-import NumericFilter from './NumericFilter'
 import Results from './Results'
 import ResultsTableStateless from './ResultsTableStateless'
+import PaginatorStatic from './PaginatorStatic'
 
-let NoComponent = () => 'no filter found'
-let Hidden = () => ''
-let getFilterComponent = type =>
-  ({
-    none: NoComponent,
-    facet: Facet,
-    arrayElementPropFacet: Facet,
-    hidden: Hidden,
-    numeric: NumericFilter,
-    boolean: BooleanFilter,
-    arraySize: NumericFilter,
-  }[type || 'none'])
-
-let updateFilters = initialSearch => idx => patch => ({
-  ...initialSearch,
-  filters: [
-    ..._.slice(0, idx, initialSearch.filters),
-    mapValuesIndexed(
-      (v, k) => (_.has(k, patch) ? _.get(k, patch) : v),
-      _.clone(initialSearch.filters[idx])
-    ),
-    ..._.slice(idx + 1, Infinity, initialSearch.filters),
-  ]
-})
+import Filters from './Filters'
 
 export default ({
   collection,
   initialSearch,
-  initialResults = [],
+  initialResults = {},
   children,
   UIComponents: ThemeComponents,
   schemas,
-  execute,
+  layoutStyle
 }) => {
   let UIComponents = _.defaults(DefaultUIComponents, ThemeComponents)
+
+  let Layout = ({ children }) => <DefaultLayout style={layoutStyle}>{children}</DefaultLayout>
 
   schemas = addDefaultDisplays(schemas)
   let schema = schemas[collection]
@@ -52,53 +30,38 @@ export default ({
     return 'Schema not found'
   }
 
-  let filterOptions =_.map(_.pick('key'), initialSearch.filters)
+  let filterOptions =_.map(
+    ({ key }) => ({
+      key,
+      options: initialResults[key],
+    }),
+    initialSearch.filters
+  ) || _.map(_.pick('key'), initialSearch.filters)
 
   return (
-    <form action={``} method="POST">
+    <form method="GET" className='fmr-form'>
       <UIComponents.Box>
-        <UIComponents.Grid columns="1fr 5fr" gap={10}>
-          <UIComponents.Box>
-            {children}
-            {mapIndexed((filter, idx) => {
-              let Component = getFilterComponent(filter.type)
-              return (
-                <Component
-                  key={filter.key}
-                  title={filter.key}
-                  {...filter}
-                  options={_.get(
-                    'options',
-                    _.find({ key: filter.key }, filterOptions)
-                  )}
-                  display={schema.properties[filter.field].display}
-                  UIComponents={UIComponents}
-                />
-              )
-            }, initialSearch.filters)}
-            <UIComponents.SubmitButton>Search</UIComponents.SubmitButton>
-          </UIComponents.Box>
-          <UIComponents.Box style={{ overflowY: 'scroll', paddingBottom: 120 }}>
-            <Results
-              {...{
-                include: _.without(initialSearch.omitFromResults, initialSearch.include),
-                setInclude: include => runSeach({ ...initialSearch, include }),
-                setSortField: sortField => runSeach({ ...initialSearch, sortField }),
-                setSortDir: sortDir => runSeach({ ...initialSearch, sortDir }),
-                schema: _.update('properties', _.omit(initialSearch.omitFromResults), schema),
-                rows: initialResults,
-                resultsCount: initialSearch.resultsCount,
-                pageSize: initialSearch.pageSize,
-                setPageSize: pageSize => runSeach({ ...initialSearch, pageSize }),
-                page: initialSearch.page,
-                setPage: page => runSeach({ ...initialSearch, page }),
-                UIComponents,
-                ResultsComponent: ResultsTableStateless,
-                stateless: true
-              }}
-            />
-          </UIComponents.Box>
-        </UIComponents.Grid>
+        <Layout>
+          <Filters
+            filters={initialSearch.filters}
+            filterOptions={filterOptions}
+            schema={schema}
+            UIComponents={UIComponents}
+          >{children}</Filters>
+          <Results
+            {...{
+              include: _.without(initialSearch.omitFromResults, initialSearch.include),
+              schema: _.update('properties', _.omit(initialSearch.omitFromResults), schema),
+              rows: initialResults.results,
+              resultsCount: initialSearch.resultsCount,
+              pageSize: initialSearch.pageSize,
+              page: initialSearch.page,
+              UIComponents,
+              ResultsComponent: ResultsTableStateless,
+              Paginator: PaginatorStatic
+            }}
+          />
+        </Layout>
       </UIComponents.Box>
     </form>
   )
