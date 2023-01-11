@@ -18,7 +18,7 @@ export default ({ initialSearch, schema, schemas, chartData, UIComponents, updat
         {..._.omit(['key'], chart)}
         key={chart.key}
         chartKey={chart.key}
-        data={chartData[chart.key] || []}
+        data={chartData && chartData[chart.key] || []}
         schema={schema}
         schemas={schemas}
         UIComponents={UIComponents}

@@ -13,7 +13,7 @@ export default async props => {
   
     // we should check a flag for not running data for the charts
     // since some chart solutions aren't server renderable
-    const initialResponse = await fetch(props.feathersOrigin || 'http://localhost:3030/search', {
+    const initialResponse = await fetch(`${props.feathersOrigin}/search`, {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',

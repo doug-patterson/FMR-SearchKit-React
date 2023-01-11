@@ -1,5 +1,34 @@
-import _SearchLayout from './SearchLayout'
-import _SearchLayoutStateless from './SearchLayoutStateless'
+export { includeSubmittedSearch } from './util'
+import Next13Search from './Next13HybridSearchNew'
 
-export let SearchLayout = _SearchLayout
-export let SearchLayoutStateless = _SearchLayoutStateless
+export default ({
+  feathersOrigin,
+  preparePage = async val => val,
+  overridesStateless,
+  UIComponents = {},
+  UIComponentsStateless = {},
+  FeathersSearchClientRenderer
+}) => {
+  const Next13HybridSearchWithFeathersOrigin = props => <Next13Search {...props} feathersOrigin={`${feathersOrigin}` } />
+  const FeathersSearchController = props => <Next13HybridSearchWithFeathersOrigin {...props} />
+
+  const FeathersSearch = props => {
+    return <FeathersSearchController {...props} SearchLayout={FeathersSearchClientRenderer} />
+  }
+
+  const FeathersSearchPage = async props => {
+    let { hydratedSearch, schemas } = await preparePage(props)
+    
+    return <FeathersSearch
+      {...props}
+      initialSearch={hydratedSearch}
+      schemas={schemas}
+      isPage={true}
+    />
+  }
+
+  return {
+    FeathersSearch,
+    FeathersSearchPage
+  }
+}
