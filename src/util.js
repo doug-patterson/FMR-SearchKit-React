@@ -81,18 +81,19 @@ export const shortNum = val => {
   return val
 }
 
-export const setUpSchemas = async (fullOverrides, schemas) => {
+export const setUpSchemas = (fullOverrides, schemas) => {
+  let newSchemas = schemas
   let collections = _.keys(schemas)
   for (let key of collections) {
     let override = fullOverrides[key]
     if (override) {
       for (let prop in override.properties) {
-        schemas = _.update(`${key}.properties.${prop}`, field => ({ ...field, ...override.properties[prop] }), schemas)
+        newSchemas = _.update(`${key}.properties.${prop}`, field => ({ ...field, ...override.properties[prop] }), newSchemas)
       }
     }
   }
 
-  return schemas
+  return newSchemas
 }
 
 const urlEncode = typeof encodeURIComponent === 'function' ? encodeURIComponent : _.identity

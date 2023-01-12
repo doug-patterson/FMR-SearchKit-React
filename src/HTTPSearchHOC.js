@@ -4,9 +4,8 @@ import _ from 'lodash/fp'
 import { setUpSchemas } from './util'
 
 const HTTPSearchWithOverrides = props => <SearchLayoutStateless
-  initialSearch={{ collection: props.collection }}
-  schemas={setUpSchemas(_.merge(props.defaultOverrides, props.overrides))}
   {...props}
+  schemas={setUpSchemas(_.merge(props.defaultOverrides, props.overrides), props.schemas)}
 />
 
 export default props => <HTTPSearchWithOverrides {...props} />

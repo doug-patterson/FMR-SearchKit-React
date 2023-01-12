@@ -9,27 +9,10 @@ import Results from './Results'
 import Charts from './Charts'
 import Filters from './Filters'
 
-// move local storage handling up in the component hierarchy
-let getLocalStorageSearch = (storageKey, searchVersion) => {
-  let item = localStorage.getItem(storageKey)
-  let search
-  if (item) {
-    let data = JSON.parse(item)
-    if (data.searchVersion >= searchVersion) {
-      search = data.search
-    }
-  }
-
-  return search
-}
-
 export default ({
-  collection,
   initialSearch,
   initialResults = {},
   children,
-  storageKey,
-  //searchVersion,
   UIComponents: ThemeComponents,
   schemas,
   execute,
@@ -41,12 +24,10 @@ export default ({
   let Layout = ({ children }) => <DefaultLayout style={layoutStyle}>{children}</DefaultLayout>
 
   schemas = addDefaultDisplays(schemas)
-  let schema = schemas[collection]
+  let schema = schemas[initialSearch.collection]
   if (!schema) {
     return 'Schema not found'
   }
-
-  storageKey = storageKey || collection
 
   let [search, setSearch] = React.useState(initialSearch)
   let [filterOptions, setFilterOptions] = React.useState(

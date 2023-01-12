@@ -1,22 +1,23 @@
 export { includeSubmittedSearch } from './util'
-import Next13Search from './Next13HybridSearchNew'
+import SearchController from './SearchController'
+import HTTPSearchHOC from './HTTPSearchHOC'
 
 export default ({
   feathersOrigin,
-  preparePage = async val => val,
+  preparePage,
+  runInitialSearch,
   overridesStateless,
-  UIComponents = {},
-  UIComponentsStateless = {},
+  UIComponentsStateless,
   FeathersSearchClientRenderer
 }) => {
-  const Next13HybridSearchWithFeathersOrigin = props => <Next13Search {...props} feathersOrigin={`${feathersOrigin}` } />
-  const FeathersSearchController = props => <Next13HybridSearchWithFeathersOrigin {...props} />
+  const HydratedSearchController = props => <SearchController {...props} runInitialSearch={(runInitialSearch && !props.clientOnly) ? runInitialSearch : null} />
 
-  const FeathersSearch = props => {
-    return <FeathersSearchController {...props} SearchLayout={FeathersSearchClientRenderer} />
-  }
+  const FeathersSearch = props => <HydratedSearchController
+    {...props}
+    SearchLayout={FeathersSearchClientRenderer}
+  />
 
-  const FeathersSearchPage = async props => {
+  const FeathersSearchPage = preparePage ? async props => {
     let { hydratedSearch, schemas } = await preparePage(props)
     
     return <FeathersSearch
@@ -25,10 +26,29 @@ export default ({
       schemas={schemas}
       isPage={true}
     />
-  }
+  } : null
+
+  const HydratedSearchControllerWithStatelessOverrides = props => <SearchController {...props} defaultOverrides={overridesStateless} runInitialSearch={(runInitialSearch && !props.clientOnly) ? runInitialSearch : null} />
+
+  const HTTPSearch = props => <HydratedSearchControllerWithStatelessOverrides
+    {...props}
+    UIComponents={UIComponentsStateless}
+    SearchLayout={HTTPSearchHOC}
+  />
+
+  const HTTPSearchPage = preparePage ? async props => {
+    let { hydratedSearch, schemas } = await preparePage(props)
+    
+    return <HTTPSearch
+      {...props}
+      initialSearch={hydratedSearch}
+      schemas={schemas}
+    />
+  } : null
 
   return {
     FeathersSearch,
-    FeathersSearchPage
+    FeathersSearchPage,
+    HTTPSearchPage
   }
 }

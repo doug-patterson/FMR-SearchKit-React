@@ -21,7 +21,7 @@ const ClientSearchWithOverrides = props => {
   React.useEffect(() => {
     let setUp = async () => {
       initApp(setApp, props.clientOnly ? setInitialResults : null, props.initialSearch, props.schemas)
-      setSchemas(await setUpSchemas(_.merge(props.defaultOverrides, props.overrides), props.schemas))
+      setSchemas(setUpSchemas(_.merge(props.defaultOverrides, props.overrides), props.schemas))
     }
     setUp()
   }, [])

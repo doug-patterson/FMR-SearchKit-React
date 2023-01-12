@@ -3,6 +3,7 @@
 import React from 'react'
 import ClientSearch from './ClientSearchHOC'
 import { buildRoute } from './util'
+import * as DefaultUIClientComponents from './DefaultUIClientComponents'
 
 let FeathersSearchRenderer = props => {
   let [schemas, setSchemas] = React.useState(props.schemas)
@@ -25,11 +26,12 @@ let FeathersSearchRenderer = props => {
     fn()
   }, [])
 
-  return schemas && <ClientSearch
-    key={_.uniqueId()} // remove
+  return app && schemas && <ClientSearch
+    key={_.uniqueId() /* currently mode="route" doesn't work without this but with it the cient search renders and runs the search too often - needs a fix*/} 
     {...props}
     schemas={schemas}
     defaultOverrides={props.overrides}
+    UIComponents={_.merge(props.UIComponents, DefaultUIClientComponents)}
     execute={props.mode === 'route'
       ? (...args) => { router.push(buildRoute(...args, typeof window === 'object' && window.location.href)) }
       : (...args) => {

@@ -12,7 +12,6 @@ import PaginatorStatic from './PaginatorStatic'
 import Filters from './Filters'
 
 export default ({
-  collection,
   initialSearch,
   initialResults = {},
   children,
@@ -25,7 +24,7 @@ export default ({
   let Layout = ({ children }) => <DefaultLayout style={layoutStyle}>{children}</DefaultLayout>
 
   schemas = addDefaultDisplays(schemas)
-  let schema = schemas[collection]
+  let schema = schemas[initialSearch.collection]
   if (!schema) {
     return 'Schema not found'
   }
