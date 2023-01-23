@@ -1,5 +1,4 @@
 export { includeSubmittedSearch } from './util'
-export { FeathersClientSearchHOC } from './FeathersClientSearchHOC'
 import SearchController from './SearchController'
 import HTTPSearchHOC from './HTTPSearchHOC'
 

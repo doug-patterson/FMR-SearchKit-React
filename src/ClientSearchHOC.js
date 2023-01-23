@@ -33,3 +33,4 @@ const ClientSearchWithOverrides = props => {
 }
 
 export default props => <ClientSearchWithOverrides {...props} />
+
