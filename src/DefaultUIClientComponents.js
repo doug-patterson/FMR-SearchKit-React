@@ -2,10 +2,10 @@
 
 import React from 'react'
 import _ from 'lodash/fp'
-import { ResponsiveLine } from '@nivo/line'
-import { ResponsiveCalendar } from '@nivo/calendar'
-import { ResponsivePie } from '@nivo/pie'
-import { ResponsiveBar } from '@nivo/bar'
+import { Line } from '@nivo/line'
+import { Calendar } from '@nivo/calendar'
+import { Pie } from '@nivo/pie'
+import { Bar } from '@nivo/bar'
 
 const americanDate = _.flow(
   _.split('/'),
@@ -37,20 +37,40 @@ export let CheckBox = ({ checked, label, onChange }) => {
   )
 }
 
-export let Input = ({ type, value, placeholder, onChange, ...props }) => (
+const ForwardRefInput = React.forwardRef((props, ref) => (
   <input
+    ref={ref}
+    {...props}
+  />
+))
+
+
+export let Input = ({ type, value, placeholder, onChange, focus, ...props }) => {
+  const inputEl = React.createRef()
+
+  React.useEffect(() => {
+    if (focus) {
+      inputEl.current.focus()
+    }
+  }, [focus])
+
+  return <ForwardRefInput
     className="fmr-input"
+    ref={inputEl}
     onChange={e => e && e.target && onChange(e.target.value)}
     placeholder={placeholder}
     value={value}
     type={type}
     {...props}
   />
-)
+}
 
-export let DateLineSingle = ({ data, x, y, xLabel, yLabel, isCurrency }) => <ResponsiveLine
+export let DateLineSingle = ({ data, x, y, xLabel, yLabel, isCurrency, height, chartWidths, chartKey }) => <Line
 data={americanDates(data)}
 curve="linear"
+width={chartWidths.current[chartKey]}
+height={height}
+animate={false}
 colors={{ scheme: 'set2' }}
 margin={{ top: 50, right: 60, bottom: 50, left: 60 }}
 xScale={{ type: 'point' }} // need to figure point v linear somehow
@@ -93,9 +113,12 @@ useMesh={true}
 tooltip={({ point }) => <div style={{ padding: 4, backgroundColor: 'white' }}><b>{point?.data?.x}</b>: {isCurrency ? '$' : ''}{point?.data?.y}</div>}
 />
 
-export let DateTimeLine = ({ data, x, y, isCurrency, xLabel, yLabel }) => <ResponsiveLine
+export let DateTimeLine = ({ data, x, y, isCurrency, xLabel, yLabel, height, chartWidths, chartKey }) => <Line
 data={isCurrency ? formatCurrency(data) : data}
 curve="linear"
+height={height}
+width={chartWidths.current[chartKey]}
+animate={false}
 colors={{ scheme: 'paired' }}
 margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
 xScale={{ type: 'point' }}
@@ -181,8 +204,14 @@ let americanDate2 = _.flow(
   ([year, month, day]) => `${month || ''}${month ? '/' : ''}${day || ''}${day ? '/' : ''}${year}`
 )
 
-export let QuantityByPeriodCalendar = ({ data, isCurrency, onClick }) => <ResponsiveCalendar
+// likely the only way to size this correctly is to render each year into its own
+// parent with one of these inside of it so that the layout can expand naturally
+// with css as years are added. That or we'll have to calculatte the height from the
+// number of years, but that may cause more flashing on rerender
+export let QuantityByPeriodCalendar = ({ data, isCurrency, onClick, height, chartWidths, chartKey }) => <Calendar
   data={fixDates(data)}
+  height={height}
+  width={chartWidths.current[chartKey]}
   from={_.flow(_.first, _.get('day'))(data)}
   to={_.flow(_.last, _.get('day'))(data)}
   emptyColor="#eeeeee"
@@ -211,7 +240,7 @@ let uniqueIdMaker = ids => label => {
   }
 }
 
-export let TopNPie = ({ data, chartKey, field, schema, legend }) => {
+export let TopNPie = ({ data, field, schema, legend, height, chartWidths, chartKey }) => {
   let getId = uniqueIdMaker({})
 
   data = _.map(datum => {
@@ -226,8 +255,10 @@ export let TopNPie = ({ data, chartKey, field, schema, legend }) => {
     }
   }, data)
 
-  return <ResponsivePie
+  return <Pie
     data={data}
+    height={height}
+    width={chartWidths.current[chartKey]}
     margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
     innerRadius={0.5}
     padAngle={0.7}
@@ -285,88 +316,88 @@ export let TopNPie = ({ data, chartKey, field, schema, legend }) => {
   />
 }
 
-export let DayOfWeekSummaryBars = ({ data, x, y, xLabel, yLabel, group, isCurrency }) => (
-  <ResponsiveBar
-      data={data}
-      keys={_.flow(
-        _.map(_.keys),
-        _.flatten,
-        _.uniq,
-        _.without(['id'])
-      )(data)}
-      margin={{ top: 50, right: group ? 130 : 80, bottom: 50, left: 80 }}
-      padding={0.3}
-      xScale={{ type: 'linear' }}
-      colors={{ scheme: 'set2' }}
-      valueFormat={`>-${isCurrency ? '$' : ''},.2r`}
-      borderColor={{
-          from: 'color',
-          modifiers: [
-              [
-                  'darker',
-                  1.6
-              ]
-          ]
-      }}
-      axisTop={null}
-      axisRight={null}
-      axisBottom={{
-          tickSize: 5,
-          tickPadding: 5,
-          tickRotation: -20,
-          legend: xLabel || x,
-          legendPosition: 'middle',
-          legendOffset: 36
-      }}
-      axisLeft={{
-          tickSize: 5,
-          tickPadding: 5,
-          tickRotation: 0,
-          legend: yLabel || y,
-          legendPosition: 'middle',
-          legendOffset: -70
-      }}
+export let DayOfWeekSummaryBars = ({ data, x, y, xLabel, yLabel, group, isCurrency, height, chartWidths, chartKey }) => <Bar
+data={data}
+width={chartWidths.current[chartKey]}
+height={height}
+layout="vertical"
+indexBy="id"
+animate={false}
+keys={_.flow(
+  _.map(_.keys),
+  _.flatten,
+  _.uniq,
+  _.without(['id'])
+)(data)}
+margin={{ top: 50, right: group ? 130 : 80, bottom: 50, left: 80 }}
+padding={0.3}
+xScale={{ type: 'linear' }}
+colors={{ scheme: 'set2' }}
+valueFormat={`>-${isCurrency ? '$' : ''},.2r`}
+borderColor={{
+    from: 'color',
+    modifiers: [
+        [
+            'darker',
+            1.6
+        ]
+    ]
+}}
+axisTop={null}
+axisRight={null}
+axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: -20,
+    legend: xLabel || x,
+    legendPosition: 'middle',
+    legendOffset: 36
+}}
+axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: yLabel || y,
+    legendPosition: 'middle',
+    legendOffset: -70
+}}
 
-      labelSkipWidth={12}
-      labelSkipHeight={12}
-      labelTextColor={{
-          from: 'color',
-          modifiers: [
-              [
-                  'darker',
-                  1.6
-              ]
-          ]
-      }}
-      {...(group ? { legends: [
-        {
-            dataFrom: 'keys',
-            anchor: 'bottom-right',
-            direction: 'column',
-            justify: false,
-            translateX: 120,
-            translateY: 0,
-            itemsSpacing: 2,
-            itemWidth: 100,
-            itemHeight: 20,
-            itemDirection: 'left-to-right',
-            itemOpacity: 0.85,
-            symbolSize: 20,
-            effects: [
-                {
-                    on: 'hover',
-                    style: {
-                        itemOpacity: 1
-                    }
-                }
-            ]
-        }
-      ] } : {})}
-      role="application"
-      ariaLabel="a11y"
-      barAriaLabel={function(e){return e.id+": "+e.formattedValue+" in country: "+e.indexValue}}
-  />
-)
+labelSkipWidth={12}
+labelSkipHeight={12}
+labelTextColor={{
+    from: 'color',
+    modifiers: [
+        [
+            'darker',
+            1.6
+        ]
+    ]
+}}
+{...(group ? { legends: [
+  {
+      dataFrom: 'keys',
+      anchor: 'bottom-right',
+      direction: 'column',
+      justify: false,
+      translateX: 120,
+      translateY: 0,
+      itemsSpacing: 2,
+      itemWidth: 100,
+      itemHeight: 20,
+      itemDirection: 'left-to-right',
+      itemOpacity: 0.85,
+      symbolSize: 20,
+      effects: [
+          {
+              on: 'hover',
+              style: {
+                  itemOpacity: 1
+              }
+          }
+      ]
+  }
+] } : {})}
+/>
 
 const addZeroHours = hours => _.map(x => _.find({ x }, hours) || ({ x, y: 0 }), [..._.range(1, 24), 0])
 
@@ -385,8 +416,10 @@ const includeAllHours = _.map(({ id, data }) => ({
   )(data)
 }))
 
-export let HourOfDaySummaryLine = ({ data, x, y, isCurrency, xLabel, yLabel, group }) => <ResponsiveLine
+export let HourOfDaySummaryLine = ({ data, x, y, isCurrency, xLabel, yLabel, group, height, chartWidths, chartKey }) => <Line
   data={includeAllHours(data)}
+  width={chartWidths.current[chartKey]}
+  height={height}
   curve="linear"
   colors={{ scheme: 'paired' }}
   margin={{ top: 50, right: group ? 130 : 80, bottom: 50, left: 80 }}

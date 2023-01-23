@@ -1,4 +1,5 @@
 export { includeSubmittedSearch } from './util'
+export { FeathersClientSearchHOC } from './FeathersClientSearchHOC'
 import SearchController from './SearchController'
 import HTTPSearchHOC from './HTTPSearchHOC'
 
@@ -14,7 +15,7 @@ export default ({
 
   const FeathersSearch = props => <HydratedSearchController
     {...props}
-    SearchLayout={FeathersSearchClientRenderer}
+    SearchLayout={props.FeathersSearchClientRenderer || FeathersSearchClientRenderer}
   />
 
   const FeathersSearchPage = preparePage ? async props => {

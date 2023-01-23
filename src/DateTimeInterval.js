@@ -10,7 +10,7 @@ import _ from 'lodash/fp'
 // ... actually we also need to send the offset with the endpoints too so we may as
 // well do that now
 
-export default ({ title, from, to, interval, disableFrom, disableTo, disableInterval, onChange, UIComponents }) => (
+export default ({ title, from, to, interval, disableFrom, disableTo, disableInterval, onChange, UIComponents, currentInput = {} }) => (
   <UIComponents.Card>
     <UIComponents.CardHeader>
       {_.startCase(title)}
@@ -23,7 +23,7 @@ export default ({ title, from, to, interval, disableFrom, disableTo, disableInte
         {!disableInterval && (
           <UIComponents.Select
             label={'Interval'}
-            value={interval || ''}
+            value={_.has(`${title}.interval`, currentInput.current) ? _.get(`${title}.interval`, currentInput.current) : (interval || '')}
             options={[
               '',
               'Today',
@@ -50,7 +50,10 @@ export default ({ title, from, to, interval, disableFrom, disableTo, disableInte
               'Previous Full Year',*/
             ]}
             {...(onChange ? {
-              onChange: val => onChange(val === 'Select' ? null : { interval: val, from: null, to: null, offset: null })
+              onChange: val => {
+                currentInput.current = { [`${title}.interval`]: val}
+                onChange({ interval: val, from: null, to: null, offset: null })
+              }
             } : {
               name: `${title}[interval]`
             })}
@@ -60,9 +63,13 @@ export default ({ title, from, to, interval, disableFrom, disableTo, disableInte
           <UIComponents.Input
             type="datetime-local"
             placeholder={'Start'}
+            focus={_.has(`${title}.from`, currentInput.current)}
             {...onChange ? {
-              onChange: val => onChange({ from: val, interval: null, offset: new Date().getTimezoneOffset()  }),
-              value: from || ''
+              onChange: val => {
+                currentInput.current = { [`${title}.from`]: val}
+                onChange({ from: val, interval: null, offset: new Date().getTimezoneOffset()  })
+              },
+              value: _.has(`${title}.from`, currentInput.current) ? _.get(`${title}.from`, currentInput.current) : (from || '')
             } : {
               name: `${title}[from]`,
               defaultValue: from || ''
@@ -73,9 +80,13 @@ export default ({ title, from, to, interval, disableFrom, disableTo, disableInte
           <UIComponents.Input
             type="datetime-local"
             placeholder={'End'}
+            focus={_.has(`${title}.to`, currentInput.current)}
             {...onChange ? {
-              onChange: val => onChange({ to: val, interval: null, offset: new Date().getTimezoneOffset() }),
-              value: to || ''
+              onChange: val => {
+                currentInput.current = { [`${title}.to`]: val}
+                onChange({ to: val, interval: null, offset: new Date().getTimezoneOffset() })
+              },
+              value: _.has(`${title}.to`, currentInput.current) ? _.get(`${title}.to`, currentInput.current) : (to || '')
             } : {
               name: `${title}[to]`,
               defaultValue: to || ''

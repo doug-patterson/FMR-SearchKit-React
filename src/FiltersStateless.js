@@ -7,6 +7,8 @@ import Facet from './Facet'
 import NumericFilter from './NumericFilter'
 import DateTimeInterval from './DateTimeInterval'
 
+
+// TODO: dry up with `Filters`
 let NoComponent = () => 'no filter found'
 let Hidden = () => ''
 
@@ -41,13 +43,13 @@ let updateFilters = filters => idx => patch =>
 // so we need to maintain a record of which input is focused and what its contents
 // are, that's all, then when rendering the filters that care need to use it
 
-export default ({ children, filters, filterOptions, schema, UIComponents, runSearch, currentInput }) => {
-  return <div key={_.join(',', _.keys(schema.properties))} style={{ gridArea: 'filters' }}>
+export default ({ children, filters, filterOptions, schema, UIComponents, runSearch, currentInput }) => 
+  <div key={_.join(',', _.keys(schema.properties))} style={{ gridArea: 'filters' }}>
     {!runSearch && <UIComponents.Button
       type="submit"
     >Search</UIComponents.Button>}
-      {children}
-      {mapIndexed((filter, idx) => {
+    {children}
+    {mapIndexed((filter, idx) => {
       let Component = getFilterComponent(filter.type)
       return (
         <Component
@@ -76,5 +78,3 @@ export default ({ children, filters, filterOptions, schema, UIComponents, runSea
       onClick={() => runSearch({})}
     >Reset Search</UIComponents.Button>}
   </div>
-} 
-  

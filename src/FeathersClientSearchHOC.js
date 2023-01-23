@@ -4,6 +4,7 @@ import React from 'react'
 import ClientSearch from './ClientSearchHOC'
 import { buildRoute } from './util'
 import * as DefaultUIClientComponents from './DefaultUIClientComponents'
+import _ from 'lodash/fp'
 
 let FeathersSearchRenderer = props => {
   let [schemas, setSchemas] = React.useState(props.schemas)
@@ -26,19 +27,32 @@ let FeathersSearchRenderer = props => {
     fn()
   }, [])
 
+  // reactions need to be supported by `execute` passing the search through
+  // a pipeline of search `constraints` that arrives here as props.constraints
+
   return app && schemas && <ClientSearch
-    key={_.uniqueId() /* currently mode="route" doesn't work without this but with it the cient search renders and runs the search too often - needs a fix*/} 
-    {...props}
+    key={_.uniqueId() /* currently mode="route" doesn't work without this*/} 
+    {..._.omit(['constraints'], props)}
     schemas={schemas}
     defaultOverrides={props.overrides}
     UIComponents={_.merge(props.UIComponents, DefaultUIClientComponents)}
-    execute={props.mode === 'route'
-      ? (...args) => { router.push(buildRoute(...args, typeof window === 'object' && window.location.href)) }
-      : (...args) => {
-          typeof window === 'object' && props.isPage && window.history.replaceState(null, null, buildRoute(...args, typeof window === 'object' && window.location.href))
-          return app.service('search').create(...args)
+    execute={async search => {
+      let constrainedSearch =_.size(props.constraints) ? _.flow(...props.constraints)(search) : search
+
+      if (props.mode === 'route') {
+        router.push(buildRoute(constrainedSearch, typeof window === 'object' && window.location.href))
+      } else {
+        let result = await app.service('search').create(constrainedSearch)
+        if (typeof window === 'object') {
+          if (props.isPage) {
+            window.history.replaceState(null, null, buildRoute(constrainedSearch, typeof window === 'object' && window.location.href))
+          }
+          window.chartResizer && window.chartResizer()
         }
-    }
+        return result
+      }
+
+    }}
   />
 }
 

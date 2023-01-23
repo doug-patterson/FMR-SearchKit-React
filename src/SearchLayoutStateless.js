@@ -9,7 +9,7 @@ import Results from './Results'
 import ResultsTableStateless from './ResultsTableStateless'
 import PaginatorStatic from './PaginatorStatic'
 
-import Filters from './Filters'
+import Filters from './FiltersStateless'
 
 export default ({
   initialSearch,
