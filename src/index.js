@@ -1,3 +1,4 @@
+import React from 'react'
 export { includeSubmittedSearch } from './util'
 import SearchController from './SearchController'
 import HTTPSearchHOC from './HTTPSearchHOC'
