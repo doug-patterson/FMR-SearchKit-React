@@ -13,28 +13,31 @@ const fieldStatsSchema = (valueInclude, valueSchema, key) => ({
       // somehow we need to be able to pass in the display function for the
       // value field - but how? We need to reuse the schema for the collecion
       // on which we're running stats somehow
-      display: _.get(`properties.${key}.display`, valueSchema) || _.get('display', valueSchema) || JSON.stringify
+      display:
+        _.get(`properties.${key}.display`, valueSchema) ||
+        _.get('display', valueSchema) ||
+        JSON.stringify
     },
     sum: {
-      bsonType: 'number',
+      bsonType: 'number'
     },
     count: {
-      bsonType: 'number',
+      bsonType: 'number'
     },
     avg: {
-      bsonType: 'number',
+      bsonType: 'number'
     },
     max: {
-      bsonType: 'number',
+      bsonType: 'number'
     },
     min: {
-      bsonType: 'number',
+      bsonType: 'number'
     }
     // other accumulators
   }
 })
 
-export default ({
+const FieldStats = ({
   title,
   valueInclude,
   schemas,
@@ -43,16 +46,23 @@ export default ({
   updateChartSearch,
   ...props
 }) => {
-
-  let resultsCount = _.flow(_.first, _.get('resultsCount'))(data)
+  const resultsCount = _.flow(_.first, _.get('resultsCount'))(data)
   data = _.map(_.omit(['resultsCount']), data)
 
-  return <Results
-    {...props}
-    runSearch={updateChartSearch}
-    include={['value', ...props.include]}
-    rows={data}
-    resultsCount={resultsCount}
-    schema={fieldStatsSchema(valueInclude, schemas[valueSchema], props.chartKey)}
-  />
+  return (
+    <Results
+      {...props}
+      runSearch={updateChartSearch}
+      include={['value', ...props.include]}
+      rows={data}
+      resultsCount={resultsCount}
+      schema={fieldStatsSchema(
+        valueInclude,
+        schemas[valueSchema],
+        props.chartKey
+      )}
+    />
+  )
 }
+
+export default FieldStats

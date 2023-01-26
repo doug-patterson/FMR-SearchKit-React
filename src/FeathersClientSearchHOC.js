@@ -6,54 +6,101 @@ import { buildRoute } from './util'
 import * as DefaultUIClientComponents from './DefaultUIClientComponents'
 import _ from 'lodash/fp'
 
-let FeathersSearchRenderer = props => {
-  let [schemas, setSchemas] = React.useState(props.schemas)
-  let [app, setApp] = React.useState(null)
+const tld = hostname =>
+  hostname === 'localhost'
+    ? 'localhost'
+    : _.flow(_.split('.'), ([, ...rest]) => [...rest], _.join('.'))(hostname)
 
-  const router = props.useRouter()
+const FeathersSearchRenderer = props => {
+  const [schemas, setSchemas] = React.useState(props.schemas)
+  const [app, setApp] = React.useState(null)
+
+  const { getSchemas, getApp, useRouter } = props
+
+  const router = useRouter()
 
   React.useEffect(() => {
     if (!schemas) {
-      let fn = async () => {
-        setSchemas(await props.getSchemas())
+      const fn = async () => {
+        setSchemas(await getSchemas())
       }
       fn()
     }
-  }, [])
+  }, [schemas, getSchemas])
   React.useEffect(() => {
-    let fn = async () => {
-      setApp(await props.getApp())
+    const fn = async () => {
+      setApp(await getApp())
+      document.cookie = `searchkitTimezoneOffset=${new Date().getTimezoneOffset()};path=/;domain=${tld(
+        window.location.hostname
+      )};max-age=2592000;`
     }
     fn()
-  }, [])
+  }, [getApp])
 
   // reactions need to be supported by `execute` passing the search through
   // a pipeline of search `constraints` that arrives here as props.constraints
 
-  return app && schemas && <ClientSearch
-    key={_.uniqueId() /* currently mode="route" doesn't work without this*/} 
-    {..._.omit(['constraints'], props)}
-    schemas={schemas}
-    defaultOverrides={props.overrides}
-    UIComponents={_.merge(props.UIComponents, DefaultUIClientComponents)}
-    execute={async search => {
-      let constrainedSearch =_.size(props.constraints) ? _.flow(...props.constraints)(search) : search
+  const offset = new Date().getTimezoneOffset()
 
-      if (props.mode === 'route') {
-        router.push(buildRoute(constrainedSearch, typeof window === 'object' && window.location.href))
-      } else {
-        let result = await app.service('search').create(constrainedSearch)
-        if (typeof window === 'object') {
-          if (props.isPage) {
-            window.history.replaceState(null, null, buildRoute(constrainedSearch, typeof window === 'object' && window.location.href))
+  props.initialSearch.filters = _.map(
+    filter => ({
+      ...filter,
+      ...(_.isNumber(filter.offset) ? { offset } : {})
+    }),
+    props.initialSearch.filters
+  )
+  props.initialSearch.charts = _.map(
+    chart => ({
+      ...chart,
+      ...(_.isNumber(chart.offset) ? { offset } : {})
+    }),
+    props.initialSearch.charts
+  )
+
+  return (
+    app &&
+    schemas && (
+      <ClientSearch
+        key={_.uniqueId() /* currently mode="route" doesn't work without this*/}
+        {..._.omit(['constraints'], props)}
+        schemas={schemas}
+        defaultOverrides={props.overrides}
+        UIComponents={_.merge(props.UIComponents, DefaultUIClientComponents)}
+        execute={async search => {
+          const constrainedSearch = _.size(props.constraints)
+            ? _.flow(...props.constraints)(search)
+            : search
+
+          if (props.mode === 'route') {
+            router.push(
+              buildRoute(
+                constrainedSearch,
+                typeof window === 'object' && window.location.href
+              )
+            )
+          } else {
+            const result = await app.service('search').create(constrainedSearch)
+            if (typeof window === 'object') {
+              if (props.isPage) {
+                window.history.replaceState(
+                  null,
+                  null,
+                  buildRoute(
+                    constrainedSearch,
+                    typeof window === 'object' && window.location.href
+                  )
+                )
+              }
+              window.chartResizer && window.chartResizer()
+            }
+            return result
           }
-          window.chartResizer && window.chartResizer()
-        }
-        return result
-      }
-
-    }}
-  />
+        }}
+      />
+    )
+  )
 }
 
-export let FeathersClientSearchHOC = props => <FeathersSearchRenderer {...props} />
+export const FeathersClientSearchHOC = props => (
+  <FeathersSearchRenderer {...props} />
+)

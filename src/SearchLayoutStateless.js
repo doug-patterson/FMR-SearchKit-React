@@ -11,7 +11,7 @@ import PaginatorStatic from './PaginatorStatic'
 
 import Filters from './FiltersStateless'
 
-export default ({
+const SearchLayoutStateless = ({
   initialSearch,
   initialResults = {},
   children,
@@ -19,26 +19,29 @@ export default ({
   schemas,
   layoutStyle
 }) => {
-  let UIComponents = _.defaults(DefaultUIComponents, ThemeComponents)
+  const UIComponents = _.defaults(DefaultUIComponents, ThemeComponents)
 
-  let Layout = ({ children }) => <DefaultLayout style={layoutStyle}>{children}</DefaultLayout>
+  const Layout = ({ children }) => (
+    <DefaultLayout style={layoutStyle}>{children}</DefaultLayout>
+  )
 
   schemas = addDefaultDisplays(schemas)
-  let schema = schemas[initialSearch.collection]
+  const schema = schemas[initialSearch.collection]
   if (!schema) {
     return 'Schema not found'
   }
 
-  let filterOptions =_.map(
-    ({ key }) => ({
-      key,
-      options: initialResults[key],
-    }),
-    initialSearch.filters
-  ) || _.map(_.pick('key'), initialSearch.filters)
+  const filterOptions =
+    _.map(
+      ({ key }) => ({
+        key,
+        options: initialResults[key]
+      }),
+      initialSearch.filters
+    ) || _.map(_.pick('key'), initialSearch.filters)
 
   return (
-    <form method="GET" className='fmr-form'>
+    <form method="GET" className="fmr-form">
       <UIComponents.Box>
         <Layout>
           <Filters
@@ -46,11 +49,20 @@ export default ({
             filterOptions={filterOptions}
             schema={schema}
             UIComponents={UIComponents}
-          >{children}</Filters>
+          >
+            {children}
+          </Filters>
           <Results
             {...{
-              include: _.without(initialSearch.omitFromResults, initialSearch.include),
-              schema: _.update('properties', _.omit(initialSearch.omitFromResults), schema),
+              include: _.without(
+                initialSearch.omitFromResults,
+                initialSearch.include
+              ),
+              schema: _.update(
+                'properties',
+                _.omit(initialSearch.omitFromResults),
+                schema
+              ),
               rows: initialResults.results,
               resultsCount: initialSearch.resultsCount,
               pageSize: initialSearch.pageSize,
@@ -65,3 +77,5 @@ export default ({
     </form>
   )
 }
+
+export default SearchLayoutStateless

@@ -1,14 +1,14 @@
 import React from 'react'
 import _ from 'lodash/fp'
 
-export default ({
+const Facet = ({
   title,
   idPath,
   options,
   values,
   onChange,
   display = _.get('_id'),
-  UIComponents,
+  UIComponents
 }) => (
   <UIComponents.Card>
     <UIComponents.CardHeader>{_.startCase(title)}</UIComponents.CardHeader>
@@ -23,16 +23,18 @@ export default ({
               <UIComponents.CheckBox
                 label={display({ ...value, ...lookup, _id })}
                 checked={checked}
-                {...(onChange ? {
-                  onChange: checked => {
-                    let newValues = checked
-                      ? _.concat(values, _id)
-                      : _.without([_id], values)
-                    onChange({ values: newValues })
-                  }
-                } : {
-                  name: `${title}[${_id}]`
-                })}
+                {...(onChange
+                  ? {
+                      onChange: checked => {
+                        const newValues = checked
+                          ? _.concat(values, _id)
+                          : _.without([_id], values)
+                        onChange({ values: newValues })
+                      }
+                    }
+                  : {
+                      name: `${title}[${_id}]`
+                    })}
               />
               <span style={{ textAlign: 'right', justifySelf: 'end' }}>
                 {count}
@@ -45,3 +47,5 @@ export default ({
     </UIComponents.CardBody>
   </UIComponents.Card>
 )
+
+export default Facet

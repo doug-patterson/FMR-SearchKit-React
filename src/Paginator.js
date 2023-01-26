@@ -1,8 +1,8 @@
 import React from 'react'
 import _ from 'lodash/fp'
 
-export default ({ page, setPage, pageSize, resultsCount, UIComponents }) => {
-  let totalPages = Math.ceil(resultsCount / pageSize) || 0
+const Paginator = ({ page, setPage, pageSize, resultsCount, UIComponents }) => {
+  const totalPages = Math.ceil(resultsCount / pageSize) || 0
 
   return (
     <UIComponents.Nav direction="row">
@@ -32,3 +32,5 @@ export default ({ page, setPage, pageSize, resultsCount, UIComponents }) => {
     </UIComponents.Nav>
   )
 }
+
+export default Paginator

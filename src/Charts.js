@@ -1,15 +1,20 @@
 import React from 'react'
 import _ from 'lodash/fp'
 import FieldStats from './FieldStats'
+import SummaryTable from './SummaryTable'
 
 let reloaded = false
 
 const ChartSizer = ({ children, chartWidths, ...props }) => {
-  let [hasWidth, setHasWidth] = React.useState(!!chartWidths.current[props.chartKey])
+  const [hasWidth, setHasWidth] = React.useState(
+    !!chartWidths.current[props.chartKey]
+  )
 
   React.useEffect(() => {
-    let resize = () => {
-      let containerWidth = document.querySelectorAll(`.fmr-chart.${props.chartKey}`)[0]?.clientWidth
+    const resize = () => {
+      const containerWidth = document.querySelectorAll(
+        `.fmr-chart.${props.chartKey}`
+      )[0]?.clientWidth
       chartWidths.current = {
         ...chartWidths.current,
         [props.chartKey]: containerWidth || 480
@@ -19,7 +24,7 @@ const ChartSizer = ({ children, chartWidths, ...props }) => {
     if (!hasWidth) {
       resize()
     }
-    let reloader = () => {
+    const reloader = () => {
       if (!reloaded) {
         window.location.reload()
       }
@@ -27,41 +32,56 @@ const ChartSizer = ({ children, chartWidths, ...props }) => {
     }
     window.addEventListener('resize', reloader)
     window.addEventListener('orientationchange', reloader)
-  }, [])
+  }, [chartWidths, hasWidth, props.chartKey])
 
   return hasWidth && <>{children}</>
 }
 
-export default ({ charts, chartWidths, schema, schemas, chartData, UIComponents }) =>
+const Charts = ({
+  charts,
+  chartWidths,
+  schema,
+  schemas,
+  chartData,
+  UIComponents
+}) => (
   <>
     {_.map(chart => {
-      let Component = UIComponents[_.upperFirst(chart.type)] || _.constant(JSON.stringify(chart))
+      let Component =
+        UIComponents[_.upperFirst(chart.type)] ||
+        _.constant(JSON.stringify(chart))
       if (chart.type === 'fieldStats') {
         Component = FieldStats
       }
-  
-      return <div
-        className={`fmr-chart ${chart.key}`}
-        key={chart.key}
-        style={{ gridArea: chart.key }}
-      >
-        <h2>{_.startCase(chart.key)}</h2>
-        <ChartSizer
-          chartWidths={chartWidths}
-          chartKey={chart.key}
+      if (chart.type === 'summaryTable') {
+        Component = SummaryTable
+      }
+
+      return (
+        <div
+          className={`fmr-chart ${chart.key}`}
+          key={chart.key}
+          style={{ gridArea: chart.key }}
         >
-          <Component
-            {..._.omit(['key'], chart)}
-            chartKey={chart.key}
-            chartWidths={chartWidths}
-            data={chartData ? chartData[chart.key] : []}
-            schema={schema}
-            schemas={schemas}
-            UIComponents={UIComponents}
-            height={280}
-          />
-        </ChartSizer>
-      </div>
+          <h2>{_.startCase(chart.key)}</h2>
+          <ChartSizer chartWidths={chartWidths} chartKey={chart.key}>
+            <Component
+              {..._.omit(['key'], chart)}
+              chartKey={chart.key}
+              chartWidths={chartWidths}
+              data={chartData ? chartData[chart.key] : []}
+              schema={schema}
+              schemas={schemas}
+              UIComponents={UIComponents}
+              height={280}
+            />
+          </ChartSizer>
+        </div>
+      )
     }, charts)}
   </>
+)
 
+Charts.displayName = 'Charts'
+
+export default Charts

@@ -1,5 +1,9 @@
 import React from 'react'
 import _ from 'lodash/fp'
-import ResultsTable from './ResultsTableHOC'
+import ResultsTableHOC from './ResultsTableHOC'
 
-export default ({ UIComponents, ...props }) => <ResultsTable {...props} HeaderMenu={UIComponents.HeaderMenu} />
+const ResultsTable = ({ UIComponents, ...props }) => (
+  <ResultsTableHOC {...props} HeaderMenu={UIComponents.HeaderMenu} />
+)
+
+export default ResultsTable

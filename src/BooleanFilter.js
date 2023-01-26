@@ -1,21 +1,23 @@
 import React from 'react'
 import _ from 'lodash/fp'
 
-export default ({ title, checked, onChange, name, UIComponents }) => (
+const BooleanFilter = ({ title, checked, onChange, name, UIComponents }) => (
   <UIComponents.Card>
-    <UIComponents.CardHeader>
-      {_.startCase(title)}
-    </UIComponents.CardHeader>
+    <UIComponents.CardHeader>{_.startCase(title)}</UIComponents.CardHeader>
     <UIComponents.CardBody>
       <UIComponents.CheckBox
         checked={checked}
         label={'Yes'}
-        {...(onChange ? {
-          onChange: val => onChange({ checked: val }),
-        }: {
-          name
-        })}
+        {...(onChange
+          ? {
+              onChange: val => onChange({ checked: val })
+            }
+          : {
+              name
+            })}
       />
     </UIComponents.CardBody>
   </UIComponents.Card>
 )
+
+export default BooleanFilter

@@ -5,13 +5,13 @@ import _ from 'lodash/fp'
 //import { Pie } from '@nivo/pie'
 import useOutsideClick from './hooks/useOutsideClick'
 
-export let Box = ({ children, ...props }) => (
+export const Box = ({ children, ...props }) => (
   <div className="fmr-box" {...props}>
     {children}
   </div>
 )
 
-export let Grid = ({ children, rows, columns, areas, gap, ...props }) => (
+export const Grid = ({ children, rows, columns, areas, gap, ...props }) => (
   <div
     className="fmr-grid"
     {...props}
@@ -21,34 +21,36 @@ export let Grid = ({ children, rows, columns, areas, gap, ...props }) => (
       gridTemplateColumns: columns,
       ...(gap ? { columnGap: gap, rowGap: gap } : {}),
       ...props.style,
-      display: 'grid',
+      display: 'grid'
     }}
   >
     {children}
   </div>
 )
 
-export let Button = ({ onClick, children, ...props }) => (
+export const Button = ({ onClick, children, ...props }) => (
   <button className="fmr-button" onClick={onClick} {...props}>
     {children}
   </button>
 )
-export let SubmitButton = ({ children, ...props }) => (
+export const SubmitButton = ({ children, ...props }) => (
   <button className="fmr-button-submit" type="submit" {...props}>
     {children}
   </button>
 )
 
-export let Select = ({ value, options, onChange, name, ...props }) => (
+export const Select = ({ value, options, onChange, name, ...props }) => (
   <select
     className="fmr-select"
-    {...(onChange ? {
-      onChange: e => e && e.target && onChange(e.target.value),
-      value
-    } : {
-      name,
-      ...(value ? { defaultValue: value } : {})
-    })}
+    {...(onChange
+      ? {
+          onChange: e => e && e.target && onChange(e.target.value),
+          value
+        }
+      : {
+          name,
+          ...(value ? { defaultValue: value } : {})
+        })}
     {...props}
   >
     {_.map(
@@ -62,7 +64,7 @@ export let Select = ({ value, options, onChange, name, ...props }) => (
   </select>
 )
 
-export let Input = ({ type, value, placeholder, name, ...props }) => (
+export const Input = ({ type, value, placeholder, name, ...props }) => (
   <input
     className="fmr-input"
     name={name}
@@ -73,8 +75,8 @@ export let Input = ({ type, value, placeholder, name, ...props }) => (
   />
 )
 
-export let CheckBox = ({ checked, label, name = ''}) => {
-  let id = _.uniqueId('fmr-checkbox-')
+export const CheckBox = ({ checked, label, name = '' }) => {
+  const id = _.uniqueId('fmr-checkbox-')
 
   return (
     <>
@@ -90,9 +92,9 @@ export let CheckBox = ({ checked, label, name = ''}) => {
   )
 }
 
-export let Menu = ({ label, open, items }) => {
-  let ref = React.useRef()
-  let [isOpen, setIsOpen] = React.useState(open)
+export const Menu = ({ label, open, items }) => {
+  const ref = React.useRef()
+  const [isOpen, setIsOpen] = React.useState(open)
   useOutsideClick(ref, () => setIsOpen(false))
 
   return (
@@ -108,7 +110,7 @@ export let Menu = ({ label, open, items }) => {
           ref={ref}
           className="fmr-sort"
           style={{
-            position: 'absolute',
+            position: 'absolute'
           }}
         >
           {_.map(
@@ -129,81 +131,73 @@ export let Menu = ({ label, open, items }) => {
   )
 }
 
-export let Nav = ({ children, direction, ...props }) => (
+export const Nav = ({ children, direction, ...props }) => (
   <nav
     className="fmr-nav"
     style={{
       display: 'flex',
-      flexDirection: direction === 'row' ? 'row' : 'column',
+      flexDirection: direction === 'row' ? 'row' : 'column'
     }}
     {...props}
   >
     {children}
   </nav>
 )
-export let NavItem = ({ label, onClick, icon }) => (
+export const NavItem = ({ label, onClick, icon }) => (
   <div onClick={onClick}>
     {icon}
     {label}
   </div>
 )
 
-export let Table = ({ children, ...props }) => (
+export const Table = ({ children, ...props }) => (
   <table className="fmr-table" {...props}>
     {children}
   </table>
 )
-export let TableHeader = ({ children, ...props }) => (
+export const TableHeader = ({ children, ...props }) => (
   <thead {...props}>{children}</thead>
 )
-export let TableBody = ({ children, ...props }) => (
+export const TableBody = ({ children, ...props }) => (
   <tbody {...props}>{children}</tbody>
 )
-export let TableRow = ({ children, ...props }) => <tr {...props}>{children}</tr>
-export let TableCell = ({ children, ...props }) => (
+export const TableRow = ({ children, ...props }) => (
+  <tr {...props}>{children}</tr>
+)
+export const TableCell = ({ children, ...props }) => (
   <td {...props}>{children}</td>
 )
 
-export let Card = ({ children, ...props }) => (
+export const Card = ({ children, ...props }) => (
   <div className="fmr-card" {...props}>
     {children}
   </div>
 )
-export let CardHeader = ({ children, ...props }) => (
+export const CardHeader = ({ children, ...props }) => (
   <div className="fmr-card-header" {...props}>
     {children}
   </div>
 )
-export let CardBody = ({ children, ...props }) => (
+export const CardBody = ({ children, ...props }) => (
   <div className="fmr-card-body" {...props}>
     {children}
   </div>
 )
-export let CardFooter = ({ children, ...props }) => (
+export const CardFooter = ({ children, ...props }) => (
   <div className="fmr-card-footer" {...props}>
     {children}
   </div>
 )
 
-export let IconBack = () => <span style={{ fontSize: '1.5rem' }}>&#171;</span>
-export let IconForward = () => (
+export const IconBack = () => <span style={{ fontSize: '1.5rem' }}>&#171;</span>
+export const IconForward = () => (
   <span style={{ fontSize: '1.5rem' }}>&#187;</span>
 )
-export let IconPrevious = () => (
+export const IconPrevious = () => (
   <span style={{ fontSize: '1.5rem' }}>&#8249;</span>
 )
-export let IconNext = () => <span style={{ fontSize: '1.5rem' }}>&#8250;</span>
+export const IconNext = () => (
+  <span style={{ fontSize: '1.5rem' }}>&#8250;</span>
+)
 
-export let SummaryTable = ({ data, isCurrency }) => {
-  let rows = _.first(data)
-  
-  return <dl className="fmr-searchkit-summary-table" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr'}}>
-    {_.map(label => <>
-      <dt style={{ fontWeight: 'bold' }}>{_.startCase(label)}</dt>
-      <dd style={{ textAlign: 'right' }}>{isCurrency ? `$${rows[label] / 100}`  : rows[label]}</dd>
-    </>, _.keys(rows))}
-  </dl>
-} 
-
-export let GroupedTotals = ({ data }) => JSON.stringify(data, 0, 2)
-
+export const GroupedTotals = ({ data }) => JSON.stringify(data, 0, 2)
