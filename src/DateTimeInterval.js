@@ -52,12 +52,12 @@ const DateTimeInterval = ({
               'Last Month',
               'Last Quarter',
               'Last Year',
-              'Last Two Years'
-              /*'Previous Full Day',
+              'Last Two Years',
+              'Previous Full Day',
               'Previous Full Week',
               'Previous Full Month',
               'Previous Full Quarter',
-              'Previous Full Year',*/
+              'Previous Full Year',
             ]}
             {...(onChange
               ? {
@@ -67,7 +67,6 @@ const DateTimeInterval = ({
                       interval: val,
                       from: null,
                       to: null,
-                      offset: null
                     })
                   }
                 }
