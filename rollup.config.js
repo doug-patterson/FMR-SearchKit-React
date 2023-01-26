@@ -5,6 +5,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 
 const input = 'src/index.js'
+const client = 'src/client.js'
 
 let MODE = [
   {
@@ -47,7 +48,34 @@ MODE.map((m) => {
             commonjs(),
         ]
     }
-    config.push(conf)
+
+    var clientConf = {
+      input: client,
+      output: {
+          name: "fmr-searchkit-react/client",
+          file: `dist/client.${m.format}.js`,
+          format: m.format,
+          exports: "auto",
+      },
+      external: ["react", /@babel\/runtime/],
+      plugins: [
+          babel({
+              exclude: 'node_modules/**',
+              plugins: ['@babel/transform-runtime'],
+              babelHelpers: 'runtime'
+          }),
+          styles({
+              postcss: {
+                  plugins: [
+                      autoprefixer()
+                  ]
+              }
+          }),
+          nodeResolve(),
+          commonjs(),
+      ]
+  }
+    config.push(conf, clientConf)
 })
 
 export default [

@@ -1,3 +1,1 @@
-import SearchLayout from './dist/index.esm'
-
-export default SearchLayout
+export * from './dist/index.esm'
