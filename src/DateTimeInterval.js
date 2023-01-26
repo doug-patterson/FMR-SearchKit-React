@@ -62,11 +62,13 @@ const DateTimeInterval = ({
             {...(onChange
               ? {
                   onChange: val => {
+                    alert("TEST")
                     currentInput.current = { [`${title}.interval`]: val }
                     onChange({
                       interval: val,
                       from: null,
                       to: null,
+                      offset: new Date().getTimezoneOffset()
                     })
                   }
                 }
