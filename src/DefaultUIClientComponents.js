@@ -2,6 +2,7 @@
 
 import React from 'react'
 import _ from 'lodash/fp'
+import useOutsideClick from './hooks/useOutsideClick'
 import { Line } from '@nivo/line'
 import { Calendar } from '@nivo/calendar'
 import { Pie } from '@nivo/pie'
@@ -18,6 +19,45 @@ const americanDates = _.map(({ id, data }) => ({
   id,
   data: _.map(({ x, y }) => ({ x: americanDate(x), y }), data)
 }))
+
+export const Menu = ({ label, open, items }) => {
+  const ref = React.useRef()
+  const [isOpen, setIsOpen] = React.useState(open)
+  useOutsideClick(ref, () => setIsOpen(false))
+
+  return (
+    <div
+      className={`fmr-menu${open ? ' open' : ''}`}
+      style={{ position: 'relative' }}
+    >
+      <div onClick={() => setIsOpen(!isOpen)} className="fmr-menu-label">
+        {label}
+      </div>
+      {isOpen && (
+        <div
+          ref={ref}
+          className="fmr-sort"
+          style={{
+            position: 'absolute'
+          }}
+        >
+          {_.map(
+            item => (
+              <button
+                key={item.label}
+                onClick={_.over([item.onClick, () => setIsOpen(false)])}
+                className="fmr-sort-button"
+              >
+                {item.label}
+              </button>
+            ),
+            items
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export const CheckBox = ({ checked, label, onChange }) => {
   const id = _.uniqueId('fmr-checkbox-')

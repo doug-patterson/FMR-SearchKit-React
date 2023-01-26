@@ -3,7 +3,6 @@ import _ from 'lodash/fp'
 //import { Line } from '@nivo/line'
 //import { Calendar } from '@nivo/calendar'
 //import { Pie } from '@nivo/pie'
-import useOutsideClick from './hooks/useOutsideClick'
 
 export const Box = ({ children, ...props }) => (
   <div className="fmr-box" {...props}>
@@ -89,45 +88,6 @@ export const CheckBox = ({ checked, label, name = '' }) => {
       />
       <label htmlFor={id}>{label}</label>
     </>
-  )
-}
-
-export const Menu = ({ label, open, items }) => {
-  const ref = React.useRef()
-  const [isOpen, setIsOpen] = React.useState(open)
-  useOutsideClick(ref, () => setIsOpen(false))
-
-  return (
-    <div
-      className={`fmr-menu${open ? ' open' : ''}`}
-      style={{ position: 'relative' }}
-    >
-      <div onClick={() => setIsOpen(!isOpen)} className="fmr-menu-label">
-        {label}
-      </div>
-      {isOpen && (
-        <div
-          ref={ref}
-          className="fmr-sort"
-          style={{
-            position: 'absolute'
-          }}
-        >
-          {_.map(
-            item => (
-              <button
-                key={item.label}
-                onClick={_.over([item.onClick, () => setIsOpen(false)])}
-                className="fmr-sort-button"
-              >
-                {item.label}
-              </button>
-            ),
-            items
-          )}
-        </div>
-      )}
-    </div>
   )
 }
 
