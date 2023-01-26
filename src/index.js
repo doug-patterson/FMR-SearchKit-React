@@ -2,7 +2,7 @@ export { includeSubmittedSearch } from './util'
 import SearchController from './SearchController'
 import HTTPSearchHOC from './HTTPSearchHOC'
 
-const Search = ({
+const _searchkit = ({
   feathersOrigin,
   preparePage,
   runInitialSearch,
@@ -82,4 +82,4 @@ const Search = ({
   }
 }
 
-export default Search
+export const searchkit = _searchkit
