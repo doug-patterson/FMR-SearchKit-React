@@ -3,16 +3,13 @@ import _ from 'lodash/fp'
 
 const Facet = ({
   title,
-  idPath,
   options,
   values,
   onChange,
   display = _.get('_id'),
   UIComponents
 }) => (
-  <UIComponents.Card>
-    <UIComponents.CardHeader>{_.startCase(title)}</UIComponents.CardHeader>
-    <UIComponents.CardBody>
+  <UIComponents.CardBody>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {_.map(
           ({ _id, checked, count, value, lookup }) => (
@@ -45,7 +42,6 @@ const Facet = ({
         )}
       </div>
     </UIComponents.CardBody>
-  </UIComponents.Card>
 )
 
 export default Facet

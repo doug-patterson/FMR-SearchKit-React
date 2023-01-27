@@ -9,15 +9,6 @@ import Results from './Results'
 import Charts from './Charts'
 import Filters from './Filters'
 
-const searchRunner = (search, runSearch) => idx => updatedChartProps => {
-  const updatedSearch = _.update(
-    `charts.${idx}`,
-    chartProps => ({ ...chartProps, ...updatedChartProps }),
-    search
-  )
-  runSearch({ charts: updatedSearch.charts })
-}
-
 const SearchLayout = ({
   initialSearch,
   initialResults = {},
@@ -26,6 +17,9 @@ const SearchLayout = ({
   schemas,
   execute,
   layoutStyle,
+  filterLayout,
+  FilterWrapper,
+  defaultOpenFilters = [],
   mode = 'feathers',
   onData = _.noop
 }) => {
@@ -46,6 +40,7 @@ const SearchLayout = ({
   const [chartData, setChartData] = React.useState(initialResults.charts)
   const currentInput = React.useRef(null)
   const chartWidths = React.useRef({})
+  const openFilters = React.useRef(defaultOpenFilters)
 
   const UIComponents = _.defaults(DefaultUIComponents, ThemeComponents)
 
@@ -93,13 +88,6 @@ const SearchLayout = ({
     onData()
   }
 
-  // it may be time to consider more radical approaches...
-  // how about something like this? each component listens on the socket for the updates
-  // it wants, and each component can call execute, which doesn't cause anything to render.
-  // the entire layout is stateless except for the individual charts, filters and tables,
-  // each of which only maintains its own state and only pays attention to the parts of the
-  // search delivered up the socket that concern it
-
   return (
     <UIComponents.Box>
       <Layout>
@@ -110,6 +98,9 @@ const SearchLayout = ({
           schema={schema}
           UIComponents={UIComponents}
           currentInput={currentInput}
+          openFilters={openFilters}
+          layout={filterLayout}
+          {...(FilterWrapper ? { Wrapper: FilterWrapper } : {})}
         >
           {children}
         </Filters>
