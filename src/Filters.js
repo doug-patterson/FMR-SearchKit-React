@@ -37,8 +37,11 @@ const updateFilters = filters => idx => patch =>
 // we need to handle the search button better - needs to move up to the main
 // layout and potentially be accompanied by sort controls and column pickers
 
-// so we need to maintain a record of which input is focused and what its contents
-// are, that's all, then when rendering the filters that care need to use it
+const DefaultWrapper = ({ title, children, UIComponents }) =>
+  <UIComponents.Card>
+    <UIComponents.CardHeader>{_.startCase(title)}</UIComponents.CardHeader>
+    <>{children}</>
+  </UIComponents.Card>
 
 const Filters = ({
   children,
@@ -47,7 +50,8 @@ const Filters = ({
   schema,
   UIComponents,
   runSearch,
-  currentInput
+  currentInput,
+  Wrapper = DefaultWrapper
 }) => {
   return (
     <div
@@ -61,36 +65,38 @@ const Filters = ({
       {mapIndexed((filter, idx) => {
         const Component = getFilterComponent(filter.type)
         return (
-          <Component
-            key={filter.key}
-            {...(runSearch
-              ? {
-                  onChange: async patch =>
-                    runSearch({
-                      filters: updateFilters(filters)(idx)(patch),
-                      page: 1
-                    })
-                }
-              : {
-                  name: filter.key
-                })}
-            title={filter.key}
-            {..._.omit(['key'], filter)}
-            options={_.get(
-              'options',
-              _.find({ key: filter.key }, filterOptions)
-            )}
-            display={
-              filter.prop
-                ? _.get(
-                    filter.prop,
-                    _.get(filter.field, schema.properties)?.items.properties
-                  )?.display
-                : _.get(filter.field, schema.properties)?.display
-            }
-            UIComponents={UIComponents}
-            currentInput={currentInput}
-          />
+          <Wrapper title={_.startCase(filter.key)} UIComponents={UIComponents}>
+            <Component
+              key={filter.key}
+              {...(runSearch
+                ? {
+                    onChange: async patch =>
+                      runSearch({
+                        filters: updateFilters(filters)(idx)(patch),
+                        page: 1
+                      })
+                  }
+                : {
+                    name: filter.key
+                  })}
+              {..._.omit(['key'], filter)}
+              title={filter.key} 
+              options={_.get(
+                'options',
+                _.find({ key: filter.key }, filterOptions)
+              )}
+              display={
+                filter.prop
+                  ? _.get(
+                      filter.prop,
+                      _.get(filter.field, schema.properties)?.items.properties
+                    )?.display
+                  : _.get(filter.field, schema.properties)?.display
+              }
+              UIComponents={UIComponents}
+              currentInput={currentInput}
+            />
+          </Wrapper>
         )
       }, _.reject('hide', filters))}
       {runSearch && (

@@ -1,5 +1,8 @@
+'use client'
+
 import React from 'react'
 import SearchLayout from './SearchLayout'
+import { FilterDropdown as FilterWrapper } from './FilterDropdown'
 import _ from 'lodash/fp'
 import { setUpSchemas } from './util'
 
@@ -49,6 +52,7 @@ const ClientSearchWithOverrides = props => {
         {...props}
         {...(initialResults ? { initialResults } : {})}
         schemas={schemas}
+        {...(props.horizontal ? { FilterWrapper } : {})}
       />
     )
   )
