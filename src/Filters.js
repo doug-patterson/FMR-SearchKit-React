@@ -51,12 +51,14 @@ const Filters = ({
   UIComponents,
   runSearch,
   currentInput,
+  openFilters,
+  layout = 'vertical',
   Wrapper = DefaultWrapper
 }) => {
   return (
     <div
       key={_.join(',', _.keys(schema.properties))}
-      style={{ gridArea: 'filters' }}
+      style={{ gridArea: 'filters', ...(layout === 'horizontal' ? { display: 'flex', flexDirection: 'column' } : { flexDirection: 'row' }) }}
     >
       {!runSearch && (
         <UIComponents.Button type="submit">Search</UIComponents.Button>
@@ -65,7 +67,7 @@ const Filters = ({
       {mapIndexed((filter, idx) => {
         const Component = getFilterComponent(filter.type)
         return (
-          <Wrapper title={_.startCase(filter.key)} UIComponents={UIComponents}>
+          <Wrapper openFilters={openFilters} filterKey={filter.key} UIComponents={UIComponents}>
             <Component
               key={filter.key}
               {...(runSearch

@@ -52,7 +52,7 @@ const ClientSearchWithOverrides = props => {
         {...props}
         {...(initialResults ? { initialResults } : {})}
         schemas={schemas}
-        {...(props.horizontal ? { FilterWrapper } : {})}
+        {...(props.collapseableFilters ? { FilterWrapper } : {})}
       />
     )
   )

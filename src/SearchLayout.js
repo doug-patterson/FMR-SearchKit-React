@@ -17,7 +17,9 @@ const SearchLayout = ({
   schemas,
   execute,
   layoutStyle,
+  filterLayout,
   FilterWrapper,
+  defaultOpenFilters = [],
   mode = 'feathers',
   onData = _.noop
 }) => {
@@ -38,6 +40,7 @@ const SearchLayout = ({
   const [chartData, setChartData] = React.useState(initialResults.charts)
   const currentInput = React.useRef(null)
   const chartWidths = React.useRef({})
+  const openFilters = React.useRef(defaultOpenFilters)
 
   const UIComponents = _.defaults(DefaultUIComponents, ThemeComponents)
 
@@ -95,6 +98,8 @@ const SearchLayout = ({
           schema={schema}
           UIComponents={UIComponents}
           currentInput={currentInput}
+          openFilters={openFilters}
+          layout={filterLayout}
           {...(FilterWrapper ? { Wrapper: FilterWrapper } : {})}
         >
           {children}
