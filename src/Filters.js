@@ -52,13 +52,13 @@ const Filters = ({
   runSearch,
   currentInput,
   openFilters,
-  layout = 'vertical',
+  layout = 'column',
   Wrapper = DefaultWrapper
 }) => {
   return (
     <div
       key={_.join(',', _.keys(schema.properties))}
-      style={{ gridArea: 'filters', ...(layout === 'horizontal' ? { display: 'flex', flexDirection: 'column' } : { flexDirection: 'row' }) }}
+      style={{ gridArea: 'filters', ...(layout === 'row' ? { display: 'flex', flexDirection: 'row' } : {}) }}
     >
       {!runSearch && (
         <UIComponents.Button type="submit">Search</UIComponents.Button>
