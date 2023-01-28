@@ -118,7 +118,7 @@ export const DateLineSingle = ({
   height,
   chartWidths,
   chartKey,
-  colors = []
+  colors
 }) => (
   <Line
     data={americanDates(data)}
@@ -126,7 +126,7 @@ export const DateLineSingle = ({
     width={chartWidths.current[chartKey]}
     height={height}
     animate={false}
-    colors={_.size(colors) ? colors : { scheme: 'set2' }}
+    colors={colors ? colors : { scheme: 'set2' }}
     margin={{ top: 50, right: 60, bottom: 50, left: 60 }}
     xScale={{ type: 'point' }} // need to figure point v linear somehow
     yScale={{
@@ -188,7 +188,8 @@ export const DateTimeLine = ({
   yLabel,
   height,
   chartWidths,
-  chartKey
+  chartKey,
+  colors
 }) => (
   <Line
     data={isCurrency ? formatCurrency({ number: data }) : data}
@@ -196,7 +197,7 @@ export const DateTimeLine = ({
     height={height}
     width={chartWidths.current[chartKey]}
     animate={false}
-    colors={{ scheme: 'paired' }}
+    colors={colors ? colors : { scheme: 'paired' }}
     margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
     xScale={{ type: 'point' }}
     yScale={{
@@ -296,7 +297,8 @@ export const QuantityByPeriodCalendar = ({
   onClick,
   height,
   chartWidths,
-  chartKey
+  chartKey,
+  colors
 }) => (
   <Calendar
     data={fixDates(data)}
@@ -305,7 +307,7 @@ export const QuantityByPeriodCalendar = ({
     from={_.flow(_.first, _.get('day'))(data)}
     to={_.flow(_.last, _.get('day'))(data)}
     emptyColor="#eeeeee"
-    colors={['#61cdbb', '#97e3d5', '#e8c1a0', '#f47560']}
+    colors={colors ? colors : ['#61cdbb', '#97e3d5', '#e8c1a0', '#f47560']}
     margin={{ top: 0, right: 40, bottom: 0, left: 40 }}
     yearSpacing={40}
     //monthSpacing={10}
@@ -428,7 +430,7 @@ export const DayOfWeekSummaryBars = ({
   height,
   chartWidths,
   chartKey,
-  colors = [],
+  colors,
   enableLabel = true
 }) => (
   <Bar
@@ -443,7 +445,7 @@ export const DayOfWeekSummaryBars = ({
     margin={{ top: 50, right: group ? 130 : 80, bottom: 50, left: 80 }}
     padding={0.3}
     xScale={{ type: 'linear' }}
-    colors={_.size(colors) ? colors : { scheme: 'set2' }}
+    colors={colors ? colors : { scheme: 'set2' }}
     valueFormat={value =>
       isCurrency
         ? formatCurrency({ number: value, minimumFractionDigits: 0 })
@@ -544,14 +546,14 @@ export const HourOfDaySummaryLine = ({
   height,
   chartWidths,
   chartKey,
-  colors = []
+  colors
 }) => (
   <Line
     data={includeAllHours(data)}
     width={chartWidths.current[chartKey]}
     height={height}
     curve="linear"
-    colors={_.size(colors) ? colors : { scheme: 'paired' }}
+    colors={colors ? colors : { scheme: 'paired' }}
     margin={{ top: 50, right: group ? 130 : 80, bottom: 50, left: 80 }}
     xScale={{ type: 'point' }}
     yScale={{
