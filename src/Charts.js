@@ -63,7 +63,7 @@ const Charts = ({
           key={chart.key}
           style={{ gridArea: chart.key }}
         >
-          <h2>{_.startCase(chart.key)}</h2>
+          <h2>{chart.label || _.startCase(chart.key)}</h2>
           <ChartSizer chartWidths={chartWidths} chartKey={chart.key}>
             <Component
               {..._.omit(['key'], chart)}

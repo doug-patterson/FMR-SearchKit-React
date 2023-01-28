@@ -7,6 +7,7 @@ import { Line } from '@nivo/line'
 import { Calendar } from '@nivo/calendar'
 import { Pie } from '@nivo/pie'
 import { Bar } from '@nivo/bar'
+import { formatCurrency } from './util'
 
 const americanDate = _.flow(
   _.split('/'),
@@ -116,7 +117,8 @@ export const DateLineSingle = ({
   isCurrency,
   height,
   chartWidths,
-  chartKey
+  chartKey,
+  colors = []
 }) => (
   <Line
     data={americanDates(data)}
@@ -124,7 +126,7 @@ export const DateLineSingle = ({
     width={chartWidths.current[chartKey]}
     height={height}
     animate={false}
-    colors={{ scheme: 'set2' }}
+    colors={_.size(colors) ? colors : { scheme: 'set2' }}
     margin={{ top: 50, right: 60, bottom: 50, left: 60 }}
     xScale={{ type: 'point' }} // need to figure point v linear somehow
     yScale={{
@@ -136,7 +138,7 @@ export const DateLineSingle = ({
     }}
     enableArea={true}
     enablePoints={false}
-    yFormat={`>-${isCurrency ? '$' : ''},.2r`}
+    yFormat={value => (isCurrency ? formatCurrency({ number: value }) : value)}
     axisTop={null}
     axisRight={null}
     axisBottom={{
@@ -144,7 +146,7 @@ export const DateLineSingle = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: -20,
-      legend: xLabel || _.startCase(x),
+      legend: xLabel === 'none' ? '' : xLabel || _.startCase(x),
       legendOffset: 36,
       legendPosition: 'middle'
     }}
@@ -153,9 +155,12 @@ export const DateLineSingle = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: yLabel || _.startCase(y),
+      legend: yLabel === 'none' ? '' : yLabel || _.startCase(y),
       legendOffset: -50,
-      legendPosition: 'middle'
+      legendPosition: 'middle',
+      format: value =>
+        isCurrency &&
+        formatCurrency({ number: value, minimumFractionDigits: 0 })
     }}
     pointSize={10}
     pointColor={{ theme: 'background' }}
@@ -165,8 +170,10 @@ export const DateLineSingle = ({
     useMesh={true}
     tooltip={({ point }) => (
       <div style={{ padding: 4, backgroundColor: 'white' }}>
-        <b>{point?.data?.x}</b>: {isCurrency ? '$' : ''}
-        {point?.data?.y}
+        <b>{point?.data?.x}</b>:{' '}
+        {isCurrency
+          ? formatCurrency({ number: point?.data?.y })
+          : point?.data?.y}
       </div>
     )}
   />
@@ -184,7 +191,7 @@ export const DateTimeLine = ({
   chartKey
 }) => (
   <Line
-    data={isCurrency ? formatCurrency(data) : data}
+    data={isCurrency ? formatCurrency({ number: data }) : data}
     curve="linear"
     height={height}
     width={chartWidths.current[chartKey]}
@@ -199,7 +206,7 @@ export const DateTimeLine = ({
       stacked: true,
       reverse: false
     }}
-    yFormat=""
+    yFormat={value => (isCurrency ? formatCurrency({ number: value }) : value)}
     axisTop={null}
     axisRight={null}
     axisBottom={{
@@ -207,7 +214,7 @@ export const DateTimeLine = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: -20,
-      legend: xLabel || _.startCase(x),
+      legend: xLabel === 'none' ? '' : xLabel || _.startCase(x),
       legendOffset: 36,
       legendPosition: 'middle'
     }}
@@ -216,9 +223,12 @@ export const DateTimeLine = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: yLabel || _.startCase(y),
+      legend: yLabel === 'none' ? '' : yLabel || _.startCase(y),
       legendOffset: -50,
-      legendPosition: 'middle'
+      legendPosition: 'middle',
+      format: value =>
+        isCurrency &&
+        formatCurrency({ number: value, minimumFractionDigits: 0 })
     }}
     pointSize={10}
     pointColor={{ theme: 'background' }}
@@ -417,12 +427,15 @@ export const DayOfWeekSummaryBars = ({
   isCurrency,
   height,
   chartWidths,
-  chartKey
+  chartKey,
+  colors = [],
+  enableLabel = true
 }) => (
   <Bar
     data={data}
     width={chartWidths.current[chartKey]}
     height={height}
+    enableLabel={enableLabel}
     layout="vertical"
     indexBy="id"
     animate={false}
@@ -430,8 +443,12 @@ export const DayOfWeekSummaryBars = ({
     margin={{ top: 50, right: group ? 130 : 80, bottom: 50, left: 80 }}
     padding={0.3}
     xScale={{ type: 'linear' }}
-    colors={{ scheme: 'set2' }}
-    valueFormat={`>-${isCurrency ? '$' : ''},.2r`}
+    colors={_.size(colors) ? colors : { scheme: 'set2' }}
+    valueFormat={value =>
+      isCurrency
+        ? formatCurrency({ number: value, minimumFractionDigits: 0 })
+        : value
+    }
     borderColor={{
       from: 'color',
       modifiers: [['darker', 1.6]]
@@ -442,7 +459,7 @@ export const DayOfWeekSummaryBars = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: -20,
-      legend: xLabel || x,
+      legend: xLabel === 'none' ? '' : xLabel || _.startCase(x),
       legendPosition: 'middle',
       legendOffset: 36
     }}
@@ -450,9 +467,12 @@ export const DayOfWeekSummaryBars = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: yLabel || y,
+      legend: yLabel === 'none' ? '' : yLabel || _.startCase(y),
       legendPosition: 'middle',
-      legendOffset: -70
+      legendOffset: -70,
+      format: value =>
+        isCurrency &&
+        formatCurrency({ number: value, minimumFractionDigits: 0 })
     }}
     labelSkipWidth={12}
     labelSkipHeight={12}
@@ -523,14 +543,15 @@ export const HourOfDaySummaryLine = ({
   group,
   height,
   chartWidths,
-  chartKey
+  chartKey,
+  colors = []
 }) => (
   <Line
     data={includeAllHours(data)}
     width={chartWidths.current[chartKey]}
     height={height}
     curve="linear"
-    colors={{ scheme: 'paired' }}
+    colors={_.size(colors) ? colors : { scheme: 'paired' }}
     margin={{ top: 50, right: group ? 130 : 80, bottom: 50, left: 80 }}
     xScale={{ type: 'point' }}
     yScale={{
@@ -542,7 +563,7 @@ export const HourOfDaySummaryLine = ({
     }}
     enableArea={true}
     enablePoints={false}
-    yFormat={`>-${isCurrency ? '$' : ''},.2r`}
+    yFormat={value => (isCurrency ? formatCurrency({ number: value }) : value)}
     axisTop={null}
     axisRight={null}
     axisBottom={{
@@ -550,7 +571,7 @@ export const HourOfDaySummaryLine = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: -45,
-      legend: xLabel || _.startCase(x),
+      legend: xLabel === 'none' ? '' : xLabel || _.startCase(x),
       legendOffset: 40,
       legendPosition: 'middle'
     }}
@@ -559,9 +580,12 @@ export const HourOfDaySummaryLine = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: yLabel || _.startCase(y),
+      legend: yLabel === 'none' ? '' : yLabel || _.startCase(y),
       legendOffset: -50,
-      legendPosition: 'middle'
+      legendPosition: 'middle',
+      format: value =>
+        isCurrency &&
+        formatCurrency({ number: value, minimumFractionDigits: 0 })
     }}
     useMesh={true}
     {...(group

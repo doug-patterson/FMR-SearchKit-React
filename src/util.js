@@ -224,14 +224,17 @@ export const includeSubmittedSearch = (initialSearch, values) =>
       )
     : initialSearch
 
-const defaultLocale = { locale: 'en-US', currency: 'USD' }
-
-export const formatCurrency = (
+export const formatCurrency = ({
   number,
-  { locale, currency } = defaultLocale
-) => {
-  return new Intl.NumberFormat(locale, {
+  minimumFractionDigits = 2,
+  locale = 'en-US',
+  currency = 'USD',
+  ...rest
+}) =>
+  number &&
+  new Intl.NumberFormat(locale, {
+    minimumFractionDigits,
     style: 'currency',
-    currency
-  }).format(number / 100)
-}
+    currency,
+    ...rest
+  }).format(_.toNumber(number) / 100)
