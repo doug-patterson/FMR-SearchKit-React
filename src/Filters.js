@@ -37,9 +37,9 @@ const updateFilters = filters => idx => patch =>
 // we need to handle the search button better - needs to move up to the main
 // layout and potentially be accompanied by sort controls and column pickers
 
-const DefaultWrapper = ({ title, children, UIComponents }) =>
+const DefaultWrapper = ({ filterKey, children, UIComponents }) =>
   <UIComponents.Card>
-    <UIComponents.CardHeader>{_.startCase(title)}</UIComponents.CardHeader>
+    <UIComponents.CardHeader>{_.startCase(filterKey)}</UIComponents.CardHeader>
     <>{children}</>
   </UIComponents.Card>
 
