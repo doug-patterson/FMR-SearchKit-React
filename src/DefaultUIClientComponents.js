@@ -110,8 +110,6 @@ export const Input = ({
 
 export const DateLineSingle = ({
   data,
-  x,
-  y,
   xLabel,
   yLabel,
   isCurrency,
@@ -146,7 +144,7 @@ export const DateLineSingle = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: -20,
-      legend: xLabel === '' ? '' : xLabel || _.startCase(x),
+      legend: xLabel,
       legendOffset: 36,
       legendPosition: 'middle'
     }}
@@ -155,7 +153,7 @@ export const DateLineSingle = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: yLabel === '' ? '' : yLabel || _.startCase(y),
+      legend: yLabel,
       legendOffset: -50,
       legendPosition: 'middle',
       format: value =>
@@ -181,8 +179,6 @@ export const DateLineSingle = ({
 
 export const DateTimeLine = ({
   data,
-  x,
-  y,
   isCurrency,
   xLabel,
   yLabel,
@@ -215,7 +211,7 @@ export const DateTimeLine = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: -20,
-      legend: xLabel === '' ? '' : xLabel || _.startCase(x),
+      legend: xLabel,
       legendOffset: 36,
       legendPosition: 'middle'
     }}
@@ -224,7 +220,7 @@ export const DateTimeLine = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: yLabel === '' ? '' : yLabel || _.startCase(y),
+      legend: yLabel,
       legendOffset: -50,
       legendPosition: 'middle',
       format: value =>
@@ -421,8 +417,6 @@ export const TopNPie = ({
 
 export const DayOfWeekSummaryBars = ({
   data,
-  x,
-  y,
   xLabel,
   yLabel,
   group,
@@ -431,11 +425,13 @@ export const DayOfWeekSummaryBars = ({
   chartWidths,
   chartKey,
   colors,
-  enableLabel = true
+  enableLabel = true,
+  label
 }) => (
   <Bar
-    data={data}
+    data={console.log(data) || data}
     width={chartWidths.current[chartKey]}
+    label={label}
     height={height}
     enableLabel={enableLabel}
     layout="vertical"
@@ -461,7 +457,7 @@ export const DayOfWeekSummaryBars = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: -20,
-      legend: xLabel === '' ? '' : xLabel || _.startCase(x),
+      legend: xLabel,
       legendPosition: 'middle',
       legendOffset: 36
     }}
@@ -469,7 +465,7 @@ export const DayOfWeekSummaryBars = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: yLabel === '' ? '' : yLabel || _.startCase(y),
+      legend: yLabel,
       legendPosition: 'middle',
       legendOffset: -70,
       format: value =>
@@ -537,8 +533,6 @@ const includeAllHours = _.map(({ id, data }) => ({
 
 export const HourOfDaySummaryLine = ({
   data,
-  x,
-  y,
   isCurrency,
   xLabel,
   yLabel,
@@ -573,7 +567,7 @@ export const HourOfDaySummaryLine = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: -45,
-      legend: xLabel === '' ? '' : xLabel || _.startCase(x),
+      legend: xLabel,
       legendOffset: 40,
       legendPosition: 'middle'
     }}
@@ -582,7 +576,7 @@ export const HourOfDaySummaryLine = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: yLabel === '' ? '' : yLabel || _.startCase(y),
+      legend: yLabel,
       legendOffset: -50,
       legendPosition: 'middle',
       format: value =>
