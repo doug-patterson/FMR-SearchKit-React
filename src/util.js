@@ -226,14 +226,12 @@ export const includeSubmittedSearch = (initialSearch, values) =>
 
 export const formatCurrency = ({
   number,
-  minimumFractionDigits = 2,
   locale = 'en-US',
   currency = 'USD',
   ...rest
 }) =>
   number &&
   new Intl.NumberFormat(locale, {
-    minimumFractionDigits,
     style: 'currency',
     currency,
     ...rest
