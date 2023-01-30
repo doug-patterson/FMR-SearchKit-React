@@ -73,7 +73,7 @@ const Charts = ({
               schema={schema}
               schemas={schemas}
               UIComponents={UIComponents}
-              height={280}
+              height={_.toNumber(chart.height) || 280}
             />
           </ChartSizer>
         </div>
