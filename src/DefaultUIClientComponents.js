@@ -429,7 +429,7 @@ export const DayOfWeekSummaryBars = ({
   label
 }) => (
   <Bar
-    data={console.log(data) || data}
+    data={data}
     width={chartWidths.current[chartKey]}
     label={label}
     height={height}
