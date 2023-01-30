@@ -146,7 +146,7 @@ export const DateLineSingle = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: -20,
-      legend: xLabel === 'none' ? '' : xLabel || _.startCase(x),
+      legend: xLabel === '' ? '' : xLabel || _.startCase(x),
       legendOffset: 36,
       legendPosition: 'middle'
     }}
@@ -155,7 +155,7 @@ export const DateLineSingle = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: yLabel === 'none' ? '' : yLabel || _.startCase(y),
+      legend: yLabel === '' ? '' : yLabel || _.startCase(y),
       legendOffset: -50,
       legendPosition: 'middle',
       format: value =>
@@ -215,7 +215,7 @@ export const DateTimeLine = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: -20,
-      legend: xLabel === 'none' ? '' : xLabel || _.startCase(x),
+      legend: xLabel === '' ? '' : xLabel || _.startCase(x),
       legendOffset: 36,
       legendPosition: 'middle'
     }}
@@ -224,7 +224,7 @@ export const DateTimeLine = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: yLabel === 'none' ? '' : yLabel || _.startCase(y),
+      legend: yLabel === '' ? '' : yLabel || _.startCase(y),
       legendOffset: -50,
       legendPosition: 'middle',
       format: value =>
@@ -461,7 +461,7 @@ export const DayOfWeekSummaryBars = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: -20,
-      legend: xLabel === 'none' ? '' : xLabel || _.startCase(x),
+      legend: xLabel === '' ? '' : xLabel || _.startCase(x),
       legendPosition: 'middle',
       legendOffset: 36
     }}
@@ -469,7 +469,7 @@ export const DayOfWeekSummaryBars = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: yLabel === 'none' ? '' : yLabel || _.startCase(y),
+      legend: yLabel === '' ? '' : yLabel || _.startCase(y),
       legendPosition: 'middle',
       legendOffset: -70,
       format: value =>
@@ -573,7 +573,7 @@ export const HourOfDaySummaryLine = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: -45,
-      legend: xLabel === 'none' ? '' : xLabel || _.startCase(x),
+      legend: xLabel === '' ? '' : xLabel || _.startCase(x),
       legendOffset: 40,
       legendPosition: 'middle'
     }}
@@ -582,7 +582,7 @@ export const HourOfDaySummaryLine = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: yLabel === 'none' ? '' : yLabel || _.startCase(y),
+      legend: yLabel === '' ? '' : yLabel || _.startCase(y),
       legendOffset: -50,
       legendPosition: 'middle',
       format: value =>
