@@ -1,7 +1,7 @@
 import React from 'react'
 import _ from 'lodash/fp'
 import Results from './Results'
-import { formatCurrency, mapValuesIndexed } from './util'
+import { formatCurrency } from './util'
 
 const makeObject = keys => row => _.zipObject(keys, row)
 
@@ -11,16 +11,7 @@ const SummaryTable = ({ data, pivot, group, rows, isCurrency, ...props }) => {
     _.fromPairs
   )(data)
   data = _.map(_.omit(['name']), data)
-  const orderedKeys = ['_id', ..._.map('key', rows)]
-  const negativeKeys = _.map('key', _.filter('negative', rows))
-  data = _.map(
-    row =>
-      mapValuesIndexed(
-        (v, k) => (_.includes(k, negativeKeys) ? 0 - v : v),
-        row
-      ),
-    data
-  )
+  const showKeys = ['_id', ..._.map('key', _.reject('hide', rows))]
   data = _.map(
     row => ({
       ...row,
@@ -39,7 +30,7 @@ const SummaryTable = ({ data, pivot, group, rows, isCurrency, ...props }) => {
     }),
     data
   )
-  data = _.map(_.pick(orderedKeys), data)
+  data = _.map(_.pick(showKeys), data)
   let include = _.keys(_.first(data))
   const originalInclude = include
   const [, ..._include] = include
