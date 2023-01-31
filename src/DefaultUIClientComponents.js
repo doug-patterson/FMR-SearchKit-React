@@ -172,6 +172,71 @@ export const DateLineSingle = ({
   />
 )
 
+export const DateLineMultiple = ({
+  data,
+  x,
+  y,
+  xLabel,
+  yLabel,
+  isCurrency,
+  height,
+  chartWidths,
+  chartKey,
+}) => console.log(data) || (
+  <Line
+    data={americanDates(_.map(d => ({ ...d, data: _.map(_.omit('group'), d.data)}),data))}
+    curve="linear"
+    width={chartWidths.current[chartKey]}
+    height={height}
+    animate={false}
+    colors={{ scheme: 'set2' }}
+    margin={{ top: 50, right: 60, bottom: 50, left: 60 }}
+    xScale={{ type: 'point' }} // need to figure point v linear somehow
+    yScale={{
+      type: 'linear',
+      min: _.minBy('y', data?.results),
+      max: 'auto',
+      stacked: true,
+      reverse: false
+    }}
+    enableArea={true}
+    enablePoints={false}
+    yFormat={`>-${isCurrency ? '$' : ''},.2r`}
+    axisTop={null}
+    axisRight={null}
+    axisBottom={{
+      orient: 'bottom',
+      tickSize: 5,
+      tickPadding: 5,
+      tickRotation: -20,
+      legend: xLabel || _.startCase(x),
+      legendOffset: 36,
+      legendPosition: 'middle'
+    }}
+    axisLeft={{
+      orient: 'left',
+      tickSize: 5,
+      tickPadding: 5,
+      tickRotation: 0,
+      legend: yLabel || _.startCase(y),
+      legendOffset: -50,
+      legendPosition: 'middle'
+    }}
+    pointSize={10}
+    pointColor={{ theme: 'background' }}
+    pointBorderWidth={2}
+    pointBorderColor={{ from: 'serieColor' }}
+    pointLabelYOffset={-12}
+    useMesh={true}
+    tooltip={({ point }) => (
+      <div style={{ padding: 4, backgroundColor: 'white' }}>
+        <b>{point?.data?.x}</b>: {isCurrency ? '$' : ''}
+        {point?.data?.y}
+      </div>
+    )}
+  />
+)
+
 export const DateTimeLine = ({
   data,
   x,
