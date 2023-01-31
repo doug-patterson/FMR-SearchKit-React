@@ -58,7 +58,11 @@ const Filters = ({
   return (
     <div
       key={_.join(',', _.keys(schema.properties))}
-      style={{ gridArea: 'filters', ...(layout === 'row' ? { display: 'flex', flexDirection: 'row' } : {}) }}
+      style={{
+        gridArea: 'filters',
+        ...(layout === 'row' ? { display: 'flex', flexDirection: 'row' } : {})
+      }}
+      className="fmr-filters"
     >
       {!runSearch && (
         <UIComponents.Button type="submit">Search</UIComponents.Button>
