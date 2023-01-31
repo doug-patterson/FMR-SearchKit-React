@@ -62,7 +62,9 @@ const Filters = ({
         gridArea: 'filters',
         ...(layout === 'row' ? { display: 'flex', flexDirection: 'row' } : {})
       }}
-      className="fmr-filters"
+      className={`${
+        layout === 'row' ? 'fmr-filters--horizontal' : 'fmr-filters--vertical'
+      }`}
     >
       {!runSearch && (
         <UIComponents.Button type="submit">Search</UIComponents.Button>
