@@ -63,7 +63,7 @@ const Filters = ({
         ...(layout === 'row' ? { display: 'flex', flexDirection: 'row' } : {})
       }}
       className={`${
-        layout === 'row' ? 'fmr-filters--horizontal' : 'fmr-filters--vertical'
+        layout === 'row' ? 'fmr-filters--row' : 'fmr-filters--column'
       }`}
     >
       {!runSearch && (
