@@ -63,10 +63,9 @@ const Charts = ({
           key={chart.key}
           style={{ gridArea: chart.key }}
         >
-          <h2>{_.startCase(chart.key)}</h2>
+          <h2>{_.toString(chart.label) || _.startCase(chart.key)}</h2>
           <ChartSizer chartWidths={chartWidths} chartKey={chart.key}>
             <Component
-              height={280}
               {..._.omit(['key'], chart)}
               chartKey={chart.key}
               chartWidths={chartWidths}
@@ -74,6 +73,7 @@ const Charts = ({
               schema={schema}
               schemas={schemas}
               UIComponents={UIComponents}
+              height={_.toNumber(chart.height) || 280}
             />
           </ChartSizer>
         </div>

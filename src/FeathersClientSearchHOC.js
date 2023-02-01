@@ -65,7 +65,7 @@ const FeathersSearchRenderer = props => {
         {..._.omit(['constraints'], props)}
         schemas={schemas}
         defaultOverrides={props.overrides}
-        UIComponents={_.merge(props.UIComponents, DefaultUIClientComponents)}
+        UIComponents={_.merge(DefaultUIClientComponents, props.UIComponents)}
         execute={async search => {
           const constrainedSearch = _.size(props.constraints)
             ? _.flow(...props.constraints)(search)

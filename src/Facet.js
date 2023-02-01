@@ -7,41 +7,41 @@ const Facet = ({
   values,
   onChange,
   display = _.get('_id'),
-  UIComponents
+  UIComponents,
+  layout
 }) => (
   <UIComponents.CardBody>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {_.map(
-          ({ _id, checked, count, value, lookup }) => (
-            <div
-              style={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto' }}
-              key={`${_id}-${checked ? 'checked' : 'unchecked'}`}
-            >
-              <UIComponents.CheckBox
-                label={display({ ...value, ...lookup, _id })}
-                checked={checked}
-                {...(onChange
-                  ? {
-                      onChange: checked => {
-                        const newValues = checked
-                          ? _.concat(values, _id)
-                          : _.without([_id], values)
-                        onChange({ values: newValues })
-                      }
+    <div
+      className="fmr-facet__wrapper"
+      style={{ display: 'flex', flexDirection: 'column' }}
+    >
+      {_.map(
+        ({ _id, checked, count, value, lookup }) => (
+          <React.Fragment key={`${_id}-${checked ? 'checked' : 'unchecked'}`}>
+            <UIComponents.CheckBox
+              layout={layout}
+              checked={checked}
+              textMiddle={display({ ...value, ...lookup, _id })}
+              textRight={count}
+              {...(onChange
+                ? {
+                    onChange: checked => {
+                      const newValues = checked
+                        ? _.concat(values, _id)
+                        : _.without([_id], values)
+                      onChange({ values: newValues })
                     }
-                  : {
-                      name: `${title}[${_id}]`
-                    })}
-              />
-              <span style={{ textAlign: 'right', justifySelf: 'end' }}>
-                {count}
-              </span>
-            </div>
-          ),
-          options
-        )}
-      </div>
-    </UIComponents.CardBody>
+                  }
+                : {
+                    name: `${title}[${_id}]`
+                  })}
+            />
+          </React.Fragment>
+        ),
+        options
+      )}
+    </div>
+  </UIComponents.CardBody>
 )
 
 export default Facet

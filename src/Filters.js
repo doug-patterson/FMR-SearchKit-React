@@ -58,7 +58,13 @@ const Filters = ({
   return (
     <div
       key={_.join(',', _.keys(schema.properties))}
-      style={{ gridArea: 'filters', ...(layout === 'row' ? { display: 'flex', flexDirection: 'row' } : {}) }}
+      style={{
+        gridArea: 'filters',
+        ...(layout === 'row' ? { display: 'flex', flexDirection: 'row' } : {})
+      }}
+      className={`${
+        layout === 'row' ? 'fmr-filters--row' : 'fmr-filters--column'
+      }`}
     >
       {!runSearch && (
         <UIComponents.Button type="submit">Search</UIComponents.Button>
@@ -70,6 +76,7 @@ const Filters = ({
           <Wrapper openFilters={openFilters} filterKey={filter.key} UIComponents={UIComponents}>
             <Component
               key={filter.key}
+              layout={layout}
               {...(runSearch
                 ? {
                     onChange: async patch =>
