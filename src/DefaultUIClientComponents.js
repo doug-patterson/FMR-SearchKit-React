@@ -60,22 +60,47 @@ export const Menu = ({ label, open, items }) => {
   )
 }
 
-export const CheckBox = ({ checked, label, onChange }) => {
-  const id = _.uniqueId('fmr-checkbox-')
-
+export const CheckBox = ({
+  checked,
+  onChange,
+  textMiddle,
+  textRight,
+  layout
+}) => {
+  const isRowLayout = layout === 'row'
   return (
-    <>
+    <label
+      className={`fmr-checkbox fmr-checkbox--${isRowLayout ? 'row' : 'column'}`}
+    >
       <input
         type="checkbox"
         checked={checked}
-        id={id}
-        className="fmr-checkbox"
+        className={`fmr-checkbox__input fmr-checkbox__input--${
+          isRowLayout ? 'row' : 'column'
+        }`}
         {...(onChange
           ? { onChange: e => e.target && onChange(e.target.checked) }
           : {})}
       />
-      <label htmlFor={id}>{label}</label>
-    </>
+      {textMiddle && (
+        <span
+          className={`fmr-checkbox__text-middle fmr-checkbox__text-middle--${
+            isRowLayout ? 'row' : 'column'
+          }`}
+        >
+          {textMiddle}
+        </span>
+      )}
+      {textRight && (
+        <span
+          className={`fmr-checkbox__text-right fmr-checkbox__text-right--${
+            isRowLayout ? 'row' : 'column'
+          }`}
+        >
+          {textRight}
+        </span>
+      )}
+    </label>
   )
 }
 

@@ -76,6 +76,7 @@ const Filters = ({
           <Wrapper openFilters={openFilters} filterKey={filter.key} UIComponents={UIComponents}>
             <Component
               key={filter.key}
+              layout={layout}
               {...(runSearch
                 ? {
                     onChange: async patch =>
