@@ -521,88 +521,87 @@ export const DayOfWeekSummaryBars = ({
   enableLabel = true,
   label,
   includeLegends = true
-}) =>
-  console.log('link is working.....') || (
-    <Bar
-      data={data}
-      width={chartWidths.current[chartKey]}
-      label={label}
-      height={height}
-      enableLabel={enableLabel}
-      layout="vertical"
-      indexBy="id"
-      animate={false}
-      keys={_.flow(_.map(_.keys), _.flatten, _.uniq, _.without(['id']))(data)}
-      margin={{ top: 50, right: group ? 130 : 80, bottom: 50, left: 80 }}
-      padding={0.3}
-      xScale={{ type: 'linear' }}
-      colors={colors ? colors : { scheme: 'set2' }}
-      valueFormat={value =>
-        isCurrency
-          ? formatCurrency({ number: value, minimumFractionDigits: 0 })
-          : value
-      }
-      borderColor={{
-        from: 'color',
-        modifiers: [['darker', 1.6]]
-      }}
-      axisTop={null}
-      axisRight={null}
-      axisBottom={{
-        tickSize: 5,
-        tickPadding: 5,
-        tickRotation: -20,
-        legend: xLabel,
-        legendPosition: 'middle',
-        legendOffset: 36
-      }}
-      axisLeft={{
-        tickSize: 5,
-        tickPadding: 5,
-        tickRotation: 0,
-        legend: yLabel,
-        legendPosition: 'middle',
-        legendOffset: -70,
-        format: value =>
-          isCurrency &&
-          formatCurrency({ number: value, minimumFractionDigits: 0 })
-      }}
-      labelSkipWidth={12}
-      labelSkipHeight={12}
-      labelTextColor={{
-        from: 'color',
-        modifiers: [['darker', 1.6]]
-      }}
-      {...(group && includeLegends
-        ? {
-            legends: [
-              {
-                dataFrom: 'keys',
-                anchor: 'bottom-right',
-                direction: 'column',
-                justify: false,
-                translateX: 120,
-                translateY: 0,
-                itemsSpacing: 2,
-                itemWidth: 100,
-                itemHeight: 20,
-                itemDirection: 'left-to-right',
-                itemOpacity: 0.85,
-                symbolSize: 20,
-                effects: [
-                  {
-                    on: 'hover',
-                    style: {
-                      itemOpacity: 1
-                    }
+}) => (
+  <Bar
+    data={data}
+    width={chartWidths.current[chartKey]}
+    label={label}
+    height={height}
+    enableLabel={enableLabel}
+    layout="vertical"
+    indexBy="id"
+    animate={false}
+    keys={_.flow(_.map(_.keys), _.flatten, _.uniq, _.without(['id']))(data)}
+    margin={{ top: 50, right: group ? 130 : 80, bottom: 50, left: 80 }}
+    padding={0.3}
+    xScale={{ type: 'linear' }}
+    colors={colors ? colors : { scheme: 'set2' }}
+    valueFormat={value =>
+      isCurrency
+        ? formatCurrency({ number: value, minimumFractionDigits: 0 })
+        : value
+    }
+    borderColor={{
+      from: 'color',
+      modifiers: [['darker', 1.6]]
+    }}
+    axisTop={null}
+    axisRight={null}
+    axisBottom={{
+      tickSize: 5,
+      tickPadding: 5,
+      tickRotation: -20,
+      legend: xLabel,
+      legendPosition: 'middle',
+      legendOffset: 36
+    }}
+    axisLeft={{
+      tickSize: 5,
+      tickPadding: 5,
+      tickRotation: 0,
+      legend: yLabel,
+      legendPosition: 'middle',
+      legendOffset: -70,
+      format: value =>
+        isCurrency &&
+        formatCurrency({ number: value, minimumFractionDigits: 0 })
+    }}
+    labelSkipWidth={12}
+    labelSkipHeight={12}
+    labelTextColor={{
+      from: 'color',
+      modifiers: [['darker', 1.6]]
+    }}
+    {...(group && includeLegends
+      ? {
+          legends: [
+            {
+              dataFrom: 'keys',
+              anchor: 'bottom-right',
+              direction: 'column',
+              justify: false,
+              translateX: 120,
+              translateY: 0,
+              itemsSpacing: 2,
+              itemWidth: 100,
+              itemHeight: 20,
+              itemDirection: 'left-to-right',
+              itemOpacity: 0.85,
+              symbolSize: 20,
+              effects: [
+                {
+                  on: 'hover',
+                  style: {
+                    itemOpacity: 1
                   }
-                ]
-              }
-            ]
-          }
-        : {})}
-    />
-  )
+                }
+              ]
+            }
+          ]
+        }
+      : {})}
+  />
+)
 
 const addZeroHours = hours =>
   _.map(x => _.find({ x }, hours) || { x, y: 0 }, [..._.range(1, 24), 0])
