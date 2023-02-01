@@ -66,6 +66,7 @@ const Charts = ({
           <h2>{_.startCase(chart.key)}</h2>
           <ChartSizer chartWidths={chartWidths} chartKey={chart.key}>
             <Component
+              height={280}
               {..._.omit(['key'], chart)}
               chartKey={chart.key}
               chartWidths={chartWidths}
@@ -73,7 +74,6 @@ const Charts = ({
               schema={schema}
               schemas={schemas}
               UIComponents={UIComponents}
-              height={280}
             />
           </ChartSizer>
         </div>
