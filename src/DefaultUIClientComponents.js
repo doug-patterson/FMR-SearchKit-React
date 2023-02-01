@@ -212,10 +212,12 @@ export const DateLineMultiple = ({
   isCurrency,
   height,
   chartWidths,
-  chartKey,
-}) => console.log(data) || (
+  chartKey
+}) => (
   <Line
-    data={americanDates(_.map(d => ({ ...d, data: _.map(_.omit('group'), d.data)}),data))}
+    data={americanDates(
+      _.map(d => ({ ...d, data: _.map(_.omit('group'), d.data) }), data)
+    )}
     curve="linear"
     width={chartWidths.current[chartKey]}
     height={height}
@@ -517,7 +519,8 @@ export const DayOfWeekSummaryBars = ({
   chartKey,
   colors,
   enableLabel = true,
-  label
+  label,
+  includeLegends = true
 }) => (
   <Bar
     data={data}
@@ -569,7 +572,7 @@ export const DayOfWeekSummaryBars = ({
       from: 'color',
       modifiers: [['darker', 1.6]]
     }}
-    {...(group
+    {...(group && includeLegends
       ? {
           legends: [
             {
@@ -631,7 +634,8 @@ export const HourOfDaySummaryLine = ({
   height,
   chartWidths,
   chartKey,
-  colors
+  colors,
+  includeLegends = true
 }) => (
   <Line
     data={includeAllHours(data)}
@@ -675,7 +679,7 @@ export const HourOfDaySummaryLine = ({
         formatCurrency({ number: value, minimumFractionDigits: 0 })
     }}
     useMesh={true}
-    {...(group
+    {...(group && includeLegends
       ? {
           legends: [
             {
