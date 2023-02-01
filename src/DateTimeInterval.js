@@ -24,7 +24,7 @@ const DateTimeInterval = ({
   layout
 }) => (
   <UIComponents.CardBody
-    className={`fmr-date-time-interval fmr-date-time-interval--${
+    className={`fmr-date-time-intervals fmr-date-time-intervals--${
       layout === 'row' ? 'row' : 'column'
     }`}
   >

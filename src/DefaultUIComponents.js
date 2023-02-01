@@ -138,7 +138,7 @@ export const CardHeader = ({ children, ...props }) => (
     {children}
   </div>
 )
-export const CardBody = ({ children, className, ...props }) => (
+export const CardBody = ({ children, className = '', ...props }) => (
   <div className={`fmr-card-body ${className}`} {...props}>
     {children}
   </div>
