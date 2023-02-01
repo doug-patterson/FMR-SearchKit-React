@@ -51,7 +51,7 @@ const Filters = ({
   UIComponents,
   runSearch,
   currentInput,
-  openFilters,
+  openFilter,
   layout = 'column',
   Wrapper = DefaultWrapper
 }) => {
@@ -73,7 +73,7 @@ const Filters = ({
       {mapIndexed((filter, idx) => {
         const Component = getFilterComponent(filter.type)
         return (
-          <Wrapper openFilters={openFilters} filterKey={filter.key} UIComponents={UIComponents}>
+          <Wrapper openFilter={openFilter} filterKey={filter.key} UIComponents={UIComponents}>
             <Component
               key={filter.key}
               layout={layout}

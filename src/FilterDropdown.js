@@ -5,18 +5,14 @@ import _ from 'lodash/fp'
 import useOutsideClick from './hooks/useOutsideClick'
 import ChevronDown from './Icons/ChevronDown'
 
-export const FilterDropdown = ({ filterKey, children, openFilters }) => {
+export const FilterDropdown = ({ filterKey, children, openFilter }) => {
   const ref = React.useRef()
-  const [isOpen, setIsOpen] = React.useState(
-    _.includes(filterKey, openFilters.current)
-  )
+  const [isOpen, setIsOpen] = React.useState(openFilter.current === filterKey)
   useOutsideClick(ref, () => setIsOpen(false))
 
   const handleToggle = () => {
     let newOpenState = !isOpen
-    openFilters.current = newOpenState
-      ? _.flow(_.concat(filterKey), _.uniq)(openFilters.current)
-      : _.without([filterKey], openFilters.current)
+    openFilter.current = isOpen ? filterKey : ''
     setIsOpen(newOpenState)
   }
 
