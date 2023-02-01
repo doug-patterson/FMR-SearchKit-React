@@ -20,113 +20,116 @@ const DateTimeInterval = ({
   disableInterval,
   onChange,
   UIComponents,
-  currentInput = {}
+  currentInput = {},
+  layout
 }) => (
-  <UIComponents.CardBody>
-    <UIComponents.Grid columns={'1fr'} rows={'40px 40px 40px'}>
-      {!disableInterval && (
-        <UIComponents.Select
-          label={'Interval'}
-          value={
-            _.has(`${title}.interval`, currentInput.current)
-              ? _.get(`${title}.interval`, currentInput.current)
-              : interval || ''
-          }
-          options={[
-            '',
-            'Today',
-            'Current Week',
-            'Current Month',
-            'Current Quarter',
-            'Current Year',
-            'Last Hour',
-            'Last Two Hours',
-            'Last Four Hours',
-            'Last Eight Hours',
-            'Last Twelve Hours',
-            'Last Day',
-            'Last Two Days',
-            'Last Three Days',
-            'Last Week',
-            'Last Two Weeks',
-            'Last Month',
-            'Last Quarter',
-            'Last Year',
-            'Last Two Years',
-            'Previous Full Day',
-            'Previous Full Week',
-            'Previous Full Month',
-            'Previous Full Quarter',
-            'Previous Full Year',
-          ]}
-          {...(onChange
-            ? {
-                onChange: val => {
-                  currentInput.current = { [`${title}.interval`]: val }
-                  onChange({
-                    interval: val,
-                    from: null,
-                    to: null,
-                    offset: new Date().getTimezoneOffset()
-                  })
-                }
+  <UIComponents.CardBody
+    className={`fmr-date-time-interval fmr-date-time-interval--${
+      layout === 'row' ? 'row' : 'column'
+    }`}
+  >
+    {!disableInterval && (
+      <UIComponents.Select
+        label={'Interval'}
+        value={
+          _.has(`${title}.interval`, currentInput.current)
+            ? _.get(`${title}.interval`, currentInput.current)
+            : interval || ''
+        }
+        options={[
+          '',
+          'Today',
+          'Current Week',
+          'Current Month',
+          'Current Quarter',
+          'Current Year',
+          'Last Hour',
+          'Last Two Hours',
+          'Last Four Hours',
+          'Last Eight Hours',
+          'Last Twelve Hours',
+          'Last Day',
+          'Last Two Days',
+          'Last Three Days',
+          'Last Week',
+          'Last Two Weeks',
+          'Last Month',
+          'Last Quarter',
+          'Last Year',
+          'Last Two Years',
+          'Previous Full Day',
+          'Previous Full Week',
+          'Previous Full Month',
+          'Previous Full Quarter',
+          'Previous Full Year'
+        ]}
+        {...(onChange
+          ? {
+              onChange: val => {
+                currentInput.current = { [`${title}.interval`]: val }
+                onChange({
+                  interval: val,
+                  from: null,
+                  to: null,
+                  offset: new Date().getTimezoneOffset()
+                })
               }
-            : {
-                name: `${title}[interval]`
-              })}
-        ></UIComponents.Select>
-      )}
-      {!disableFrom && (
-        <UIComponents.Input
-          type="datetime-local"
-          placeholder={'Start'}
-          focus={_.has(`${title}.from`, currentInput.current)}
-          {...(onChange
-            ? {
-                onChange: val => {
-                  currentInput.current = { [`${title}.from`]: val }
-                  onChange({
-                    from: val,
-                    interval: null,
-                    offset: new Date().getTimezoneOffset()
-                  })
-                },
-                value: _.has(`${title}.from`, currentInput.current)
-                  ? _.get(`${title}.from`, currentInput.current)
-                  : from || ''
-              }
-            : {
-                name: `${title}[from]`,
-                defaultValue: from || ''
-              })}
-        />
-      )}
-      {!disableTo && (
-        <UIComponents.Input
-          type="datetime-local"
-          placeholder={'End'}
-          focus={_.has(`${title}.to`, currentInput.current)}
-          {...(onChange
-            ? {
-                onChange: val => {
-                  currentInput.current = { [`${title}.to`]: val }
-                  onChange({
-                    to: val,
-                    interval: null,
-                    offset: new Date().getTimezoneOffset()
-                  })
-                },
-                value: _.has(`${title}.to`, currentInput.current)
-                  ? _.get(`${title}.to`, currentInput.current)
-                  : to || ''
-              }
-            : {
-                name: `${title}[to]`,
-                defaultValue: to || ''
-              })}
-        />
-      )}
-    </UIComponents.Grid>
+            }
+          : {
+              name: `${title}[interval]`
+            })}
+      ></UIComponents.Select>
+    )}
+    {!disableFrom && (
+      <UIComponents.Input
+        type="datetime-local"
+        placeholder={'Start'}
+        focus={_.has(`${title}.from`, currentInput.current)}
+        {...(onChange
+          ? {
+              onChange: val => {
+                currentInput.current = { [`${title}.from`]: val }
+                onChange({
+                  from: val,
+                  interval: null,
+                  offset: new Date().getTimezoneOffset()
+                })
+              },
+              value: _.has(`${title}.from`, currentInput.current)
+                ? _.get(`${title}.from`, currentInput.current)
+                : from || ''
+            }
+          : {
+              name: `${title}[from]`,
+              defaultValue: from || ''
+            })}
+      />
+    )}
+    {!disableTo && (
+      <UIComponents.Input
+        type="datetime-local"
+        placeholder={'End'}
+        focus={_.has(`${title}.to`, currentInput.current)}
+        {...(onChange
+          ? {
+              onChange: val => {
+                currentInput.current = { [`${title}.to`]: val }
+                onChange({
+                  to: val,
+                  interval: null,
+                  offset: new Date().getTimezoneOffset()
+                })
+              },
+              value: _.has(`${title}.to`, currentInput.current)
+                ? _.get(`${title}.to`, currentInput.current)
+                : to || ''
+            }
+          : {
+              name: `${title}[to]`,
+              defaultValue: to || ''
+            })}
+      />
+    )}
   </UIComponents.CardBody>
 )
 

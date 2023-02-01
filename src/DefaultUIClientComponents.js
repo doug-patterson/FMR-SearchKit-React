@@ -110,6 +110,7 @@ export const Input = ({
   placeholder,
   onChange,
   focus,
+  label,
   ...props
 }) => {
   const inputEl = React.createRef()
