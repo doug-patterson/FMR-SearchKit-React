@@ -235,4 +235,4 @@ export const formatCurrency = ({
     style: 'currency',
     currency,
     ...rest
-  }).format(_.toNumber(number) / 100)
+  }).format(_.toNumber(number))
