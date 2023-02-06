@@ -162,7 +162,7 @@ export const DateLineSingle = ({
     }}
     enableArea={true}
     enablePoints={false}
-    yFormat={value => (isCurrency ? formatCurrency({ number: value }) : value)}
+    yFormat={value => (isCurrency ? formatCurrency({ amount: value }) : value)}
     axisTop={null}
     axisRight={null}
     axisBottom={{
@@ -184,7 +184,7 @@ export const DateLineSingle = ({
       legendPosition: 'middle',
       format: value =>
         isCurrency &&
-        formatCurrency({ number: value, minimumFractionDigits: 0 })
+        formatCurrency({ amount: value, minimumFractionDigits: 0 })
     }}
     pointSize={10}
     pointColor={{ theme: 'background' }}
@@ -196,7 +196,7 @@ export const DateLineSingle = ({
       <div style={{ padding: 4, backgroundColor: 'white' }}>
         <b>{point?.data?.x}</b>:{' '}
         {isCurrency
-          ? formatCurrency({ number: point?.data?.y })
+          ? formatCurrency({ amount: point?.data?.y })
           : point?.data?.y}
       </div>
     )}
@@ -281,7 +281,7 @@ export const DateTimeLine = ({
   colors
 }) => (
   <Line
-    data={isCurrency ? formatCurrency({ number: data }) : data}
+    data={isCurrency ? formatCurrency({ amount: data }) : data}
     curve="linear"
     height={height}
     width={chartWidths.current[chartKey]}
@@ -296,7 +296,7 @@ export const DateTimeLine = ({
       stacked: true,
       reverse: false
     }}
-    yFormat={value => (isCurrency ? formatCurrency({ number: value }) : value)}
+    yFormat={value => (isCurrency ? formatCurrency({ amount: value }) : value)}
     axisTop={null}
     axisRight={null}
     axisBottom={{
@@ -318,7 +318,7 @@ export const DateTimeLine = ({
       legendPosition: 'middle',
       format: value =>
         isCurrency &&
-        formatCurrency({ number: value, minimumFractionDigits: 0 })
+        formatCurrency({ amount: value, minimumFractionDigits: 0 })
     }}
     pointSize={10}
     pointColor={{ theme: 'background' }}
@@ -538,7 +538,7 @@ export const DayOfWeekSummaryBars = ({
     colors={colors ? colors : { scheme: 'set2' }}
     valueFormat={value =>
       isCurrency
-        ? formatCurrency({ number: value, minimumFractionDigits: 0 })
+        ? formatCurrency({ amount: value, minimumFractionDigits: 0 })
         : value
     }
     borderColor={{
@@ -564,7 +564,7 @@ export const DayOfWeekSummaryBars = ({
       legendOffset: -70,
       format: value =>
         isCurrency &&
-        formatCurrency({ number: value, minimumFractionDigits: 0 })
+        formatCurrency({ amount: value, minimumFractionDigits: 0 })
     }}
     labelSkipWidth={12}
     labelSkipHeight={12}
@@ -654,7 +654,7 @@ export const HourOfDaySummaryLine = ({
     }}
     enableArea={true}
     enablePoints={false}
-    yFormat={value => (isCurrency ? formatCurrency({ number: value }) : value)}
+    yFormat={value => (isCurrency ? formatCurrency({ amount: value }) : value)}
     axisTop={null}
     axisRight={null}
     axisBottom={{
@@ -676,7 +676,7 @@ export const HourOfDaySummaryLine = ({
       legendPosition: 'middle',
       format: value =>
         isCurrency &&
-        formatCurrency({ number: value, minimumFractionDigits: 0 })
+        formatCurrency({ amount: value, minimumFractionDigits: 0 })
     }}
     useMesh={true}
     {...(group && includeLegends

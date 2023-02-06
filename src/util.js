@@ -225,14 +225,17 @@ export const includeSubmittedSearch = (initialSearch, values) =>
     : initialSearch
 
 export const formatCurrency = ({
-  number,
+  amount,
   locale = 'en-US',
   currency = 'USD',
   ...rest
-}) =>
-  number &&
+}) => 
+  amount ?
   new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
     ...rest
-  }).format(_.toNumber(number) / 100)
+    // since Intl uses major currency units and square uses minor ones
+    // we'll need to fix this if we ever operate somewhere where the minor
+    // currency unit isn't the major one / 100 -- e.g. India
+  }).format(amount / 100) : ''

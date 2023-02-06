@@ -71,7 +71,7 @@ const SummaryTable = ({ data, pivot, group, rows, isCurrency, ...props }) => {
                     {_.startCase(k)}
                   </span>
                 ) : k ? (
-                  formatCurrency({ number: k })
+                  formatCurrency({ amount: k })
                 ) : (
                   <span>&nbsp;</span>
                 )
