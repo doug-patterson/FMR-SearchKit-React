@@ -142,7 +142,8 @@ export const DateLineSingle = ({
   height,
   chartWidths,
   chartKey,
-  colors
+  colors,
+  currency
 }) => (
   <Line
     data={americanDates(data)}
@@ -162,7 +163,7 @@ export const DateLineSingle = ({
     }}
     enableArea={true}
     enablePoints={false}
-    yFormat={value => (isCurrency ? formatCurrency({ number: value }) : value)}
+    yFormat={value => (isCurrency ? formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }) : value)}
     axisTop={null}
     axisRight={null}
     axisBottom={{
@@ -184,7 +185,7 @@ export const DateLineSingle = ({
       legendPosition: 'middle',
       format: value =>
         isCurrency &&
-        formatCurrency({ number: value, minimumFractionDigits: 0 })
+        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
     }}
     pointSize={10}
     pointColor={{ theme: 'background' }}
@@ -196,7 +197,7 @@ export const DateLineSingle = ({
       <div style={{ padding: 4, backgroundColor: 'white' }}>
         <b>{point?.data?.x}</b>:{' '}
         {isCurrency
-          ? formatCurrency({ number: point?.data?.y })
+          ? formatCurrency({ amount: point?.data?.y, currency, minimumFractionDigits: 0 })
           : point?.data?.y}
       </div>
     )}
@@ -278,10 +279,11 @@ export const DateTimeLine = ({
   height,
   chartWidths,
   chartKey,
-  colors
+  colors,
+  currency
 }) => (
   <Line
-    data={isCurrency ? formatCurrency({ number: data }) : data}
+    data={isCurrency ? formatCurrency({ amount: data, currency, minimumFractionDigits: 0 }) : data}
     curve="linear"
     height={height}
     width={chartWidths.current[chartKey]}
@@ -296,7 +298,7 @@ export const DateTimeLine = ({
       stacked: true,
       reverse: false
     }}
-    yFormat={value => (isCurrency ? formatCurrency({ number: value }) : value)}
+    yFormat={value => (isCurrency ? formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }) : value)}
     axisTop={null}
     axisRight={null}
     axisBottom={{
@@ -318,7 +320,7 @@ export const DateTimeLine = ({
       legendPosition: 'middle',
       format: value =>
         isCurrency &&
-        formatCurrency({ number: value, minimumFractionDigits: 0 })
+        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
     }}
     pointSize={10}
     pointColor={{ theme: 'background' }}
@@ -520,7 +522,8 @@ export const DayOfWeekSummaryBars = ({
   colors,
   enableLabel = true,
   label,
-  includeLegends = true
+  includeLegends = true,
+  currency
 }) => (
   <Bar
     data={data}
@@ -538,7 +541,7 @@ export const DayOfWeekSummaryBars = ({
     colors={colors ? colors : { scheme: 'set2' }}
     valueFormat={value =>
       isCurrency
-        ? formatCurrency({ number: value, minimumFractionDigits: 0 })
+        ? formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
         : value
     }
     borderColor={{
@@ -564,7 +567,7 @@ export const DayOfWeekSummaryBars = ({
       legendOffset: -70,
       format: value =>
         isCurrency &&
-        formatCurrency({ number: value, minimumFractionDigits: 0 })
+        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
     }}
     labelSkipWidth={12}
     labelSkipHeight={12}
@@ -635,7 +638,8 @@ export const HourOfDaySummaryLine = ({
   chartWidths,
   chartKey,
   colors,
-  includeLegends = true
+  includeLegends = true,
+  currency
 }) => (
   <Line
     data={includeAllHours(data)}
@@ -654,7 +658,7 @@ export const HourOfDaySummaryLine = ({
     }}
     enableArea={true}
     enablePoints={false}
-    yFormat={value => (isCurrency ? formatCurrency({ number: value }) : value)}
+    yFormat={value => (isCurrency ? formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }) : value)}
     axisTop={null}
     axisRight={null}
     axisBottom={{
@@ -676,7 +680,7 @@ export const HourOfDaySummaryLine = ({
       legendPosition: 'middle',
       format: value =>
         isCurrency &&
-        formatCurrency({ number: value, minimumFractionDigits: 0 })
+        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
     }}
     useMesh={true}
     {...(group && includeLegends

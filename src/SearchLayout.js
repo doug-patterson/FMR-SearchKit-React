@@ -60,12 +60,12 @@ const SearchLayout = ({
       ...patch
     }
 
-    const {
+    const [{
       results,
       resultsCount: newResultsCount,
       charts,
       ...filterResults
-    } = (await execute(updatedSearch)) || {}
+    }, constrainedSearch] = (await execute(updatedSearch)) || {}
 
     if (mode === 'route') {
       return
@@ -79,7 +79,7 @@ const SearchLayout = ({
       search.filters
     )
 
-    setSearch(updatedSearch)
+    setSearch(constrainedSearch)
     setFilterOptions(newFilterOptions)
     setRows(results)
     setResultsCount(_.get('count', newResultsCount) || 0)

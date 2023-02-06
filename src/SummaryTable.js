@@ -5,7 +5,7 @@ import { formatCurrency } from './util'
 
 const makeObject = keys => row => _.zipObject(keys, row)
 
-const SummaryTable = ({ data, pivot, group, rows, isCurrency, ...props }) => {
+const SummaryTable = ({ data, pivot, group, rows, isCurrency, currency, ...props }) => {
   const names = _.flow(
     _.map(({ _id, name }) => [_id, name]),
     _.fromPairs
@@ -71,7 +71,7 @@ const SummaryTable = ({ data, pivot, group, rows, isCurrency, ...props }) => {
                     {_.startCase(k)}
                   </span>
                 ) : k ? (
-                  formatCurrency({ number: k })
+                  formatCurrency({ amount: k, currency })
                 ) : (
                   <span>&nbsp;</span>
                 )
