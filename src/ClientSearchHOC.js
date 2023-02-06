@@ -45,16 +45,13 @@ const ClientSearchWithOverrides = props => {
   ])
 
   return (
-    app &&
-    schemas && (
-      <SearchLayout
-        initialSearch={{ collection: props?.collection }}
-        {...props}
-        {...(initialResults ? { initialResults } : {})}
-        schemas={schemas}
-        {...(props.collapseableFilters ? { FilterWrapper } : {})}
-      />
-    )
+    <SearchLayout
+      initialSearch={{ collection: props?.collection }}
+      {...props}
+      {...(initialResults ? { initialResults } : {})}
+      schemas={props.schemas || schemas}
+      {...(props.collapseableFilters ? { FilterWrapper } : {})}
+    />
   )
 }
 

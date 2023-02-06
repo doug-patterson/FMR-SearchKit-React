@@ -55,45 +55,41 @@ const FeathersSearchRenderer = props => {
   )
 
   return (
-    app &&
-    schemas && (
-      <ClientSearch
-        key={_.uniqueId() /* currently mode="route" doesn't work without this*/}
-        {..._.omit(['constraints'], props)}
-        schemas={schemas}
-        defaultOverrides={props.overrides}
-        UIComponents={_.merge(DefaultUIClientComponents, props.UIComponents)}
-        execute={async search => {
-          const constrainedSearch = _.size(_.get(props.initialSearch?.id, props.constraints))
-            ? _.flow(..._.get(props.initialSearch.id, props.constraints))(search)
-            : search
-
-          if (props.mode === 'route') {
-            router.push(
-              buildRoute(
-                constrainedSearch,
-                typeof window === 'object' && window.location.href
-              )
+    <ClientSearch
+      key={_.uniqueId() /* currently mode="route" doesn't work without this*/}
+      {..._.omit(['constraints'], props)}
+      schemas={props.schemas || schemas}
+      defaultOverrides={props.overrides}
+      UIComponents={_.merge(DefaultUIClientComponents, props.UIComponents)}
+      execute={async search => {
+        const constrainedSearch = _.size(_.get(props.initialSearch?.id, props.constraints))
+          ? _.flow(..._.get(props.initialSearch.id, props.constraints))(search)
+          : search
+        if (props.mode === 'route') {
+          router.push(
+            buildRoute(
+              constrainedSearch,
+              typeof window === 'object' && window.location.href
             )
-          } else {
-            const result = await app.service('search').create(constrainedSearch)
-            if (typeof window === 'object') {
-              if (props.isPage) {
-                window.history.replaceState(
-                  null,
-                  null,
-                  buildRoute(
-                    constrainedSearch,
-                    typeof window === 'object' && window.location.href
-                  )
+          )
+        } else {
+          const result = await app.service('search').create(constrainedSearch)
+          if (typeof window === 'object') {
+            if (props.isPage) {
+              window.history.replaceState(
+                null,
+                null,
+                buildRoute(
+                  constrainedSearch,
+                  typeof window === 'object' && window.location.href
                 )
-              }
+              )
             }
-            return [result, constrainedSearch]
           }
-        }}
-      />
-    )
+          return [result, constrainedSearch]
+        }
+      }}
+    />
   )
 }
 
