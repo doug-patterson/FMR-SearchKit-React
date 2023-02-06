@@ -89,7 +89,7 @@ const FeathersSearchRenderer = props => {
                 )
               }
             }
-            return result
+            return [result, constrainedSearch]
           }
         }}
       />
