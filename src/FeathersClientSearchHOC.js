@@ -37,9 +37,6 @@ const FeathersSearchRenderer = props => {
     fn()
   }, [getApp])
 
-  // reactions need to be supported by `execute` passing the search through
-  // a pipeline of search `constraints` that arrives here as props.constraints
-
   const offset = new Date().getTimezoneOffset()
 
   props.initialSearch.filters = _.map(
@@ -67,8 +64,8 @@ const FeathersSearchRenderer = props => {
         defaultOverrides={props.overrides}
         UIComponents={_.merge(DefaultUIClientComponents, props.UIComponents)}
         execute={async search => {
-          const constrainedSearch = _.size(props.constraints)
-            ? _.flow(...props.constraints)(search)
+          const constrainedSearch = _.size(_.get(props.initialSearch?.id, props.constraints))
+            ? _.flow(..._.get(props.initialSearch.id, props.constraints))(search)
             : search
 
           if (props.mode === 'route') {
@@ -91,7 +88,6 @@ const FeathersSearchRenderer = props => {
                   )
                 )
               }
-              window.chartResizer && window.chartResizer()
             }
             return result
           }
