@@ -59,7 +59,6 @@ const ClientSearchWithOverrides = props => {
 
   return (
     <SearchLayout
-      initialSearch={{ collection: props?.collection }}
       {...props}
       {...(initialResults ? { initialResults } : {})}
       schemas={props.schemas || schemas}
