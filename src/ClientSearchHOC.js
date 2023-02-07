@@ -5,6 +5,12 @@ import SearchLayout from './SearchLayout'
 import { FilterDropdown as FilterWrapper } from './FilterDropdown'
 import _ from 'lodash/fp'
 import { setUpSchemas } from './util'
+import { buildRoute } from './util'
+
+const tld = hostname =>
+  hostname === 'localhost'
+    ? 'localhost'
+    : _.flow(_.split('.'), ([, ...rest]) => [...rest], _.join('.'))(hostname)
 
 const initApp = async (setApp, setInitialResults, initialSearch, getApp) => {
   const app = await getApp()
@@ -12,6 +18,9 @@ const initApp = async (setApp, setInitialResults, initialSearch, getApp) => {
     setInitialResults(await app.service('search').create(initialSearch))
   }
   setApp(app)
+  document.cookie = `searchkitTimezoneOffset=${new Date().getTimezoneOffset()};path=/;domain=${tld(
+    window.location.hostname
+  )};max-age=2592000;`
 }
 
 const ClientSearchWithOverrides = props => {
@@ -19,6 +28,10 @@ const ClientSearchWithOverrides = props => {
   const [schemas, setSchemas] = React.useState(null)
   const [initialResults, setInitialResults] = React.useState(null)
 
+  const router = props.useRouter()
+
+  // this completely repeats what's done in the parent FeathersClientSearchHOC
+  // we need to consolidate to only do this stuff in one place
   React.useEffect(() => {
     const setUp = async () => {
       initApp(
@@ -30,7 +43,7 @@ const ClientSearchWithOverrides = props => {
       setSchemas(
         setUpSchemas(
           _.merge(props.defaultOverrides, props.overrides),
-          props.schemas
+          props.schemas || await props.getSchemas()
         )
       )
     }
@@ -51,6 +64,34 @@ const ClientSearchWithOverrides = props => {
       {...(initialResults ? { initialResults } : {})}
       schemas={props.schemas || schemas}
       {...(props.collapseableFilters ? { FilterWrapper } : {})}
+      execute={async search => {
+        const constrainedSearch = _.size(_.get(props.initialSearch?.id, props.constraints))
+          ? _.flow(..._.get(props.initialSearch.id, props.constraints))(search)
+          : search
+        if (props.mode === 'route') {
+          router.push(
+            buildRoute(
+              constrainedSearch,
+              typeof window === 'object' && window.location.href
+            )
+          )
+        } else {
+          const result = await app.service('search').create(constrainedSearch)
+          if (typeof window === 'object') {
+            if (props.isPage) {
+              window.history.replaceState(
+                null,
+                null,
+                buildRoute(
+                  constrainedSearch,
+                  typeof window === 'object' && window.location.href
+                )
+              )
+            }
+          }
+          return [result, constrainedSearch]
+        }
+      }}
     />
   )
 }
