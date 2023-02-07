@@ -2,18 +2,15 @@
 
 import React from 'react'
 import _ from 'lodash/fp'
-import useOutsideClick from './hooks/useOutsideClick'
 import ChevronDown from './Icons/ChevronDown'
 
-export const FilterDropdown = ({ filterKey, children, openFilters }) => {
-  const ref = React.useRef()
+export const FilterDropdown = ({ filterKey, children, openFilters, openMode }) => {
   const [isOpen, setIsOpen] = React.useState(
     _.includes(filterKey, openFilters.current)
   )
-  useOutsideClick(ref, () => setIsOpen(false))
 
-  const handleToggle = () => {
-    let newOpenState = !isOpen
+  const handleToggle = close => {
+    let newOpenState = close === 'close' ? false : !isOpen
     openFilters.current = newOpenState
       ? _.flow(_.concat(filterKey), _.uniq)(openFilters.current)
       : _.without([filterKey], openFilters.current)
@@ -25,7 +22,6 @@ export const FilterDropdown = ({ filterKey, children, openFilters }) => {
       <button
         onClick={handleToggle}
         className="fmr-filter-dropdown__button"
-        ref={ref}
       >
         <span className="fmr-filter-dropdown__label">
           {_.startCase(filterKey)}
@@ -37,7 +33,7 @@ export const FilterDropdown = ({ filterKey, children, openFilters }) => {
         />
       </button>
       {isOpen && (
-        <div className="fmr-filter-dropdown__outer" ref={ref}>
+        <div className="fmr-filter-dropdown__outer">
           <div className="fmr-filter-dropdown__inner">{children}</div>
         </div>
       )}

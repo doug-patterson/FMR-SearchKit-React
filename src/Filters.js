@@ -55,6 +55,7 @@ const Filters = ({
   layout = 'column',
   Wrapper = DefaultWrapper
 }) => {
+  console.log("RENDER FILTERS")
   return (
     <div
       key={_.join(',', _.keys(schema.properties))}
