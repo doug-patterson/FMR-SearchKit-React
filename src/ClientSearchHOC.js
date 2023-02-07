@@ -58,10 +58,10 @@ const ClientSearchWithOverrides = props => {
   ])
 
   return (
-    <SearchLayout
+    schemas && <SearchLayout
       {...props}
       {...(initialResults ? { initialResults } : {})}
-      schemas={props.schemas || schemas}
+      schemas={schemas}
       {...(props.collapseableFilters ? { FilterWrapper } : {})}
       execute={async search => {
         const constrainedSearch = _.size(_.get(props.initialSearch?.id, props.constraints))
