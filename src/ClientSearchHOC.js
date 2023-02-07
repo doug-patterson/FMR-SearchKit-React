@@ -12,12 +12,18 @@ const tld = hostname =>
     ? 'localhost'
     : _.flow(_.split('.'), ([, ...rest]) => [...rest], _.join('.'))(hostname)
 
-const initApp = async (setApp, setInitialResults, initialSearch, getApp) => {
-  const app = await getApp()
+const initApp = async (setApp, setInitialResults, initialSearch, getApp, getSchemas, setSchemas) => {
+  const [app, schemas] = await Promise.all([
+    getApp(),
+    setSchemas && getSchemas()
+  ])
+  setApp(app)
   if (setInitialResults) {
     setInitialResults(await app.service('search').create(initialSearch))
   }
-  setApp(app)
+  if (schemas) {
+    setSchemas(schemas)
+  }
   document.cookie = `searchkitTimezoneOffset=${new Date().getTimezoneOffset()};path=/;domain=${tld(
     window.location.hostname
   )};max-age=2592000;`
@@ -25,7 +31,7 @@ const initApp = async (setApp, setInitialResults, initialSearch, getApp) => {
 
 const ClientSearchWithOverrides = props => {
   const [app, setApp] = React.useState(null)
-  const [schemas, setSchemas] = React.useState(null)
+  const [schemas, setSchemas] = React.useState(props.schemas)
   const [initialResults, setInitialResults] = React.useState(null)
 
   const router = props.useRouter()
@@ -38,13 +44,9 @@ const ClientSearchWithOverrides = props => {
         setApp,
         props.clientOnly ? setInitialResults : null,
         props.initialSearch,
-        props.getApp
-      )
-      setSchemas(
-        setUpSchemas(
-          _.merge(props.defaultOverrides, props.overrides),
-          props.schemas || await props.getSchemas()
-        )
+        props.getApp,
+        props.getSchemas,
+        !props.schemas && setSchemas
       )
     }
     setUp()
@@ -61,12 +63,16 @@ const ClientSearchWithOverrides = props => {
     schemas && <SearchLayout
       {...props}
       {...(initialResults ? { initialResults } : {})}
-      schemas={schemas}
+      schemas={setUpSchemas(
+        _.merge(props.defaultOverrides, props.overrides),
+        schemas
+      )}
       {...(props.collapseableFilters ? { FilterWrapper } : {})}
       execute={async search => {
         const constrainedSearch = _.size(_.get(props.initialSearch?.id, props.constraints))
           ? _.flow(..._.get(props.initialSearch.id, props.constraints))(search)
           : search
+
         if (props.mode === 'route') {
           router.push(
             buildRoute(
