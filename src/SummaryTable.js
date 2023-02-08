@@ -1,9 +1,19 @@
 import React from 'react'
 import _ from 'lodash/fp'
 import Results from './Results'
-import { formatCurrency } from './util'
+import { formatCurrency, mapValuesIndexed } from './util'
 
 const makeObject = keys => row => _.zipObject(keys, row)
+
+const makeSummaryColumn = _.map(row => ({
+  _id: row._id,
+  total: _.flow(
+    _.omit('_id'),
+    _.values,
+    _.sumBy(_.identity)
+  )(row),
+  ..._.omit('_id', row)
+}))
 
 const SummaryTable = ({ data, pivot, group, rows, isCurrency, currency, ...props }) => {
   const names = _.flow(
@@ -46,20 +56,19 @@ const SummaryTable = ({ data, pivot, group, rows, isCurrency, currency, ...props
     idx => ({ _id: include[idx], ...data[idx] }),
     _.range(0, _.size(data))
   )
-  include = ['_id', ...keys]
+  include = ['_id', 'total', ...keys]
 
-  // if !pivot we shoould just display _id with () => name
-  // if pivot we should make { label: name } on the schema and make the table use that
+  console.log(data)
 
   return (
     <Results
       {...props}
       include={include}
-      rows={data}
+      rows={makeSummaryColumn(data)}
       resultsCount={_.size(data)}
       schema={{
         properties: _.zipObject(
-          _.keys(_.first(data)),
+          [..._.keys(_.first(data)), 'total'],
           _.map(
             k => ({
               static: true,
@@ -76,7 +85,7 @@ const SummaryTable = ({ data, pivot, group, rows, isCurrency, currency, ...props
                   <span>&nbsp;</span>
                 )
             }),
-            _.keys(_.first(data))
+            [..._.keys(_.first(data)), 'total']
           )
         )
       }}
