@@ -60,44 +60,51 @@ const ClientSearchWithOverrides = props => {
   ])
 
   return (
-    schemas && <SearchLayout
-      {...props}
-      {...(initialResults ? { initialResults } : {})}
-      schemas={setUpSchemas(
-        _.merge(props.defaultOverrides, props.overrides),
-        schemas
-      )}
-      {...(props.collapseableFilters ? { FilterWrapper } : {})}
-      execute={async search => {
-        const constrainedSearch = _.size(_.get(props.initialSearch?.id, props.constraints))
-          ? _.flow(..._.get(props.initialSearch.id, props.constraints))(search)
-          : search
-
-        if (props.mode === 'route') {
-          router.push(
-            buildRoute(
-              constrainedSearch,
-              typeof window === 'object' && window.location.href
-            )
+    schemas && (
+      <SearchLayout
+        {...props}
+        {...(initialResults ? { initialResults } : {})}
+        schemas={setUpSchemas(
+          _.merge(props.defaultOverrides, props.overrides),
+          schemas
+        )}
+        {...(props.collapseableFilters ? { FilterWrapper } : {})}
+        execute={async search => {
+          const constrainedSearch = _.size(
+            _.get(props.initialSearch?.id, props.constraints)
           )
-        } else {
-          const result = await app.service('search').create(constrainedSearch)
-          if (typeof window === 'object') {
-            if (props.isPage) {
-              window.history.replaceState(
-                null,
-                null,
-                buildRoute(
+            ? _.flow(..._.get(props.initialSearch.id, props.constraints))(
+                search
+              )
+            : search
+
+          if (props.mode === 'route') {
+            router.push(
+              buildRoute(
+                constrainedSearch,
+                typeof window === 'object' && window.location.href
+              )
+            )
+          } else {
+            const result = await app.service('search').create(constrainedSearch)
+            if (typeof window === 'object') {
+              if (props.isPage) {
+                const newUrl = buildRoute(
                   constrainedSearch,
                   typeof window === 'object' && window.location.href
                 )
-              )
+                window.history.replaceState(
+                  { ...window.history.state, as: newUrl, url: newUrl },
+                  '',
+                  newUrl
+                )
+              }
             }
+            return [result, constrainedSearch]
           }
-          return [result, constrainedSearch]
-        }
-      }}
-    />
+        }}
+      />
+    )
   )
 }
 
