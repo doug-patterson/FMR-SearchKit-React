@@ -182,6 +182,7 @@ const setFilterValues = type =>
   ({
     facet: facetValues,
     arrayElementPropFacet: facetValues,
+    subqueryFacet: facetValues,
     boolean: (keys, values) => ({
       checked: _.get(_.first(keys), values) === 'on'
     }),
