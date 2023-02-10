@@ -8,7 +8,7 @@ import NumericFilter from './NumericFilter'
 import DateTimeInterval from './DateTimeInterval'
 
 const NoComponent = () => 'no filter found'
-const Hidden = () => ''
+const UseWithHide = () => <div>This fitlter should be used with <code>hide: true</code></div>
 
 const getFilterComponent = type =>
   ({
@@ -16,8 +16,7 @@ const getFilterComponent = type =>
     facet: Facet,
     subqueryFacet: Facet,
     arrayElementPropFacet: Facet,
-    hidden: Hidden,
-    hiddenExists: Hidden,
+    propExists: UseWithHide,
     numeric: NumericFilter,
     boolean: BooleanFilter,
     fieldHasTruthyValue: BooleanFilter,
