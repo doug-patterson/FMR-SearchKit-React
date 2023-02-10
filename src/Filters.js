@@ -14,7 +14,7 @@ const getFilterComponent = type =>
   ({
     none: NoComponent,
     facet: Facet,
-    indirectFacet: Facet,
+    subqueryFacet: Facet,
     arrayElementPropFacet: Facet,
     hidden: Hidden,
     hiddenExists: Hidden,
@@ -101,7 +101,7 @@ const Filters = ({
                       filter.prop,
                       _.get(filter.field, schema.properties)?.items.properties
                     )?.display
-                  : _.get(filter.field, schema.properties)?.display
+                  : _.get(filter.subqueryLocalField || filter.field, schema.properties)?.display
               }
               UIComponents={UIComponents}
               currentInput={currentInput}
