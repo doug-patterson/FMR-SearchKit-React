@@ -14,6 +14,7 @@ const getFilterComponent = type =>
   ({
     none: NoComponent,
     facet: Facet,
+    subqueryFacet: Facet,
     arrayElementPropFacet: Facet,
     hidden: Hidden,
     hiddenExists: Hidden,
@@ -55,7 +56,6 @@ const Filters = ({
   layout = 'column',
   Wrapper = DefaultWrapper
 }) => {
-  console.log("RENDER FILTERS")
   return (
     <div
       key={_.join(',', _.keys(schema.properties))}
@@ -101,7 +101,7 @@ const Filters = ({
                       filter.prop,
                       _.get(filter.field, schema.properties)?.items.properties
                     )?.display
-                  : _.get(filter.field, schema.properties)?.display
+                  : _.get(filter.subqueryLocalField || filter.field, schema.properties)?.display
               }
               UIComponents={UIComponents}
               currentInput={currentInput}
