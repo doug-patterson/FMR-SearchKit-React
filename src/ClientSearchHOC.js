@@ -12,7 +12,14 @@ const tld = hostname =>
     ? 'localhost'
     : _.flow(_.split('.'), ([, ...rest]) => [...rest], _.join('.'))(hostname)
 
-const initApp = async (setApp, setInitialResults, initialSearch, getApp, getSchemas, setSchemas) => {
+const initApp = async (
+  setApp,
+  setInitialResults,
+  initialSearch,
+  getApp,
+  getSchemas,
+  setSchemas
+) => {
   const [app, schemas] = await Promise.all([
     getApp(),
     setSchemas && getSchemas()
@@ -38,6 +45,7 @@ const ClientSearchWithOverrides = props => {
 
   // this completely repeats what's done in the parent FeathersClientSearchHOC
   // we need to consolidate to only do this stuff in one place
+  const invalidateCache = () => router.refresh()
   React.useEffect(() => {
     const setUp = async () => {
       initApp(
@@ -50,6 +58,7 @@ const ClientSearchWithOverrides = props => {
       )
     }
     setUp()
+    return () => window.removeEventListener('popstate', invalidateCache)
   }, [
     props.clientOnly,
     props.defaultOverrides,
@@ -60,44 +69,52 @@ const ClientSearchWithOverrides = props => {
   ])
 
   return (
-    schemas && <SearchLayout
-      {...props}
-      {...(initialResults ? { initialResults } : {})}
-      schemas={setUpSchemas(
-        _.merge(props.defaultOverrides, props.overrides),
-        schemas
-      )}
-      {...(props.collapseableFilters ? { FilterWrapper } : {})}
-      execute={async search => {
-        const constrainedSearch = _.size(_.get(props.initialSearch?.id, props.constraints))
-          ? _.flow(..._.get(props.initialSearch.id, props.constraints))(search)
-          : search
-
-        if (props.mode === 'route') {
-          router.push(
-            buildRoute(
-              constrainedSearch,
-              typeof window === 'object' && window.location.href
-            )
+    schemas && (
+      <SearchLayout
+        {...props}
+        {...(initialResults ? { initialResults } : {})}
+        schemas={setUpSchemas(
+          _.merge(props.defaultOverrides, props.overrides),
+          schemas
+        )}
+        {...(props.collapseableFilters ? { FilterWrapper } : {})}
+        execute={async search => {
+          const constrainedSearch = _.size(
+            _.get(props.initialSearch?.id, props.constraints)
           )
-        } else {
-          const result = await app.service('search').create(constrainedSearch)
-          if (typeof window === 'object') {
-            if (props.isPage) {
-              window.history.replaceState(
-                null,
-                null,
-                buildRoute(
+            ? _.flow(..._.get(props.initialSearch.id, props.constraints))(
+                search
+              )
+            : search
+
+          if (props.mode === 'route') {
+            router.push(
+              buildRoute(
+                constrainedSearch,
+                typeof window === 'object' && window.location.href
+              )
+            )
+          } else {
+            const result = await app.service('search').create(constrainedSearch)
+            if (typeof window === 'object') {
+              if (props.isPage) {
+                const newUrl = buildRoute(
                   constrainedSearch,
                   typeof window === 'object' && window.location.href
                 )
-              )
+                window.history.replaceState(
+                  { ...window.history.state, as: newUrl, url: newUrl },
+                  '',
+                  newUrl
+                )
+                window.addEventListener('popstate', invalidateCache)
+              }
             }
+            return [result, constrainedSearch]
           }
-          return [result, constrainedSearch]
-        }
-      }}
-    />
+        }}
+      />
+    )
   )
 }
 
