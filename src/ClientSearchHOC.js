@@ -12,7 +12,14 @@ const tld = hostname =>
     ? 'localhost'
     : _.flow(_.split('.'), ([, ...rest]) => [...rest], _.join('.'))(hostname)
 
-const initApp = async (setApp, setInitialResults, initialSearch, getApp, getSchemas, setSchemas) => {
+const initApp = async (
+  setApp,
+  setInitialResults,
+  initialSearch,
+  getApp,
+  getSchemas,
+  setSchemas
+) => {
   const [app, schemas] = await Promise.all([
     getApp(),
     setSchemas && getSchemas()
@@ -38,6 +45,7 @@ const ClientSearchWithOverrides = props => {
 
   // this completely repeats what's done in the parent FeathersClientSearchHOC
   // we need to consolidate to only do this stuff in one place
+  const invalidateCache = () => router.refresh()
   React.useEffect(() => {
     const setUp = async () => {
       initApp(
@@ -50,6 +58,7 @@ const ClientSearchWithOverrides = props => {
       )
     }
     setUp()
+    return () => window.removeEventListener('popstate', invalidateCache)
   }, [
     props.clientOnly,
     props.defaultOverrides,
@@ -98,6 +107,7 @@ const ClientSearchWithOverrides = props => {
                   '',
                   newUrl
                 )
+                window.addEventListener('popstate', invalidateCache)
               }
             }
             return [result, constrainedSearch]
