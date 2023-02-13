@@ -75,7 +75,7 @@ const Filters = ({
         const FinalWrapper = filter.hide ? React.Fragment : Wrapper
         return (
           <FinalWrapper openFilters={openFilters} filterKey={filter.key} UIComponents={UIComponents}>
-            <Component
+            {!filter.hide &&<Component
               key={filter.key}
               layout={layout}
               {...(runSearch
@@ -111,7 +111,7 @@ const Filters = ({
               }
               UIComponents={UIComponents}
               currentInput={currentInput}
-            />
+            />}
           </FinalWrapper>
         )
       }, filters)}
