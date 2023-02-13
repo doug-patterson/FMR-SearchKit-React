@@ -1,20 +1,50 @@
 import React from 'react'
 import _ from 'lodash/fp'
 
+// we'll need to make a stateless facet for the pure server rendered search
+
 const Facet = ({
   title,
   options,
   values,
   onChange,
+  debouncedOnChange,
   display = _.get('_id'),
   UIComponents,
-  layout
-}) => (
-  <UIComponents.CardBody>
+  layout,
+  currentInput = {},
+  hasOptionSearch
+}) => {
+    let [optionSearch, setOptionSearch] = React.useState(
+      _.has(`${title}.optionSearch`, currentInput.current)
+        ? _.get(`${title}.optionSearch`, currentInput.current)
+        : ''
+    )
+    return <UIComponents.CardBody>
     <div
       className="fmr-facet__wrapper"
       style={{ display: 'flex', flexDirection: 'column' }}
     >
+      {hasOptionSearch && <div className="fmr-facet__option-search">
+        <UIComponents.Input
+          type="text"
+          placeholder={'Search Options'}
+          focus={_.has(`${title}.optionSearch`, currentInput.current)}
+          {...(onChange
+            ? {
+                onChange: val => {
+                  setOptionSearch(val)
+                  currentInput.current = { [`${title}.optionSearch`]: val }
+                  debouncedOnChange({ optionSearch: val })
+                },
+                value: optionSearch
+              }
+            : {
+                name: `${name}[optionSearch]`,
+                defaultValue: optionSearch
+              })}
+        />
+      </div>}
       {_.map(
         ({ _id, checked, count, value, lookup }) => (
           <React.Fragment key={`${_id}-${checked ? 'checked' : 'unchecked'}`}>
@@ -42,6 +72,6 @@ const Facet = ({
       )}
     </div>
   </UIComponents.CardBody>
-)
+}
 
 export default Facet

@@ -83,7 +83,12 @@ const Filters = ({
                       runSearch({
                         filters: updateFilters(filters)(idx)(patch),
                         page: 1
-                      })
+                      }),
+                    debouncedOnChange: _.debounce(1000, async patch =>
+                      runSearch({
+                        filters: updateFilters(filters)(idx)(patch),
+                        page: 1
+                      }))
                   }
                 : {
                     name: filter.key
@@ -94,6 +99,7 @@ const Filters = ({
                 'options',
                 _.find({ key: filter.key }, filterOptions)
               )}
+              hasOptionSearch={_.isString(filter.optionSearch)}
               display={
                 filter.prop
                   ? _.get(
