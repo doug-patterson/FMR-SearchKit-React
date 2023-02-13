@@ -16,7 +16,8 @@ const Results = ({
   page = 1,
   ResultsComponent = ResultsTable,
   Paginator = DefaultPaginator,
-  UIComponents
+  UIComponents,
+  overrideData
 }) => (
   <div style={{ gridArea: 'results' }}>
     <UIComponents.Box>
@@ -29,7 +30,8 @@ const Results = ({
           setSortDir: newSortDir => runSearch({ sortDir: newSortDir, page: 1 }),
           schema,
           rows,
-          UIComponents
+          UIComponents,
+          overrideData
         }}
       />
       {pageSize > 0 && (

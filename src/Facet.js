@@ -8,7 +8,8 @@ const Facet = ({
   onChange,
   display = _.get('_id'),
   UIComponents,
-  layout
+  layout,
+  overrideData
 }) => (
   <UIComponents.CardBody>
     <div
@@ -21,7 +22,7 @@ const Facet = ({
             <UIComponents.CheckBox
               layout={layout}
               checked={checked}
-              textMiddle={display({ ...value, ...lookup, _id })}
+              textMiddle={display((_.isObject(value) || lookup) ? { ...value, ...lookup, _id } : _id, null, overrideData)}
               textRight={count}
               {...(onChange
                 ? {

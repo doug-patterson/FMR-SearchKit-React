@@ -118,12 +118,12 @@ const DefaultHeaderMenu = ({
   )
 }
 
-const renderCell = ({ row, field, schema, idx }) => {
+const renderCell = ({ row, field, schema, overrideData, idx }) => {
   const display = (
     _.get(`properties.${field}.tableCellDisplay`, schema) ||
     _.get(`properties.${field}.display`, schema) ||
     _.identity
-  )(_.get(field, row), row, idx)
+  )(_.get(field, row), row, overrideData, idx)
 
   return [display]
 }
@@ -136,7 +136,8 @@ const Component = ({
   schema,
   rows,
   UIComponents,
-  HeaderMenu = DefaultHeaderMenu
+  HeaderMenu = DefaultHeaderMenu,
+  overrideData
 }) => (
   <UIComponents.Box style={{ width: '100%', overflowX: 'auto' }}>
     <UIComponents.Table className="results-table">
@@ -163,13 +164,13 @@ const Component = ({
         </UIComponents.TableRow>
       </UIComponents.TableHeader>
       <UIComponents.TableBody>
-        {mapIndexed(
+        {_.map(
           row => (
             <UIComponents.TableRow key={row._id} id={row._id}>
-              {_.map(
-                field => (
+              {mapIndexed(
+                (field, idx) => (
                   <UIComponents.TableCell key={field}>
-                    {renderCell({ row, field, schema })}
+                    {renderCell({ row, field, schema, overrideData, idx })}
                   </UIComponents.TableCell>
                 ),
                 include

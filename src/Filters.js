@@ -53,7 +53,8 @@ const Filters = ({
   currentInput,
   openFilters,
   layout = 'column',
-  Wrapper = DefaultWrapper
+  Wrapper = DefaultWrapper,
+  overrideData
 }) => {
   return (
     <div
@@ -104,6 +105,7 @@ const Filters = ({
               }
               UIComponents={UIComponents}
               currentInput={currentInput}
+              overrideData={overrideData}
             />
           </Wrapper>
         )

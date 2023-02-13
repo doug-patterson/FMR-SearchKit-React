@@ -202,7 +202,7 @@ const setFilterValues = type =>
       })
   }[type] || (() => ({})))
 
-export const includeSubmittedSearch = (initialSearch, values) =>
+export const includeSubmittedSearch = (initialSearch, values) => initialSearch ||
   _.size(values)
     ? _.update(
         'filters',

@@ -21,7 +21,8 @@ const SearchLayout = ({
   FilterWrapper,
   defaultOpenFilters = [],
   mode = 'feathers',
-  onData = _.noop
+  onData = _.noop,
+  overrideData
 }) => {
   const [search, setSearch] = React.useState(initialSearch)
   const [filterOptions, setFilterOptions] = React.useState(
@@ -101,6 +102,7 @@ const SearchLayout = ({
           openFilters={openFilters}
           layout={filterLayout}
           {...(FilterWrapper ? { Wrapper: FilterWrapper } : {})}
+          overrideData={overrideData}
         >
           {children}
         </Filters>
@@ -133,6 +135,7 @@ const SearchLayout = ({
             page={search.page}
             UIComponents={UIComponents}
             runSearch={runSearch}
+            overrideData={overrideData}
           />
         )}
       </Layout>

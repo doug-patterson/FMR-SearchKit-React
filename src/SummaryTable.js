@@ -58,8 +58,6 @@ const SummaryTable = ({ data, pivot, group, rows, isCurrency, currency, ...props
   )
   include = ['_id', 'total', ...keys]
 
-  console.log(data)
-
   return (
     <Results
       {...props}
