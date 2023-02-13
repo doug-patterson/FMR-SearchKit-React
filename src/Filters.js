@@ -72,8 +72,9 @@ const Filters = ({
       {children}
       {mapIndexed((filter, idx) => {
         const Component = getFilterComponent(filter.type)
+        const FinalWrapper = filter.hide ? React.Fragment : Wrapper
         return (
-          <Wrapper openFilters={openFilters} filterKey={filter.key} UIComponents={UIComponents}>
+          <FinalWrapper openFilters={openFilters} filterKey={filter.key} UIComponents={UIComponents}>
             <Component
               key={filter.key}
               layout={layout}
@@ -111,9 +112,9 @@ const Filters = ({
               UIComponents={UIComponents}
               currentInput={currentInput}
             />
-          </Wrapper>
+          </FinalWrapper>
         )
-      }, _.reject('hide', filters))}
+      }, filters)}
       {runSearch && (
         <UIComponents.Button onClick={() => runSearch({})}>
           Reset Search
