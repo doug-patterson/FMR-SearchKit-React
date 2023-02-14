@@ -15,7 +15,7 @@ const makeSummaryColumn = _.map(row => ({
   ..._.omit('_id', row)
 }))
 
-const SummaryTable = ({ data, pivot, group, rows, isCurrency, currency, ...props }) => {
+const SummaryTable = ({ data, group, rows, isCurrency, currency, ...props }) => {
   const names = _.flow(
     _.map(({ _id, name }) => [_id, name]),
     _.fromPairs

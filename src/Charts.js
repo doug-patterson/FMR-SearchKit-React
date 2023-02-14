@@ -2,6 +2,7 @@ import React from 'react'
 import _ from 'lodash/fp'
 import FieldStats from './FieldStats'
 import SummaryTable from './SummaryTable'
+import TotalsBar from './TotalsBar'
 
 let reloaded = false
 
@@ -56,6 +57,9 @@ const Charts = ({
       if (chart.type === 'summaryTable') {
         Component = SummaryTable
       }
+      if (chart.type === 'totalsBar') {
+        Component = TotalsBar
+      }
 
       return (
         <div
@@ -63,7 +67,7 @@ const Charts = ({
           key={chart.key}
           style={{ gridArea: chart.key }}
         >
-          <h2>{_.toString(chart.label) || _.startCase(chart.key)}</h2>
+          {!chart.hideLabel && <h2>{_.toString(chart.label) || _.startCase(chart.key)}</h2>}
           <ChartSizer chartWidths={chartWidths} chartKey={chart.key}>
             <Component
               {..._.omit(['key'], chart)}

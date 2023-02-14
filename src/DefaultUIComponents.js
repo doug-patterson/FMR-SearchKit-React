@@ -159,5 +159,3 @@ export const IconPrevious = () => (
 export const IconNext = () => (
   <span style={{ fontSize: '1.5rem' }}>&#8250;</span>
 )
-
-export const GroupedTotals = ({ data }) => JSON.stringify(data, 0, 2)
