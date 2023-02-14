@@ -607,7 +607,7 @@ export const DayOfWeekSummaryBars = ({
 )
 
 const addZeroHours = hours =>
-  _.map(x => _.find({ x }, hours) || { x, y: 0 }, [..._.range(1, 24), 0])
+  _.map(x => _.find({ x }, hours) || { x, y: 0 }, _.range(0, 24))
 
 const decorateHour = hour => {
   if (hour === 0) {
