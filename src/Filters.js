@@ -43,6 +43,8 @@ const DefaultWrapper = ({ filterKey, children, UIComponents }) =>
     <>{children}</>
   </UIComponents.Card>
 
+const unsetOptionSearches = _.map(_.set('optionSearch', ''))
+
 const Filters = ({
   children,
   filters,
@@ -82,12 +84,12 @@ const Filters = ({
                 ? {
                     onChange: async patch =>
                       runSearch({
-                        filters: updateFilters(filters)(idx)(patch),
+                        filters: updateFilters(unsetOptionSearches(filters))(idx)(patch),
                         page: 1
                       }),
                     debouncedOnChange: _.debounce(1000, async patch =>
                       runSearch({
-                        filters: updateFilters(filters)(idx)(patch),
+                        filters: updateFilters(unsetOptionSearches(filters))(idx)(patch),
                         page: 1
                       }))
                   }
