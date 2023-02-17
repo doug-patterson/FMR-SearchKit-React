@@ -15,63 +15,71 @@ const Facet = ({
   currentInput = {},
   hasOptionSearch
 }) => {
-    let [optionSearch, setOptionSearch] = React.useState(
-      _.has(`${title}.optionSearch`, currentInput.current)
-        ? _.get(`${title}.optionSearch`, currentInput.current)
-        : ''
-    )
-    return <UIComponents.CardBody>
-    <div
-      className="fmr-facet__wrapper"
-      style={{ display: 'flex', flexDirection: 'column' }}
-    >
-      {hasOptionSearch && <div className="fmr-facet__option-search">
-        <UIComponents.Input
-          type="text"
-          placeholder={'Search Options'}
-          focus={_.has(`${title}.optionSearch`, currentInput.current)}
-          {...(onChange
-            ? {
-                onChange: val => {
-                  setOptionSearch(val)
-                  currentInput.current = { [`${title}.optionSearch`]: val }
-                  debouncedOnChange({ optionSearch: val })
-                },
-                value: optionSearch
-              }
-            : {
-                name: `${name}[optionSearch]`,
-                defaultValue: optionSearch
-              })}
-        />
-      </div>}
-      {_.map(
-        ({ _id, checked, count, value, lookup }) => (
-          <React.Fragment key={`${_id}-${checked ? 'checked' : 'unchecked'}`}>
-            <UIComponents.CheckBox
-              layout={layout}
-              checked={checked}
-              textMiddle={display({ ...value, ...lookup, _id })}
-              textRight={count}
+  let [optionSearch, setOptionSearch] = React.useState(
+    _.has(`${title}.optionSearch`, currentInput.current)
+      ? _.get(`${title}.optionSearch`, currentInput.current)
+      : ''
+  )
+  return (
+    <UIComponents.CardBody>
+      <div
+        className="fmr-facet__wrapper"
+        style={{ display: 'flex', flexDirection: 'column' }}
+      >
+        {hasOptionSearch && (
+          <div
+            className={`fmr-facet__option-search fmr-facet__option-search--${layout}`}
+          >
+            <UIComponents.Input
+              type="text"
+              placeholder={'Search Options'}
+              focus={_.has(`${title}.optionSearch`, currentInput.current)}
               {...(onChange
                 ? {
-                    onChange: checked => {
-                      const newValues = checked
-                        ? _.concat(values, _id)
-                        : _.without([_id], values)
-                      onChange({ values: newValues })
-                    }
+                    onChange: val => {
+                      setOptionSearch(val)
+                      currentInput.current = {
+                        [`${title}.optionSearch`]: val
+                      }
+                      debouncedOnChange({ optionSearch: val })
+                    },
+                    value: optionSearch
                   }
                 : {
-                    name: `${title}[${_id}]`
+                    name: `${name}[optionSearch]`,
+                    defaultValue: optionSearch
                   })}
             />
-          </React.Fragment>
-        ),
-        options
-      )}
-    </div>
-  </UIComponents.CardBody>
+          </div>
+        )}
+        {_.map(
+          ({ _id, checked, count, value, lookup }) => (
+            <React.Fragment key={`${_id}-${checked ? 'checked' : 'unchecked'}`}>
+              <UIComponents.CheckBox
+                layout={layout}
+                checked={checked}
+                textMiddle={display({ ...value, ...lookup, _id })}
+                textRight={count}
+                {...(onChange
+                  ? {
+                      onChange: checked => {
+                        const newValues = checked
+                          ? _.concat(values, _id)
+                          : _.without([_id], values)
+                        onChange({ values: newValues })
+                      }
+                    }
+                  : {
+                      name: `${title}[${_id}]`
+                    })}
+              />
+            </React.Fragment>
+          ),
+          options
+        )}
+      </div>
+    </UIComponents.CardBody>
+  )
 }
 
 export default Facet
