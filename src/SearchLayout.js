@@ -9,6 +9,10 @@ import Results from './Results'
 import Charts from './Charts'
 import Filters from './Filters'
 
+const Layout = ({ layoutStyle, children }) => (
+  <DefaultLayout style={layoutStyle}>{children}</DefaultLayout>
+)
+
 const SearchLayout = ({
   initialSearch,
   initialResults = {},
@@ -44,10 +48,6 @@ const SearchLayout = ({
 
   const UIComponents = _.defaults(DefaultUIComponents, ThemeComponents)
 
-  const Layout = ({ children }) => (
-    <DefaultLayout style={layoutStyle}>{children}</DefaultLayout>
-  )
-
   schemas = addDefaultDisplays(schemas)
   const schema = schemas[initialSearch.collection]
   if (!schema) {
@@ -60,12 +60,10 @@ const SearchLayout = ({
       ...patch
     }
 
-    const [{
-      results,
-      resultsCount: newResultsCount,
-      charts,
-      ...filterResults
-    }, constrainedSearch] = (await execute(updatedSearch)) || {}
+    const [
+      { results, resultsCount: newResultsCount, charts, ...filterResults },
+      constrainedSearch
+    ] = (await execute(updatedSearch)) || {}
 
     if (mode === 'route') {
       return
@@ -84,13 +82,12 @@ const SearchLayout = ({
     setRows(results)
     setResultsCount(_.get('count', newResultsCount) || 0)
     setChartData(charts)
-
     onData()
   }
 
   return (
     <UIComponents.Box>
-      <Layout>
+      <Layout layoutStyle={layoutStyle}>
         <Filters
           filters={search.filters}
           filterOptions={filterOptions}
