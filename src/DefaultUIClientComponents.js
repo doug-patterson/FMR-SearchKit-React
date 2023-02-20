@@ -311,12 +311,11 @@ export const DateLineSingle = ({
 
 export const DateLineMultiple = ({
   data,
-  x,
-  y,
   xLabel,
   yLabel,
   isCurrency,
   colors,
+  currency,
   height,
   period,
   margins = { top: 50, right: 60, bottom: 50, left: 60 }
@@ -343,7 +342,15 @@ export const DateLineMultiple = ({
     }}
     enableArea={true}
     enablePoints={false}
-    yFormat={`>-${isCurrency ? '$' : ''},.2r`}
+    yFormat={value =>
+      isCurrency
+        ? formatCurrency({
+            amount: value,
+            currency,
+            minimumFractionDigits: 0
+          })
+        : value
+    }
     axisTop={null}
     axisRight={null}
     axisBottom={{
@@ -362,7 +369,10 @@ export const DateLineMultiple = ({
       tickRotation: 0,
       legend: yLabel,
       legendOffset: -50,
-      legendPosition: 'middle'
+      legendPosition: 'middle',
+      format: value =>
+        isCurrency &&
+        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
     }}
     pointSize={10}
     pointColor={{ theme: 'background' }}
@@ -372,8 +382,14 @@ export const DateLineMultiple = ({
     useMesh={true}
     tooltip={({ point }) => (
       <div style={{ padding: 4, backgroundColor: 'white' }}>
-        <b>{point?.data?.x}</b>: {isCurrency ? '$' : ''}
-        {point?.data?.y}
+        <b>{point?.data?.x}</b>:{' '}
+        {isCurrency
+          ? formatCurrency({
+              amount: point?.data?.y,
+              currency,
+              minimumFractionDigits: 0
+            })
+          : point?.data?.y}
       </div>
     )}
   />
