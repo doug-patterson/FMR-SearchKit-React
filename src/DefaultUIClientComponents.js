@@ -8,6 +8,7 @@ import { ResponsiveCalendar } from '@nivo/calendar'
 import { ResponsivePie } from '@nivo/pie'
 import { ResponsiveBar } from '@nivo/bar'
 import { formatCurrency } from './util'
+import { parse, format, addDays, addWeeks, addMonths } from 'date-fns'
 
 const americanDate = _.flow(
   _.split('/'),
@@ -134,6 +135,77 @@ export const Input = ({
   )
 }
 
+let getPeriodAdder = period => ({
+  day: date => addDays(date, 1),
+  week: date => addWeeks(date, 1),
+  month: date => addMonths(date, 1)
+}[period])
+
+let getDateFormatString = period => period === 'month' ? 'M/yyyy' : 'd/M/yyyy'
+
+const getInterveningPoints = ({ period, previous, point }) => {
+  let addPeriod = getPeriodAdder(period)
+
+  let dateFormatString = getDateFormatString(period)
+  let previousDate = parse(previous.x,  dateFormatString, new Date())
+  let pointDate = parse(point.x, dateFormatString, new Date())
+
+  let interveningDates = []
+
+  let nextDate = addPeriod(previousDate)
+
+  while (nextDate < pointDate) {
+    interveningDates.push(nextDate)
+    nextDate = addPeriod(nextDate)
+  }
+
+  return _.map(
+    date => ({ x: format(date, dateFormatString), y: 0 }),
+    interveningDates
+  )
+}
+
+const addZeroPeriods = period => _.reduce((acc, point) => {
+  let previous = _.last(acc)
+  if (!previous) {
+    acc.push(point)
+  } else {
+    acc.push(...getInterveningPoints({ period, previous, point }), point)
+  }
+
+  return acc
+}, [])
+
+const firstXValue = _.flow(_.get('data'), _.first, _.get('x'))
+const lastXValue = _.flow(_.get('data'), _.last, _.get('x'))
+
+const extendEndpoints = ({ start, end, period }) => line => {
+  let extendedLine = line
+  let dateFormatString = getDateFormatString(period)
+  console.log({ start, end })
+
+  if (_.flow(_.first, _.get('x'), date => parse(date, dateFormatString, new Date()))(line) > start) {
+    extendedLine = [format(start, dateFormatString, {}), ...extendedLine]
+  }
+  if (_.flow(_.last, _.get('x'), date => parse(date, dateFormatString, new Date()))(line) < end) {
+    extendedLine = [...extendedLine, format(end, dateFormatString, {})]
+  }
+
+  console.log({ line, extendedLine})
+
+  return extendedLine
+}
+
+const addZeroPeriodsToAllLines = period => lines => {
+  let start = _.flow(_.minBy(firstXValue), firstXValue)(lines)
+  let end = _.flow(_.maxBy(lastXValue), lastXValue)(lines)
+
+  return _.map(({ id, data }) => ({ id, data: _.flow(
+    extendEndpoints({ start, end, period }),
+    addZeroPeriods(period)
+  )(data) }), lines)
+}
+
 export const DateLineSingle = ({
   data,
   xLabel,
@@ -146,7 +218,7 @@ export const DateLineSingle = ({
 }) => {
   return (
     <ResponsiveLine
-      data={americanDates(data)}
+      data={_.flow(addZeroPeriodsToAllLines(period), americanDates)(data)}
       curve="linear"
       animate={true}
       height={height}
@@ -230,7 +302,7 @@ export const DateLineMultiple = ({
 }) => (
   <div className="date-line-multiple">
     <ResponsiveLine
-      data={americanDates(
+      data={_.flow(addZeroPeriodsToAllLines(period), americanDates)(
         _.map(d => ({ ...d, data: _.map(_.omit('group'), d.data) }), data)
       )}
       curve="linear"
