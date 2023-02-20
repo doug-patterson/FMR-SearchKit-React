@@ -205,8 +205,6 @@ const extendEndpoints =
       extendedLine = [...extendedLine, { x: format(end, dateFormatString, {}), y: 0 }]
     }
 
-    console.log({ line, extendedLine })
-
     return extendedLine
   }
 
