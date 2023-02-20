@@ -214,6 +214,7 @@ export const DateLineSingle = ({
   height,
   colors,
   currency,
+  period,
   margins = { top: 50, right: 60, bottom: 50, left: 60 }
 }) => {
   return (
@@ -298,6 +299,7 @@ export const DateLineMultiple = ({
   yLabel,
   isCurrency,
   height,
+  period,
   margins = { top: 50, right: 60, bottom: 50, left: 60 }
 }) => (
   <div className="date-line-multiple">
