@@ -8,6 +8,7 @@ import { ResponsiveCalendar } from '@nivo/calendar'
 import { ResponsivePie } from '@nivo/pie'
 import { ResponsiveBar } from '@nivo/bar'
 import { formatCurrency } from './util'
+import { parse, format, addDays, addWeeks, addMonths } from 'date-fns'
 
 const americanDate = _.flow(
   _.split('/'),
@@ -134,6 +135,95 @@ export const Input = ({
   )
 }
 
+let getPeriodAdder = period =>
+  ({
+    day: date => addDays(date, 1),
+    week: date => addWeeks(date, 1),
+    month: date => addMonths(date, 1)
+  }[period])
+
+let getDateFormatString = period => (period === 'month' ? 'M/yyyy' : 'd/M/yyyy')
+
+const getInterveningPoints = ({ period, previous, point }) => {
+  let addPeriod = getPeriodAdder(period)
+
+  let dateFormatString = getDateFormatString(period)
+  let previousDate = parse(previous.x, dateFormatString, new Date())
+  let pointDate = parse(point.x, dateFormatString, new Date())
+
+  let interveningDates = []
+
+  let nextDate = addPeriod(previousDate)
+
+  while (nextDate < pointDate) {
+    interveningDates.push(nextDate)
+    nextDate = addPeriod(nextDate)
+  }
+
+  return _.map(
+    date => ({ x: format(date, dateFormatString), y: 0 }),
+    interveningDates
+  )
+}
+
+const addZeroPeriods = period =>
+  _.reduce((acc, point) => {
+    let previous = _.last(acc)
+    if (!previous) {
+      acc.push(point)
+    } else {
+      acc.push(...getInterveningPoints({ period, previous, point }), point)
+    }
+
+    return acc
+  }, [])
+
+const firstXValue = _.flow(_.get('data'), _.first, _.get('x'))
+const lastXValue = _.flow(_.get('data'), _.last, _.get('x'))
+
+const extendEndpoints =
+  ({ start, end, period }) =>
+  line => {
+    let extendedLine = line
+    let dateFormatString = getDateFormatString(period)
+    
+    start = parse(start, dateFormatString, new Date())
+    end = parse(end, dateFormatString, new Date())
+
+    if (
+      _.flow(_.first, _.get('x'), date =>
+        parse(date, dateFormatString, new Date())
+      )(line) > start
+    ) {
+      extendedLine = [{ x: format(start, dateFormatString, {}), y: 0 }, ...extendedLine]
+    }
+    if (
+      _.flow(_.last, _.get('x'), date =>
+        parse(date, dateFormatString, new Date())
+      )(line) < end
+    ) {
+      extendedLine = [...extendedLine, { x: format(end, dateFormatString, {}), y: 0 }]
+    }
+
+    return extendedLine
+  }
+
+const addZeroPeriodsToAllLines = period => lines => {
+  let start = _.flow(_.minBy(firstXValue), firstXValue)(lines)
+  let end = _.flow(_.maxBy(lastXValue), lastXValue)(lines)
+
+  return _.map(
+    ({ id, data }) => ({
+      id,
+      data: _.flow(
+        extendEndpoints({ start, end, period }),
+        addZeroPeriods(period)
+      )(data)
+    }),
+    lines
+  )
+}
+
 export const DateLineSingle = ({
   data,
   xLabel,
@@ -142,11 +232,12 @@ export const DateLineSingle = ({
   height,
   colors,
   currency,
+  period,
   margins = { top: 50, right: 60, bottom: 50, left: 60 }
 }) => {
   return (
     <ResponsiveLine
-      data={americanDates(data)}
+      data={_.flow(addZeroPeriodsToAllLines(period), americanDates)(data)}
       curve="linear"
       animate={true}
       height={height}
@@ -220,71 +311,88 @@ export const DateLineSingle = ({
 
 export const DateLineMultiple = ({
   data,
-  x,
-  y,
   xLabel,
   yLabel,
   isCurrency,
+  colors,
+  currency,
   height,
+  period,
   margins = { top: 50, right: 60, bottom: 50, left: 60 }
 }) => (
-  <div className="date-line-multiple">
-    <ResponsiveLine
-      data={americanDates(
-        _.map(d => ({ ...d, data: _.map(_.omit('group'), d.data) }), data)
-      )}
-      curve="linear"
-      animate={true}
-      height={height}
-      colors={{ scheme: 'set2' }}
-      margin={{
-        ...margins
-      }}
-      xScale={{ type: 'point' }} // need to figure point v linear somehow
-      yScale={{
-        type: 'linear',
-        min: _.minBy('y', data?.results),
-        max: 'auto',
-        stacked: true,
-        reverse: false
-      }}
-      enableArea={true}
-      enablePoints={false}
-      yFormat={`>-${isCurrency ? '$' : ''},.2r`}
-      axisTop={null}
-      axisRight={null}
-      axisBottom={{
-        orient: 'bottom',
-        tickSize: 5,
-        tickPadding: 5,
-        tickRotation: -20,
-        legend: xLabel || _.startCase(x),
-        legendOffset: 36,
-        legendPosition: 'middle'
-      }}
-      axisLeft={{
-        orient: 'left',
-        tickSize: 5,
-        tickPadding: 5,
-        tickRotation: 0,
-        legend: yLabel || _.startCase(y),
-        legendOffset: -50,
-        legendPosition: 'middle'
-      }}
-      pointSize={10}
-      pointColor={{ theme: 'background' }}
-      pointBorderWidth={2}
-      pointBorderColor={{ from: 'serieColor' }}
-      pointLabelYOffset={-12}
-      useMesh={true}
-      tooltip={({ point }) => (
-        <div style={{ padding: 4, backgroundColor: 'white' }}>
-          <b>{point?.data?.x}</b>: {isCurrency ? '$' : ''}
-          {point?.data?.y}
-        </div>
-      )}
-    />
-  </div>
+  <ResponsiveLine
+    data={_.flow(
+      addZeroPeriodsToAllLines(period),
+      americanDates
+    )(_.map(d => ({ ...d, data: _.map(_.omit('group'), d.data) }), data))}
+    curve="linear"
+    animate={true}
+    height={height}
+    colors={colors ? colors : { scheme: 'set2' }}
+    margin={{
+      ...margins
+    }}
+    xScale={{ type: 'point' }} // need to figure point v linear somehow
+    yScale={{
+      type: 'linear',
+      min: _.minBy('y', data?.results),
+      max: 'auto',
+      stacked: true,
+      reverse: false
+    }}
+    enableArea={true}
+    enablePoints={false}
+    yFormat={value =>
+      isCurrency
+        ? formatCurrency({
+            amount: value,
+            currency,
+            minimumFractionDigits: 0
+          })
+        : value
+    }
+    axisTop={null}
+    axisRight={null}
+    axisBottom={{
+      orient: 'bottom',
+      tickSize: 5,
+      tickPadding: 5,
+      tickRotation: -20,
+      legend: xLabel,
+      legendOffset: 36,
+      legendPosition: 'middle'
+    }}
+    axisLeft={{
+      orient: 'left',
+      tickSize: 5,
+      tickPadding: 5,
+      tickRotation: 0,
+      legend: yLabel,
+      legendOffset: -50,
+      legendPosition: 'middle',
+      format: value =>
+        isCurrency &&
+        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
+    }}
+    pointSize={10}
+    pointColor={{ theme: 'background' }}
+    pointBorderWidth={2}
+    pointBorderColor={{ from: 'serieColor' }}
+    pointLabelYOffset={-12}
+    useMesh={true}
+    tooltip={({ point }) => (
+      <div style={{ padding: 4, backgroundColor: 'white' }}>
+        <b>{point?.data?.x}</b>:{' '}
+        {isCurrency
+          ? formatCurrency({
+              amount: point?.data?.y,
+              currency,
+              minimumFractionDigits: 0
+            })
+          : point?.data?.y}
+      </div>
+    )}
+  />
 )
 
 export const DateTimeLine = ({
