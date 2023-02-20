@@ -186,21 +186,23 @@ const extendEndpoints =
   line => {
     let extendedLine = line
     let dateFormatString = getDateFormatString(period)
-    console.log({ start, end })
+    
+    start = parse(start, dateFormatString, new Date())
+    end = parse(end, dateFormatString, new Date())
 
     if (
       _.flow(_.first, _.get('x'), date =>
         parse(date, dateFormatString, new Date())
       )(line) > start
     ) {
-      extendedLine = [format(start, dateFormatString, {}), ...extendedLine]
+      extendedLine = [{ x: format(start, dateFormatString, {}), y: 0 }, ...extendedLine]
     }
     if (
       _.flow(_.last, _.get('x'), date =>
         parse(date, dateFormatString, new Date())
       )(line) < end
     ) {
-      extendedLine = [...extendedLine, format(end, dateFormatString, {})]
+      extendedLine = [...extendedLine, { x: format(end, dateFormatString, {}), y: 0 }]
     }
 
     console.log({ line, extendedLine })
