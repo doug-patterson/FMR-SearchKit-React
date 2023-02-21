@@ -186,7 +186,7 @@ const extendEndpoints =
   line => {
     let extendedLine = line
     let dateFormatString = getDateFormatString(period)
-    
+
     start = parse(start, dateFormatString, new Date())
     end = parse(end, dateFormatString, new Date())
 
@@ -195,14 +195,20 @@ const extendEndpoints =
         parse(date, dateFormatString, new Date())
       )(line) > start
     ) {
-      extendedLine = [{ x: format(start, dateFormatString, {}), y: 0 }, ...extendedLine]
+      extendedLine = [
+        { x: format(start, dateFormatString, {}), y: 0 },
+        ...extendedLine
+      ]
     }
     if (
       _.flow(_.last, _.get('x'), date =>
         parse(date, dateFormatString, new Date())
       )(line) < end
     ) {
-      extendedLine = [...extendedLine, { x: format(end, dateFormatString, {}), y: 0 }]
+      extendedLine = [
+        ...extendedLine,
+        { x: format(end, dateFormatString, {}), y: 0 }
+      ]
     }
 
     return extendedLine
@@ -746,24 +752,23 @@ export const DayOfWeekSummaryBars = ({
 const addZeroHours = hours =>
   _.map(x => _.find({ x }, hours) || { x, y: 0 }, _.range(0, 24))
 
-const decorateHour = hour => {
-  if (hour === 0) {
-    return 'Midnight'
-  }
-  if (hour === 12) {
-    return 'Noon'
-  }
-
-  return hour < 12 ? `${hour} AM` : `${hour - 12} PM`
+const decorateHourXFormat = hour => {
+  if (hour === 0) return '12 am'
+  if (hour === 12) return '12 pm'
+  return hour < 12 ? `${hour}:00 AM` : `${hour - 12}:00 PM`
 }
 
 const includeAllHours = _.map(({ id, data }) => ({
   id,
-  data: _.flow(
-    addZeroHours,
-    _.map(({ x, y }) => ({ x: decorateHour(x), y }))
-  )(data)
+  data: addZeroHours(data)
 }))
+
+const formatAxisBottomHour = hour => {
+  if (hour % 2) return ''
+  if (hour === 0) return '12 am'
+  if (hour === 12) return '12 pm'
+  return hour < 12 ? `${hour}` : `${hour - 12}`
+}
 
 export const HourOfDaySummaryLine = ({
   data,
@@ -797,6 +802,7 @@ export const HourOfDaySummaryLine = ({
       }}
       enableArea={true}
       enablePoints={false}
+      xFormat={decorateHourXFormat}
       yFormat={value =>
         isCurrency
           ? formatCurrency({
@@ -812,10 +818,11 @@ export const HourOfDaySummaryLine = ({
         orient: 'bottom',
         tickSize: 5,
         tickPadding: 5,
-        tickRotation: -45,
+        tickRotation: 0,
         legend: xLabel,
         legendOffset: 40,
-        legendPosition: 'middle'
+        legendPosition: 'middle',
+        format: formatAxisBottomHour
       }}
       axisLeft={{
         orient: 'left',
@@ -834,6 +841,16 @@ export const HourOfDaySummaryLine = ({
           })
       }}
       useMesh={true}
+      tooltip={({ point }) => (
+        <div className="tooltip-hour-of-day-summary-line">
+          <p className="tooltip-hour-of-day-summary-line__x">
+            {point?.data?.xFormatted || point?.data?.x}
+          </p>
+          <p className="tooltip-hour-of-day-summary-line__y">
+            {point?.data?.yFormatted || point?.data?.y}
+          </p>
+        </div>
+      )}
       {...(group && includeLegends
         ? {
             legends: [
