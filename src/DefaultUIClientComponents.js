@@ -232,11 +232,10 @@ const addZeroPeriodsToAllLines = period => lines => {
 
 const monthDayYear = _.flow(_.split('/'), _.size, _.eq(3))
 const monthYearOnly = _.flow(_.split('/'), _.size, _.eq(2))
+
 const formatAxisBottomDate = ({ iteratee, start, end }) => {
   if (monthDayYear(iteratee)) {
     const day = format(new Date(iteratee), 'd')
-    start = americanDate(start)
-    end = americanDate(end)
     if (start === iteratee) return format(new Date(start), 'MMM d')
     if (end === iteratee) return format(new Date(end), 'MMM d')
     if (day === '1') return format(new Date(iteratee), 'MMM d')
@@ -259,8 +258,8 @@ const formatTooltipDate = date => {
 }
 
 // date range
-const getFirstDate = _.flow(_.first, _.get('data'), _.first, _.get('x'))
-const getLastDate = _.flow(_.last, _.get('data'), _.last, _.get('x'))
+const getFirstDateAndConvertToAmerican = _.flow(firstXValue, americanDate)
+const getLastDateAndConvertToAmerican = _.flow(lastXValue, americanDate)
 
 export const DateLineSingle = ({
   data,
@@ -317,8 +316,8 @@ export const DateLineSingle = ({
           axisBottom?.formatDate
             ? formatAxisBottomDate({
                 iteratee: value,
-                start: getFirstDate(data),
-                end: getLastDate(data)
+                start: getFirstDateAndConvertToAmerican(_.first(data)),
+                end: getLastDateAndConvertToAmerican(_.first(data))
               })
             : value,
         ...axisBottom
@@ -413,8 +412,8 @@ export const DateLineMultiple = ({
         axisBottom?.formatDate
           ? formatAxisBottomDate({
               iteratee: value,
-              start: getFirstDate(data),
-              end: getLastDate(data)
+              start: getFirstDateAndConvertToAmerican(_.first(data)),
+              end: getLastDateAndConvertToAmerican(_.first(data))
             })
           : value,
       ...axisBottom
