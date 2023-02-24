@@ -230,16 +230,48 @@ const addZeroPeriodsToAllLines = period => lines => {
   )
 }
 
+const monthDayYear = _.flow(_.split('/'), _.size, _.eq(3))
+const monthYearOnly = _.flow(_.split('/'), _.size, _.eq(2))
+const formatAxisBottomDate = ({ iteratee, start, end }) => {
+  if (monthDayYear(iteratee)) {
+    const day = format(new Date(iteratee), 'd')
+    start = americanDate(start)
+    end = americanDate(end)
+    if (start === iteratee) return format(new Date(start), 'MMM d')
+    if (end === iteratee) return format(new Date(end), 'MMM d')
+    if (day === '1') return format(new Date(iteratee), 'MMM d')
+    return day
+  }
+  if (monthYearOnly(iteratee)) {
+    const [month, year] = _.split('/', iteratee)
+    return format(new Date(+year, +month - 1, 1), 'MMM yyyy')
+  }
+}
+
+const formatTooltipDate = date => {
+  if (monthDayYear(date)) {
+    format(new Date(date), 'MMM d, yyyy')
+  }
+  if (monthYearOnly(date)) {
+    const [month, year] = _.split('/', date)
+    return format(new Date(+year, +month - 1, 1), 'MMM yyyy')
+  }
+}
+
+// date range
+const getFirstDate = _.flow(_.first, _.get('data'), _.first, _.get('x'))
+const getLastDate = _.flow(_.last, _.get('data'), _.last, _.get('x'))
+
 export const DateLineSingle = ({
   data,
-  xLabel,
-  yLabel,
   isCurrency,
   height,
   colors,
   currency,
   period,
-  margins = { top: 50, right: 60, bottom: 50, left: 60 }
+  margin,
+  axisBottom,
+  axisLeft
 }) => {
   return (
     <ResponsiveLine
@@ -249,7 +281,11 @@ export const DateLineSingle = ({
       height={height}
       colors={colors ? colors : { scheme: 'set2' }}
       margin={{
-        ...margins
+        top: 50,
+        right: 60,
+        bottom: 50,
+        left: 60,
+        ...margin
       }}
       xScale={{ type: 'point' }} // need to figure point v linear somehow
       yScale={{
@@ -276,22 +312,27 @@ export const DateLineSingle = ({
         orient: 'bottom',
         tickSize: 5,
         tickPadding: 5,
-        tickRotation: -20,
-        legend: xLabel,
-        legendOffset: 36,
-        legendPosition: 'middle'
+        tickRotation: 0,
+        format: value =>
+          axisBottom?.formatDate
+            ? formatAxisBottomDate({
+                iteratee: value,
+                start: getFirstDate(data),
+                end: getLastDate(data)
+              })
+            : value,
+        ...axisBottom
       }}
       axisLeft={{
         orient: 'left',
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: yLabel,
-        legendOffset: -50,
-        legendPosition: 'middle',
+        tickValues: 6,
         format: value =>
           isCurrency &&
-          formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
+          formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }),
+        ...axisLeft
       }}
       pointSize={10}
       pointColor={{ theme: 'background' }}
@@ -299,32 +340,32 @@ export const DateLineSingle = ({
       pointBorderColor={{ from: 'serieColor' }}
       pointLabelYOffset={-12}
       useMesh={true}
-      tooltip={({ point }) => (
-        <div style={{ padding: 4, backgroundColor: 'white' }}>
-          <b>{point?.data?.x}</b>:{' '}
-          {isCurrency
-            ? formatCurrency({
-                amount: point?.data?.y,
-                currency,
-                minimumFractionDigits: 0
-              })
-            : point?.data?.y}
-        </div>
-      )}
+      tooltip={({ point }) => {
+        return (
+          <div className="tooltip-dateline">
+            <p className="tooltip-dateline__x">
+              {formatTooltipDate(point?.data?.x) || point?.data?.x}
+            </p>
+            <p className="tooltip-dateline__y">
+              {point?.data?.yFormatted || point?.data?.y}
+            </p>
+          </div>
+        )
+      }}
     />
   )
 }
 
 export const DateLineMultiple = ({
   data,
-  xLabel,
-  yLabel,
   isCurrency,
   colors,
   currency,
   height,
   period,
-  margins = { top: 50, right: 60, bottom: 50, left: 60 }
+  margin,
+  axisBottom,
+  axisLeft
 }) => (
   <ResponsiveLine
     data={_.flow(
@@ -336,7 +377,11 @@ export const DateLineMultiple = ({
     height={height}
     colors={colors ? colors : { scheme: 'set2' }}
     margin={{
-      ...margins
+      top: 50,
+      right: 60,
+      bottom: 50,
+      left: 60,
+      ...margin
     }}
     xScale={{ type: 'point' }} // need to figure point v linear somehow
     yScale={{
@@ -363,22 +408,27 @@ export const DateLineMultiple = ({
       orient: 'bottom',
       tickSize: 5,
       tickPadding: 5,
-      tickRotation: -20,
-      legend: xLabel,
-      legendOffset: 36,
-      legendPosition: 'middle'
+      tickRotation: 0,
+      format: value =>
+        axisBottom?.formatDate
+          ? formatAxisBottomDate({
+              iteratee: value,
+              start: getFirstDate(data),
+              end: getLastDate(data)
+            })
+          : value,
+      ...axisBottom
     }}
     axisLeft={{
       orient: 'left',
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: yLabel,
-      legendOffset: -50,
-      legendPosition: 'middle',
+      tickValues: 6,
       format: value =>
         isCurrency &&
-        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
+        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }),
+      ...axisLeft
     }}
     pointSize={10}
     pointColor={{ theme: 'background' }}
@@ -386,30 +436,30 @@ export const DateLineMultiple = ({
     pointBorderColor={{ from: 'serieColor' }}
     pointLabelYOffset={-12}
     useMesh={true}
-    tooltip={({ point }) => (
-      <div style={{ padding: 4, backgroundColor: 'white' }}>
-        <b>{point?.data?.x}</b>:{' '}
-        {isCurrency
-          ? formatCurrency({
-              amount: point?.data?.y,
-              currency,
-              minimumFractionDigits: 0
-            })
-          : point?.data?.y}
-      </div>
-    )}
+    tooltip={({ point }) => {
+      return (
+        <div className="tooltip-dateline">
+          <p className="tooltip-dateline__x">
+            {formatTooltipDate(point?.data?.x) || point?.data?.x}
+          </p>
+          <p className="tooltip-dateline__y">
+            {point?.data?.yFormatted || point?.data?.y}
+          </p>
+        </div>
+      )
+    }}
   />
 )
 
 export const DateTimeLine = ({
   data,
   isCurrency,
-  xLabel,
-  yLabel,
   height,
   colors,
   currency,
-  margins = { top: 50, right: 110, bottom: 50, left: 60 }
+  margin,
+  axisBottom,
+  axisLeft
 }) => (
   <ResponsiveLine
     data={
@@ -422,7 +472,11 @@ export const DateTimeLine = ({
     height={height}
     colors={colors ? colors : { scheme: 'paired' }}
     margin={{
-      ...margins
+      top: 50,
+      right: 110,
+      bottom: 50,
+      left: 60,
+      ...margin
     }}
     xScale={{ type: 'point' }}
     yScale={{
@@ -444,21 +498,18 @@ export const DateTimeLine = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: -20,
-      legend: xLabel,
-      legendOffset: 36,
-      legendPosition: 'middle'
+      ...axisBottom
     }}
     axisLeft={{
       orient: 'left',
       tickSize: 5,
       tickPadding: 5,
+      tickValues: 6,
       tickRotation: 0,
-      legend: yLabel,
-      legendOffset: -50,
-      legendPosition: 'middle',
       format: value =>
         isCurrency &&
-        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
+        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }),
+      ...axisLeft
     }}
     pointSize={10}
     pointColor={{ theme: 'background' }}
@@ -572,7 +623,7 @@ export const TopNPie = ({
   legend,
   height,
   chartKey,
-  margins = { top: 50, right: 30, bottom: 50, left: 30 }
+  margin
 }) => {
   const getId = uniqueIdMaker({})
 
@@ -595,7 +646,7 @@ export const TopNPie = ({
     <ResponsivePie
       data={data}
       height={height}
-      margin={{ ...margins }}
+      margin={{ top: 50, right: 30, bottom: 50, left: 30, ...margin }}
       innerRadius={0.5}
       padAngle={0.7}
       cornerRadius={3}
@@ -647,10 +698,10 @@ export const TopNPie = ({
   )
 }
 
+const formatDayAxisBottom = day => (day ? day.charAt(0) : '')
+
 export const DayOfWeekSummaryBars = ({
   data,
-  xLabel,
-  yLabel,
   group,
   isCurrency,
   height,
@@ -659,7 +710,9 @@ export const DayOfWeekSummaryBars = ({
   label,
   includeLegends = true,
   currency,
-  margins = { top: 50, right: group ? 130 : 80, bottom: 50, left: 80 }
+  axisBottom,
+  axisLeft,
+  margin
 }) => {
   return (
     <ResponsiveBar
@@ -672,7 +725,11 @@ export const DayOfWeekSummaryBars = ({
       animate={true}
       keys={_.flow(_.map(_.keys), _.flatten, _.uniq, _.without(['id']))(data)}
       margin={{
-        ...margins
+        top: 50,
+        right: group ? 130 : 80,
+        bottom: 50,
+        left: 80,
+        ...margin
       }}
       padding={0.3}
       xScale={{ type: 'linear' }}
@@ -695,21 +752,19 @@ export const DayOfWeekSummaryBars = ({
       axisBottom={{
         tickSize: 5,
         tickPadding: 5,
-        tickRotation: -20,
-        legend: xLabel,
-        legendPosition: 'middle',
-        legendOffset: 36
+        tickRotation: 0,
+        format: value =>
+          axisBottom?.tickFirstCharOnly ? formatDayAxisBottom(value) : value,
+        ...axisBottom
       }}
       axisLeft={{
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: yLabel,
-        legendPosition: 'middle',
-        legendOffset: -70,
         format: value =>
           isCurrency &&
-          formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
+          formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }),
+        ...axisLeft
       }}
       labelSkipWidth={12}
       labelSkipHeight={12}
@@ -717,6 +772,16 @@ export const DayOfWeekSummaryBars = ({
         from: 'color',
         modifiers: [['darker', 1.6]]
       }}
+      tooltip={value => (
+        <div className="tooltip-day-of-week-summary-bar">
+          <p className="tooltip-day-of-week-summary-bar__x">
+            {value?.indexValue || value?.data?.x}
+          </p>
+          <p className="tooltip-day-of-week-summary-bar__y">
+            {value?.formattedValue || value?.data?.y}
+          </p>
+        </div>
+      )}
       {...(group && includeLegends
         ? {
             legends: [
@@ -752,7 +817,7 @@ export const DayOfWeekSummaryBars = ({
 const addZeroHours = hours =>
   _.map(x => _.find({ x }, hours) || { x, y: 0 }, _.range(0, 24))
 
-const decorateHourXFormat = hour => {
+const decorateHour = hour => {
   if (hour === 0) return '12 am'
   if (hour === 12) return '12 pm'
   return hour < 12 ? `${hour}:00 AM` : `${hour - 12}:00 PM`
@@ -763,8 +828,8 @@ const includeAllHours = _.map(({ id, data }) => ({
   data: addZeroHours(data)
 }))
 
-const formatAxisBottomHour = hour => {
-  if (hour % 2) return ''
+const formatAxisBottomHour = ({ hour, showOnlyEvenHours }) => {
+  if (showOnlyEvenHours && hour % 2 !== 0) return ''
   if (hour === 0) return '12 am'
   if (hour === 12) return '12 pm'
   return hour < 12 ? `${hour}` : `${hour - 12}`
@@ -773,14 +838,14 @@ const formatAxisBottomHour = hour => {
 export const HourOfDaySummaryLine = ({
   data,
   isCurrency,
-  xLabel,
-  yLabel,
   group,
   height,
   colors,
   includeLegends = true,
   currency,
-  margins = { top: 50, right: group ? 130 : 80, bottom: 50, left: 80 }
+  axisBottom,
+  axisLeft,
+  margin
 }) => {
   return (
     <ResponsiveLine
@@ -790,7 +855,11 @@ export const HourOfDaySummaryLine = ({
       height={height}
       colors={colors ? colors : { scheme: 'paired' }}
       margin={{
-        ...margins
+        top: 50,
+        right: group ? 130 : 80,
+        bottom: 50,
+        left: 80,
+        ...margin
       }}
       xScale={{ type: 'point' }}
       yScale={{
@@ -802,7 +871,7 @@ export const HourOfDaySummaryLine = ({
       }}
       enableArea={true}
       enablePoints={false}
-      xFormat={decorateHourXFormat}
+      xFormat={decorateHour}
       yFormat={value =>
         isCurrency
           ? formatCurrency({
@@ -819,26 +888,26 @@ export const HourOfDaySummaryLine = ({
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: xLabel,
-        legendOffset: 40,
-        legendPosition: 'middle',
-        format: formatAxisBottomHour
+        format: value =>
+          formatAxisBottomHour({
+            hour: value,
+            showOnlyEvenHours: axisBottom?.showOnlyEvenHours
+          }),
+        ...axisBottom
       }}
       axisLeft={{
         orient: 'left',
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: yLabel,
-        legendOffset: -50,
-        legendPosition: 'middle',
         format: value =>
           isCurrency &&
           formatCurrency({
             amount: value,
             currency,
             minimumFractionDigits: 0
-          })
+          }),
+        ...axisLeft
       }}
       useMesh={true}
       tooltip={({ point }) => (
