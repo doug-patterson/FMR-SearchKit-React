@@ -59,11 +59,7 @@ const Facet = ({
               <UIComponents.CheckBox
                 layout={layout}
                 checked={checked}
-<<<<<<< HEAD
                 textMiddle={display(_.isString(value) ? value : { ...value, ...lookup, _id }, null, overrideData)}
-=======
-                textMiddle={display({ ...value, ...lookup, _id })}
->>>>>>> f5d5f9bd5113229def5d6cfa97cceb3139dd7b0e
                 textRight={count}
                 {...(onChange
                   ? {
