@@ -139,7 +139,7 @@ const Component = ({
   HeaderMenu = DefaultHeaderMenu,
   overrideData
 }) => (
-  <UIComponents.Box style={{ width: '100%', overflowX: 'auto' }}>
+  <UIComponents.Box className="fmr-results-table-parent" style={{ width: '100%', overflowX: 'auto' }}>
     <UIComponents.Table className="results-table">
       <UIComponents.TableHeader>
         <UIComponents.TableRow>

@@ -3,11 +3,12 @@
 import React from 'react'
 import _ from 'lodash/fp'
 import useOutsideClick from './hooks/useOutsideClick'
-import { Line } from '@nivo/line'
-import { Calendar } from '@nivo/calendar'
-import { Pie } from '@nivo/pie'
-import { Bar } from '@nivo/bar'
+import { ResponsiveLine } from '@nivo/line'
+import { ResponsiveCalendar } from '@nivo/calendar'
+import { ResponsivePie } from '@nivo/pie'
+import { ResponsiveBar } from '@nivo/bar'
 import { formatCurrency } from './util'
+import { parse, format, addDays, addWeeks, addMonths } from 'date-fns'
 
 const americanDate = _.flow(
   _.split('/'),
@@ -134,97 +135,253 @@ export const Input = ({
   )
 }
 
+let getPeriodAdder = period =>
+  ({
+    day: date => addDays(date, 1),
+    week: date => addWeeks(date, 1),
+    month: date => addMonths(date, 1)
+  }[period])
+
+let getDateFormatString = period => (period === 'month' ? 'M/yyyy' : 'd/M/yyyy')
+
+const getInterveningPoints = ({ period, previous, point }) => {
+  let addPeriod = getPeriodAdder(period)
+
+  let dateFormatString = getDateFormatString(period)
+  let previousDate = parse(previous.x, dateFormatString, new Date())
+  let pointDate = parse(point.x, dateFormatString, new Date())
+
+  let interveningDates = []
+
+  let nextDate = addPeriod(previousDate)
+
+  while (nextDate < pointDate) {
+    interveningDates.push(nextDate)
+    nextDate = addPeriod(nextDate)
+  }
+
+  return _.map(
+    date => ({ x: format(date, dateFormatString), y: 0 }),
+    interveningDates
+  )
+}
+
+const addZeroPeriods = period =>
+  _.reduce((acc, point) => {
+    let previous = _.last(acc)
+    if (!previous) {
+      acc.push(point)
+    } else {
+      acc.push(...getInterveningPoints({ period, previous, point }), point)
+    }
+
+    return acc
+  }, [])
+
+const firstXValue = _.flow(_.get('data'), _.first, _.get('x'))
+const lastXValue = _.flow(_.get('data'), _.last, _.get('x'))
+
+const extendEndpoints =
+  ({ start, end, period }) =>
+  line => {
+    let extendedLine = line
+    let dateFormatString = getDateFormatString(period)
+
+    start = parse(start, dateFormatString, new Date())
+    end = parse(end, dateFormatString, new Date())
+
+    if (
+      _.flow(_.first, _.get('x'), date =>
+        parse(date, dateFormatString, new Date())
+      )(line) > start
+    ) {
+      extendedLine = [
+        { x: format(start, dateFormatString, {}), y: 0 },
+        ...extendedLine
+      ]
+    }
+    if (
+      _.flow(_.last, _.get('x'), date =>
+        parse(date, dateFormatString, new Date())
+      )(line) < end
+    ) {
+      extendedLine = [
+        ...extendedLine,
+        { x: format(end, dateFormatString, {}), y: 0 }
+      ]
+    }
+
+    return extendedLine
+  }
+
+const addZeroPeriodsToAllLines = period => lines => {
+  let start = _.flow(_.minBy(firstXValue), firstXValue)(lines)
+  let end = _.flow(_.maxBy(lastXValue), lastXValue)(lines)
+
+  return _.map(
+    ({ id, data }) => ({
+      id,
+      data: _.flow(
+        extendEndpoints({ start, end, period }),
+        addZeroPeriods(period)
+      )(data)
+    }),
+    lines
+  )
+}
+
+const monthDayYear = _.flow(_.split('/'), _.size, _.eq(3))
+const monthYearOnly = _.flow(_.split('/'), _.size, _.eq(2))
+
+const formatAxisBottomDate = ({ iteratee, start, end }) => {
+  if (monthDayYear(iteratee)) {
+    const day = format(new Date(iteratee), 'd')
+    if (start === iteratee) return format(new Date(start), 'MMM d')
+    if (end === iteratee) return format(new Date(end), 'MMM d')
+    if (day === '1') return format(new Date(iteratee), 'MMM d')
+    return day
+  }
+  if (monthYearOnly(iteratee)) {
+    const [month, year] = _.split('/', iteratee)
+    return format(new Date(+year, +month - 1, 1), 'MMM yyyy')
+  }
+}
+
+const formatTooltipDate = date => {
+  if (monthDayYear(date)) {
+    format(new Date(date), 'MMM d, yyyy')
+  }
+  if (monthYearOnly(date)) {
+    const [month, year] = _.split('/', date)
+    return format(new Date(+year, +month - 1, 1), 'MMM yyyy')
+  }
+}
+
+// date range
+const getFirstDateAndConvertToAmerican = _.flow(firstXValue, americanDate)
+const getLastDateAndConvertToAmerican = _.flow(lastXValue, americanDate)
+
 export const DateLineSingle = ({
   data,
-  xLabel,
-  yLabel,
   isCurrency,
   height,
-  chartWidths,
-  chartKey,
   colors,
-  currency
-}) => (
-  <Line
-    data={americanDates(data)}
-    curve="linear"
-    width={chartWidths.current[chartKey]}
-    height={height}
-    animate={false}
-    colors={colors ? colors : { scheme: 'set2' }}
-    margin={{ top: 50, right: 60, bottom: 50, left: 60 }}
-    xScale={{ type: 'point' }} // need to figure point v linear somehow
-    yScale={{
-      type: 'linear',
-      min: _.minBy('y', data?.results),
-      max: 'auto',
-      stacked: true,
-      reverse: false
-    }}
-    enableArea={true}
-    enablePoints={false}
-    yFormat={value => (isCurrency ? formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }) : value)}
-    axisTop={null}
-    axisRight={null}
-    axisBottom={{
-      orient: 'bottom',
-      tickSize: 5,
-      tickPadding: 5,
-      tickRotation: -20,
-      legend: xLabel,
-      legendOffset: 36,
-      legendPosition: 'middle'
-    }}
-    axisLeft={{
-      orient: 'left',
-      tickSize: 5,
-      tickPadding: 5,
-      tickRotation: 0,
-      legend: yLabel,
-      legendOffset: -50,
-      legendPosition: 'middle',
-      format: value =>
-        isCurrency &&
-        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
-    }}
-    pointSize={10}
-    pointColor={{ theme: 'background' }}
-    pointBorderWidth={2}
-    pointBorderColor={{ from: 'serieColor' }}
-    pointLabelYOffset={-12}
-    useMesh={true}
-    tooltip={({ point }) => (
-      <div style={{ padding: 4, backgroundColor: 'white' }}>
-        <b>{point?.data?.x}</b>:{' '}
-        {isCurrency
-          ? formatCurrency({ amount: point?.data?.y, currency, minimumFractionDigits: 0 })
-          : point?.data?.y}
-      </div>
-    )}
-  />
-)
+  currency,
+  period,
+  margin,
+  axisBottom,
+  axisLeft
+}) => {
+  return (
+    <ResponsiveLine
+      data={_.flow(addZeroPeriodsToAllLines(period), americanDates)(data)}
+      curve="linear"
+      animate={true}
+      height={height}
+      colors={colors ? colors : { scheme: 'set2' }}
+      margin={{
+        top: 50,
+        right: 60,
+        bottom: 50,
+        left: 60,
+        ...margin
+      }}
+      xScale={{ type: 'point' }} // need to figure point v linear somehow
+      yScale={{
+        type: 'linear',
+        min: _.minBy('y', data?.results),
+        max: 'auto',
+        stacked: true,
+        reverse: false
+      }}
+      enableArea={true}
+      enablePoints={false}
+      yFormat={value =>
+        isCurrency
+          ? formatCurrency({
+              amount: value,
+              currency,
+              minimumFractionDigits: 0
+            })
+          : value
+      }
+      axisTop={null}
+      axisRight={null}
+      axisBottom={{
+        orient: 'bottom',
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+        format: value =>
+          axisBottom?.formatDate
+            ? formatAxisBottomDate({
+                iteratee: value,
+                start: getFirstDateAndConvertToAmerican(_.first(data)),
+                end: getLastDateAndConvertToAmerican(_.first(data))
+              })
+            : value,
+        ...axisBottom
+      }}
+      axisLeft={{
+        orient: 'left',
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+        tickValues: 6,
+        format: value =>
+          isCurrency &&
+          formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }),
+        ...axisLeft
+      }}
+      pointSize={10}
+      pointColor={{ theme: 'background' }}
+      pointBorderWidth={2}
+      pointBorderColor={{ from: 'serieColor' }}
+      pointLabelYOffset={-12}
+      useMesh={true}
+      tooltip={({ point }) => {
+        return (
+          <div className="tooltip-dateline">
+            <p className="tooltip-dateline__x">
+              {formatTooltipDate(point?.data?.x) || point?.data?.x}
+            </p>
+            <p className="tooltip-dateline__y">
+              {point?.data?.yFormatted || point?.data?.y}
+            </p>
+          </div>
+        )
+      }}
+    />
+  )
+}
 
 export const DateLineMultiple = ({
   data,
-  x,
-  y,
-  xLabel,
-  yLabel,
   isCurrency,
+  colors,
+  currency,
   height,
-  chartWidths,
-  chartKey
+  period,
+  margin,
+  axisBottom,
+  axisLeft
 }) => (
-  <Line
-    data={americanDates(
-      _.map(d => ({ ...d, data: _.map(_.omit('group'), d.data) }), data)
-    )}
+  <ResponsiveLine
+    data={_.flow(
+      addZeroPeriodsToAllLines(period),
+      americanDates
+    )(_.map(d => ({ ...d, data: _.map(_.omit('group'), d.data) }), data))}
     curve="linear"
-    width={chartWidths.current[chartKey]}
+    animate={true}
     height={height}
-    animate={false}
-    colors={{ scheme: 'set2' }}
-    margin={{ top: 50, right: 60, bottom: 50, left: 60 }}
+    colors={colors ? colors : { scheme: 'set2' }}
+    margin={{
+      top: 50,
+      right: 60,
+      bottom: 50,
+      left: 60,
+      ...margin
+    }}
     xScale={{ type: 'point' }} // need to figure point v linear somehow
     yScale={{
       type: 'linear',
@@ -235,26 +392,42 @@ export const DateLineMultiple = ({
     }}
     enableArea={true}
     enablePoints={false}
-    yFormat={`>-${isCurrency ? '$' : ''},.2r`}
+    yFormat={value =>
+      isCurrency
+        ? formatCurrency({
+            amount: value,
+            currency,
+            minimumFractionDigits: 0
+          })
+        : value
+    }
     axisTop={null}
     axisRight={null}
     axisBottom={{
       orient: 'bottom',
       tickSize: 5,
       tickPadding: 5,
-      tickRotation: -20,
-      legend: xLabel || _.startCase(x),
-      legendOffset: 36,
-      legendPosition: 'middle'
+      tickRotation: 0,
+      format: value =>
+        axisBottom?.formatDate
+          ? formatAxisBottomDate({
+              iteratee: value,
+              start: getFirstDateAndConvertToAmerican(_.first(data)),
+              end: getLastDateAndConvertToAmerican(_.first(data))
+            })
+          : value,
+      ...axisBottom
     }}
     axisLeft={{
       orient: 'left',
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: yLabel || _.startCase(y),
-      legendOffset: -50,
-      legendPosition: 'middle'
+      tickValues: 6,
+      format: value =>
+        isCurrency &&
+        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }),
+      ...axisLeft
     }}
     pointSize={10}
     pointColor={{ theme: 'background' }}
@@ -262,34 +435,48 @@ export const DateLineMultiple = ({
     pointBorderColor={{ from: 'serieColor' }}
     pointLabelYOffset={-12}
     useMesh={true}
-    tooltip={({ point }) => (
-      <div style={{ padding: 4, backgroundColor: 'white' }}>
-        <b>{point?.data?.x}</b>: {isCurrency ? '$' : ''}
-        {point?.data?.y}
-      </div>
-    )}
+    tooltip={({ point }) => {
+      return (
+        <div className="tooltip-dateline">
+          <p className="tooltip-dateline__x">
+            {formatTooltipDate(point?.data?.x) || point?.data?.x}
+          </p>
+          <p className="tooltip-dateline__y">
+            {point?.data?.yFormatted || point?.data?.y}
+          </p>
+        </div>
+      )
+    }}
   />
 )
 
 export const DateTimeLine = ({
   data,
   isCurrency,
-  xLabel,
-  yLabel,
   height,
-  chartWidths,
-  chartKey,
   colors,
-  currency
+  currency,
+  margin,
+  axisBottom,
+  axisLeft
 }) => (
-  <Line
-    data={isCurrency ? formatCurrency({ amount: data, currency, minimumFractionDigits: 0 }) : data}
+  <ResponsiveLine
+    data={
+      isCurrency
+        ? formatCurrency({ amount: data, currency, minimumFractionDigits: 0 })
+        : data
+    }
     curve="linear"
+    animate={true}
     height={height}
-    width={chartWidths.current[chartKey]}
-    animate={false}
     colors={colors ? colors : { scheme: 'paired' }}
-    margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
+    margin={{
+      top: 50,
+      right: 110,
+      bottom: 50,
+      left: 60,
+      ...margin
+    }}
     xScale={{ type: 'point' }}
     yScale={{
       type: 'linear',
@@ -298,7 +485,11 @@ export const DateTimeLine = ({
       stacked: true,
       reverse: false
     }}
-    yFormat={value => (isCurrency ? formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }) : value)}
+    yFormat={value =>
+      isCurrency
+        ? formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
+        : value
+    }
     axisTop={null}
     axisRight={null}
     axisBottom={{
@@ -306,21 +497,18 @@ export const DateTimeLine = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: -20,
-      legend: xLabel,
-      legendOffset: 36,
-      legendPosition: 'middle'
+      ...axisBottom
     }}
     axisLeft={{
       orient: 'left',
       tickSize: 5,
       tickPadding: 5,
+      tickValues: 6,
       tickRotation: 0,
-      legend: yLabel,
-      legendOffset: -50,
-      legendPosition: 'middle',
       format: value =>
         isCurrency &&
-        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
+        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }),
+      ...axisLeft
     }}
     pointSize={10}
     pointColor={{ theme: 'background' }}
@@ -387,19 +575,19 @@ export const QuantityByPeriodCalendar = ({
   isCurrency,
   onClick,
   height,
-  chartWidths,
-  chartKey,
-  colors
+  colors,
+  margins = { top: 20, right: 20, bottom: 20, left: 20 }
 }) => (
-  <Calendar
+  <ResponsiveCalendar
     data={fixDates(data)}
     height={height}
-    width={chartWidths.current[chartKey]}
     from={_.flow(_.first, _.get('day'))(data)}
     to={_.flow(_.last, _.get('day'))(data)}
     emptyColor="#eeeeee"
     colors={colors ? colors : ['#61cdbb', '#97e3d5', '#e8c1a0', '#f47560']}
-    margin={{ top: 0, right: 40, bottom: 0, left: 40 }}
+    margin={{
+      ...margins
+    }}
     yearSpacing={40}
     //monthSpacing={10}
     monthBorderColor="#ffffff"
@@ -433,8 +621,8 @@ export const TopNPie = ({
   schema,
   legend,
   height,
-  chartWidths,
-  chartKey
+  chartKey,
+  margin
 }) => {
   const getId = uniqueIdMaker({})
 
@@ -454,11 +642,10 @@ export const TopNPie = ({
   }, data)
 
   return (
-    <Pie
+    <ResponsivePie
       data={data}
       height={height}
-      width={chartWidths.current[chartKey]}
-      margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
+      margin={{ top: 50, right: 30, bottom: 50, left: 30, ...margin }}
       innerRadius={0.5}
       padAngle={0.7}
       cornerRadius={3}
@@ -510,208 +697,258 @@ export const TopNPie = ({
   )
 }
 
+const formatDayAxisBottom = day => (day ? day.charAt(0) : '')
+
 export const DayOfWeekSummaryBars = ({
   data,
-  xLabel,
-  yLabel,
   group,
   isCurrency,
   height,
-  chartWidths,
-  chartKey,
   colors,
   enableLabel = true,
   label,
   includeLegends = true,
-  currency
-}) => (
-  <Bar
-    data={data}
-    width={chartWidths.current[chartKey]}
-    label={label}
-    height={height}
-    enableLabel={enableLabel}
-    layout="vertical"
-    indexBy="id"
-    animate={false}
-    keys={_.flow(_.map(_.keys), _.flatten, _.uniq, _.without(['id']))(data)}
-    margin={{ top: 50, right: group ? 130 : 80, bottom: 50, left: 80 }}
-    padding={0.3}
-    xScale={{ type: 'linear' }}
-    colors={colors ? colors : { scheme: 'set2' }}
-    valueFormat={value =>
-      isCurrency
-        ? formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
-        : value
-    }
-    borderColor={{
-      from: 'color',
-      modifiers: [['darker', 1.6]]
-    }}
-    axisTop={null}
-    axisRight={null}
-    axisBottom={{
-      tickSize: 5,
-      tickPadding: 5,
-      tickRotation: -20,
-      legend: xLabel,
-      legendPosition: 'middle',
-      legendOffset: 36
-    }}
-    axisLeft={{
-      tickSize: 5,
-      tickPadding: 5,
-      tickRotation: 0,
-      legend: yLabel,
-      legendPosition: 'middle',
-      legendOffset: -70,
-      format: value =>
-        isCurrency &&
-        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
-    }}
-    labelSkipWidth={12}
-    labelSkipHeight={12}
-    labelTextColor={{
-      from: 'color',
-      modifiers: [['darker', 1.6]]
-    }}
-    {...(group && includeLegends
-      ? {
-          legends: [
-            {
-              dataFrom: 'keys',
-              anchor: 'bottom-right',
-              direction: 'column',
-              justify: false,
-              translateX: 120,
-              translateY: 0,
-              itemsSpacing: 2,
-              itemWidth: 100,
-              itemHeight: 20,
-              itemDirection: 'left-to-right',
-              itemOpacity: 0.85,
-              symbolSize: 20,
-              effects: [
-                {
-                  on: 'hover',
-                  style: {
-                    itemOpacity: 1
+  currency,
+  axisBottom,
+  axisLeft,
+  margin
+}) => {
+  return (
+    <ResponsiveBar
+      data={data}
+      label={label}
+      enableLabel={enableLabel}
+      height={height}
+      layout="vertical"
+      indexBy="id"
+      animate={true}
+      keys={_.flow(_.map(_.keys), _.flatten, _.uniq, _.without(['id']))(data)}
+      margin={{
+        top: 50,
+        right: group ? 130 : 80,
+        bottom: 50,
+        left: 80,
+        ...margin
+      }}
+      padding={0.3}
+      xScale={{ type: 'linear' }}
+      colors={colors ? colors : { scheme: 'set2' }}
+      valueFormat={value =>
+        isCurrency
+          ? formatCurrency({
+              amount: value,
+              currency,
+              minimumFractionDigits: 0
+            })
+          : value
+      }
+      borderColor={{
+        from: 'color',
+        modifiers: [['darker', 1.6]]
+      }}
+      axisTop={null}
+      axisRight={null}
+      axisBottom={{
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+        format: value =>
+          axisBottom?.tickFirstCharOnly ? formatDayAxisBottom(value) : value,
+        ...axisBottom
+      }}
+      axisLeft={{
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+        format: value =>
+          isCurrency &&
+          formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }),
+        ...axisLeft
+      }}
+      labelSkipWidth={12}
+      labelSkipHeight={12}
+      labelTextColor={{
+        from: 'color',
+        modifiers: [['darker', 1.6]]
+      }}
+      tooltip={value => (
+        <div className="tooltip-day-of-week-summary-bar">
+          <p className="tooltip-day-of-week-summary-bar__x">
+            {value?.indexValue || value?.data?.x}
+          </p>
+          <p className="tooltip-day-of-week-summary-bar__y">
+            {value?.formattedValue || value?.data?.y}
+          </p>
+        </div>
+      )}
+      {...(group && includeLegends
+        ? {
+            legends: [
+              {
+                dataFrom: 'keys',
+                anchor: 'bottom-right',
+                direction: 'column',
+                justify: false,
+                translateX: 120,
+                translateY: 0,
+                itemsSpacing: 2,
+                itemWidth: 100,
+                itemHeight: 20,
+                itemDirection: 'left-to-right',
+                itemOpacity: 0.85,
+                symbolSize: 20,
+                effects: [
+                  {
+                    on: 'hover',
+                    style: {
+                      itemOpacity: 1
+                    }
                   }
-                }
-              ]
-            }
-          ]
-        }
-      : {})}
-  />
-)
+                ]
+              }
+            ]
+          }
+        : {})}
+    />
+  )
+}
 
 const addZeroHours = hours =>
-  _.map(x => _.find({ x }, hours) || { x, y: 0 }, [..._.range(1, 24), 0])
+  _.map(x => _.find({ x }, hours) || { x, y: 0 }, _.range(0, 24))
 
 const decorateHour = hour => {
-  if (hour === 0) {
-    return 'Midnight'
-  }
-  if (hour === 12) {
-    return 'Noon'
-  }
-
-  return hour < 12 ? `${hour} AM` : `${hour - 12} PM`
+  if (hour === 0) return '12 am'
+  if (hour === 12) return '12 pm'
+  return hour < 12 ? `${hour}:00 AM` : `${hour - 12}:00 PM`
 }
 
 const includeAllHours = _.map(({ id, data }) => ({
   id,
-  data: _.flow(
-    addZeroHours,
-    _.map(({ x, y }) => ({ x: decorateHour(x), y }))
-  )(data)
+  data: addZeroHours(data)
 }))
+
+const formatAxisBottomHour = ({ hour, showOnlyEvenHours }) => {
+  if (showOnlyEvenHours && hour % 2 !== 0) return ''
+  if (hour === 0) return '12 am'
+  if (hour === 12) return '12 pm'
+  return hour < 12 ? `${hour}` : `${hour - 12}`
+}
 
 export const HourOfDaySummaryLine = ({
   data,
   isCurrency,
-  xLabel,
-  yLabel,
   group,
   height,
-  chartWidths,
-  chartKey,
   colors,
   includeLegends = true,
-  currency
-}) => (
-  <Line
-    data={includeAllHours(data)}
-    width={chartWidths.current[chartKey]}
-    height={height}
-    curve="linear"
-    colors={colors ? colors : { scheme: 'paired' }}
-    margin={{ top: 50, right: group ? 130 : 80, bottom: 50, left: 80 }}
-    xScale={{ type: 'point' }}
-    yScale={{
-      type: 'linear',
-      min: 'auto',
-      max: 'auto',
-      stacked: true,
-      reverse: false
-    }}
-    enableArea={true}
-    enablePoints={false}
-    yFormat={value => (isCurrency ? formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }) : value)}
-    axisTop={null}
-    axisRight={null}
-    axisBottom={{
-      orient: 'bottom',
-      tickSize: 5,
-      tickPadding: 5,
-      tickRotation: -45,
-      legend: xLabel,
-      legendOffset: 40,
-      legendPosition: 'middle'
-    }}
-    axisLeft={{
-      orient: 'left',
-      tickSize: 5,
-      tickPadding: 5,
-      tickRotation: 0,
-      legend: yLabel,
-      legendOffset: -50,
-      legendPosition: 'middle',
-      format: value =>
-        isCurrency &&
-        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
-    }}
-    useMesh={true}
-    {...(group && includeLegends
-      ? {
-          legends: [
-            {
-              anchor: 'bottom-right',
-              direction: 'column',
-              justify: false,
-              translateX: 100,
-              translateY: 0,
-              itemsSpacing: 0,
-              itemDirection: 'left-to-right',
-              itemWidth: 80,
-              itemHeight: 20,
-              itemOpacity: 0.75,
-              symbolSize: 12,
-              symbolShape: 'circle',
-              symbolBorderColor: 'rgba(0, 0, 0, .5)',
-              effects: [
-                {
-                  on: 'hover',
-                  style: {
-                    itemBackground: 'rgba(0, 0, 0, .03)',
-                    itemOpacity: 1
+  currency,
+  axisBottom,
+  axisLeft,
+  margin
+}) => {
+  return (
+    <ResponsiveLine
+      data={includeAllHours(data)}
+      curve="linear"
+      animate={true}
+      height={height}
+      colors={colors ? colors : { scheme: 'paired' }}
+      margin={{
+        top: 50,
+        right: group ? 130 : 80,
+        bottom: 50,
+        left: 80,
+        ...margin
+      }}
+      xScale={{ type: 'point' }}
+      yScale={{
+        type: 'linear',
+        min: 'auto',
+        max: 'auto',
+        stacked: true,
+        reverse: false
+      }}
+      enableArea={true}
+      enablePoints={false}
+      xFormat={decorateHour}
+      yFormat={value =>
+        isCurrency
+          ? formatCurrency({
+              amount: value,
+              currency,
+              minimumFractionDigits: 0
+            })
+          : value
+      }
+      axisTop={null}
+      axisRight={null}
+      axisBottom={{
+        orient: 'bottom',
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+        format: value =>
+          formatAxisBottomHour({
+            hour: value,
+            showOnlyEvenHours: axisBottom?.showOnlyEvenHours
+          }),
+        ...axisBottom
+      }}
+      axisLeft={{
+        orient: 'left',
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+        format: value =>
+          isCurrency &&
+          formatCurrency({
+            amount: value,
+            currency,
+            minimumFractionDigits: 0
+          }),
+        ...axisLeft
+      }}
+      useMesh={true}
+      tooltip={({ point }) => (
+        <div className="tooltip-hour-of-day-summary-line">
+          <p className="tooltip-hour-of-day-summary-line__x">
+            {point?.data?.xFormatted || point?.data?.x}
+          </p>
+          <p className="tooltip-hour-of-day-summary-line__y">
+            {point?.data?.yFormatted || point?.data?.y}
+          </p>
+        </div>
+      )}
+      {...(group && includeLegends
+        ? {
+            legends: [
+              {
+                anchor: 'bottom-right',
+                direction: 'column',
+                justify: false,
+                translateX: 100,
+                translateY: 0,
+                itemsSpacing: 0,
+                itemDirection: 'left-to-right',
+                itemWidth: 80,
+                itemHeight: 20,
+                itemOpacity: 0.75,
+                symbolSize: 12,
+                symbolShape: 'circle',
+                symbolBorderColor: 'rgba(0, 0, 0, .5)',
+                effects: [
+                  {
+                    on: 'hover',
+                    style: {
+                      itemBackground: 'rgba(0, 0, 0, .03)',
+                      itemOpacity: 1
+                    }
                   }
-                }
-              ]
-            }
-          ]
-        }
-      : {})}
-  />
-)
+                ]
+              }
+            ]
+          }
+        : {})}
+    />
+  )
+}

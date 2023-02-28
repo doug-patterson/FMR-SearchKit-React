@@ -8,7 +8,11 @@ import NumericFilter from './NumericFilter'
 import DateTimeInterval from './DateTimeInterval'
 
 const NoComponent = () => 'no filter found'
-const UseWithHide = () => <div>This fitlter should be used with <code>hide: true</code></div>
+const UseWithHide = () => (
+  <div>
+    This fitlter should be used with <code>hide: true</code>
+  </div>
+)
 
 const getFilterComponent = type =>
   ({
@@ -37,11 +41,14 @@ const updateFilters = filters => idx => patch =>
 // we need to handle the search button better - needs to move up to the main
 // layout and potentially be accompanied by sort controls and column pickers
 
-const DefaultWrapper = ({ filterKey, children, UIComponents }) =>
+const DefaultWrapper = ({ filterKey, children, UIComponents }) => (
   <UIComponents.Card>
     <UIComponents.CardHeader>{_.startCase(filterKey)}</UIComponents.CardHeader>
     <>{children}</>
   </UIComponents.Card>
+)
+
+const unsetOptionSearches = _.map(_.set('optionSearch', ''))
 
 const Filters = ({
   children,
@@ -51,7 +58,7 @@ const Filters = ({
   UIComponents,
   runSearch,
   currentInput,
-  openFilters,
+  onlyOneFilterOpenAtAtime,
   layout = 'column',
   Wrapper = DefaultWrapper,
   overrideData
@@ -73,43 +80,64 @@ const Filters = ({
       {children}
       {mapIndexed((filter, idx) => {
         const Component = getFilterComponent(filter.type)
+        const FinalWrapper = filter.hide ? React.Fragment : Wrapper
         return (
-          <Wrapper openFilters={openFilters} filterKey={filter.key} UIComponents={UIComponents}>
-            <Component
-              key={filter.key}
-              layout={layout}
-              {...(runSearch
-                ? {
-                    onChange: async patch =>
-                      runSearch({
-                        filters: updateFilters(filters)(idx)(patch),
-                        page: 1
-                      })
-                  }
-                : {
-                    name: filter.key
-                  })}
-              {..._.omit(['key'], filter)}
-              title={filter.key} 
-              options={_.get(
-                'options',
-                _.find({ key: filter.key }, filterOptions)
-              )}
-              display={
-                filter.prop
-                  ? _.get(
-                      filter.prop,
-                      _.get(filter.field, schema.properties)?.items.properties
-                    )?.display
-                  : _.get(filter.subqueryLocalField || filter.field, schema.properties)?.display
-              }
-              UIComponents={UIComponents}
-              currentInput={currentInput}
-              overrideData={overrideData}
-            />
-          </Wrapper>
+          <FinalWrapper
+            onlyOneFilterOpenAtAtime={onlyOneFilterOpenAtAtime}
+            filterKey={filter.key}
+            UIComponents={UIComponents}
+          >
+            {!filter.hide && (
+              <Component
+                key={filter.key}
+                layout={layout}
+                {...(runSearch
+                  ? {
+                      onChange: async patch =>
+                        runSearch({
+                          filters: updateFilters(unsetOptionSearches(filters))(
+                            idx
+                          )(patch),
+                          page: 1
+                        }),
+                      debouncedOnChange: _.debounce(1000, async patch =>
+                        runSearch({
+                          filters: updateFilters(unsetOptionSearches(filters))(
+                            idx
+                          )(patch),
+                          page: 1
+                        })
+                      )
+                    }
+                  : {
+                      name: filter.key
+                    })}
+                {..._.omit(['key'], filter)}
+                title={filter.key}
+                options={_.get(
+                  'options',
+                  _.find({ key: filter.key }, filterOptions)
+                )}
+                hasOptionSearch={_.isString(filter.optionSearch)}
+                display={
+                  filter.prop
+                    ? _.get(
+                        filter.prop,
+                        _.get(filter.field, schema.properties)?.items.properties
+                      )?.display
+                    : _.get(
+                        filter.subqueryLocalField || filter.field,
+                        schema.properties
+                      )?.display
+                }
+                UIComponents={UIComponents}
+                currentInput={currentInput}
+                overrideData={overrideData}
+              />
+            )}
+          </FinalWrapper>
         )
-      }, _.reject('hide', filters))}
+      }, filters)}
       {runSearch && (
         <UIComponents.Button onClick={() => runSearch({})}>
           Reset Search

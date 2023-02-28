@@ -149,15 +149,13 @@ export const CardFooter = ({ children, ...props }) => (
   </div>
 )
 
-export const IconBack = () => <span style={{ fontSize: '1.5rem' }}>&#171;</span>
+export const IconBack = () => <span>&#171;</span>
 export const IconForward = () => (
-  <span style={{ fontSize: '1.5rem' }}>&#187;</span>
+  <span>&#187;</span>
 )
 export const IconPrevious = () => (
-  <span style={{ fontSize: '1.5rem' }}>&#8249;</span>
+  <span>&#8249;</span>
 )
 export const IconNext = () => (
-  <span style={{ fontSize: '1.5rem' }}>&#8250;</span>
+  <span>&#8250;</span>
 )
-
-export const GroupedTotals = ({ data }) => JSON.stringify(data, 0, 2)

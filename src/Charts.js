@@ -2,40 +2,7 @@ import React from 'react'
 import _ from 'lodash/fp'
 import FieldStats from './FieldStats'
 import SummaryTable from './SummaryTable'
-
-let reloaded = false
-
-const ChartSizer = ({ children, chartWidths, ...props }) => {
-  const [hasWidth, setHasWidth] = React.useState(
-    !!chartWidths.current[props.chartKey]
-  )
-
-  React.useEffect(() => {
-    const resize = () => {
-      const containerWidth = document.querySelectorAll(
-        `.fmr-chart.${props.chartKey}`
-      )[0]?.clientWidth
-      chartWidths.current = {
-        ...chartWidths.current,
-        [props.chartKey]: containerWidth || 480
-      }
-      setHasWidth(true)
-    }
-    if (!hasWidth) {
-      resize()
-    }
-    const reloader = () => {
-      if (!reloaded) {
-        window.location.reload()
-      }
-      reloaded = true
-    }
-    window.addEventListener('resize', reloader)
-    window.addEventListener('orientationchange', reloader)
-  }, [chartWidths, hasWidth, props.chartKey])
-
-  return hasWidth && <>{children}</>
-}
+import TotalsBar from './TotalsBar'
 
 const Charts = ({
   charts,
@@ -56,6 +23,9 @@ const Charts = ({
       if (chart.type === 'summaryTable') {
         Component = SummaryTable
       }
+      if (chart.type === 'totalsBar') {
+        Component = TotalsBar
+      }
 
       return (
         <div
@@ -63,19 +33,19 @@ const Charts = ({
           key={chart.key}
           style={{ gridArea: chart.key }}
         >
-          <h2>{_.toString(chart.label) || _.startCase(chart.key)}</h2>
-          <ChartSizer chartWidths={chartWidths} chartKey={chart.key}>
-            <Component
-              {..._.omit(['key'], chart)}
-              chartKey={chart.key}
-              chartWidths={chartWidths}
-              data={chartData ? chartData[chart.key] : []}
-              schema={schema}
-              schemas={schemas}
-              UIComponents={UIComponents}
-              height={_.toNumber(chart.height) || 280}
-            />
-          </ChartSizer>
+          {!chart.hideLabel && (
+            <h2>{_.toString(chart.label) || _.startCase(chart.key)}</h2>
+          )}
+          <Component
+            {..._.omit(['key'], chart)}
+            chartKey={chart.key}
+            chartWidths={chartWidths}
+            data={chartData ? chartData[chart.key] : []}
+            schema={schema}
+            schemas={schemas}
+            UIComponents={UIComponents}
+            height={_.toNumber(chart.height) || 280}
+          />
         </div>
       )
     }, charts)}

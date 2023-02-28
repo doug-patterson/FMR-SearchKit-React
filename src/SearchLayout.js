@@ -9,6 +9,10 @@ import Results from './Results'
 import Charts from './Charts'
 import Filters from './Filters'
 
+const Layout = ({ layoutStyle, children }) => (
+  <DefaultLayout style={layoutStyle}>{children}</DefaultLayout>
+)
+
 const SearchLayout = ({
   initialSearch,
   initialResults = {},
@@ -18,8 +22,8 @@ const SearchLayout = ({
   execute,
   layoutStyle,
   filterLayout,
+  onlyOneFilterOpenAtAtime,
   FilterWrapper,
-  defaultOpenFilters = [],
   mode = 'feathers',
   onData = _.noop,
   overrideData
@@ -41,13 +45,8 @@ const SearchLayout = ({
   const [chartData, setChartData] = React.useState(initialResults.charts)
   const currentInput = React.useRef(null)
   const chartWidths = React.useRef({})
-  const openFilters = React.useRef(defaultOpenFilters)
 
   const UIComponents = _.defaults(DefaultUIComponents, ThemeComponents)
-
-  const Layout = ({ children }) => (
-    <DefaultLayout style={layoutStyle}>{children}</DefaultLayout>
-  )
 
   schemas = addDefaultDisplays(schemas)
   const schema = schemas[initialSearch.collection]
@@ -61,12 +60,10 @@ const SearchLayout = ({
       ...patch
     }
 
-    const [{
-      results,
-      resultsCount: newResultsCount,
-      charts,
-      ...filterResults
-    }, constrainedSearch] = (await execute(updatedSearch)) || {}
+    const [
+      { results, resultsCount: newResultsCount, charts, ...filterResults },
+      constrainedSearch
+    ] = (await execute(updatedSearch)) || {}
 
     if (mode === 'route') {
       return
@@ -85,13 +82,12 @@ const SearchLayout = ({
     setRows(results)
     setResultsCount(_.get('count', newResultsCount) || 0)
     setChartData(charts)
-
     onData()
   }
 
   return (
     <UIComponents.Box>
-      <Layout>
+      <Layout layoutStyle={layoutStyle}>
         <Filters
           filters={search.filters}
           filterOptions={filterOptions}
@@ -99,7 +95,7 @@ const SearchLayout = ({
           schema={schema}
           UIComponents={UIComponents}
           currentInput={currentInput}
-          openFilters={openFilters}
+          onlyOneFilterOpenAtAtime={onlyOneFilterOpenAtAtime}
           layout={filterLayout}
           {...(FilterWrapper ? { Wrapper: FilterWrapper } : {})}
           overrideData={overrideData}
