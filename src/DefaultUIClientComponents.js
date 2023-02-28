@@ -249,7 +249,7 @@ const formatAxisBottomDate = ({ iteratee, start, end }) => {
 
 const formatTooltipDate = date => {
   if (monthDayYear(date)) {
-    format(new Date(date), 'MMM d, yyyy')
+    return format(new Date(date), 'MMM d, yyyy')
   }
   if (monthYearOnly(date)) {
     const [month, year] = _.split('/', date)
