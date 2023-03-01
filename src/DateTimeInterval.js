@@ -20,7 +20,6 @@ const DateTimeInterval = ({
   disableInterval,
   onChange,
   UIComponents,
-  currentInput = {},
   layout
 }) => (
   <UIComponents.CardBody
@@ -31,11 +30,7 @@ const DateTimeInterval = ({
     {!disableInterval && (
       <UIComponents.Select
         label={'Interval'}
-        value={
-          _.has(`${title}.interval`, currentInput.current)
-            ? _.get(`${title}.interval`, currentInput.current)
-            : interval || ''
-        }
+        value={interval || ''}
         options={[
           '',
           'Today',
@@ -66,7 +61,6 @@ const DateTimeInterval = ({
         {...(onChange
           ? {
               onChange: val => {
-                currentInput.current = { [`${title}.interval`]: val }
                 onChange({
                   interval: val,
                   from: null,
@@ -84,20 +78,16 @@ const DateTimeInterval = ({
       <UIComponents.Input
         type="datetime-local"
         placeholder={'Start'}
-        focus={_.has(`${title}.from`, currentInput.current)}
         {...(onChange
           ? {
               onChange: val => {
-                currentInput.current = { [`${title}.from`]: val }
                 onChange({
                   from: val,
                   interval: null,
                   offset: new Date().getTimezoneOffset()
                 })
               },
-              value: _.has(`${title}.from`, currentInput.current)
-                ? _.get(`${title}.from`, currentInput.current)
-                : from || ''
+              value: from || ''
             }
           : {
               name: `${title}[from]`,
@@ -109,20 +99,16 @@ const DateTimeInterval = ({
       <UIComponents.Input
         type="datetime-local"
         placeholder={'End'}
-        focus={_.has(`${title}.to`, currentInput.current)}
         {...(onChange
           ? {
               onChange: val => {
-                currentInput.current = { [`${title}.to`]: val }
                 onChange({
                   to: val,
                   interval: null,
                   offset: new Date().getTimezoneOffset()
                 })
               },
-              value: _.has(`${title}.to`, currentInput.current)
-                ? _.get(`${title}.to`, currentInput.current)
-                : to || ''
+              value: to || ''
             }
           : {
               name: `${title}[to]`,

@@ -12,15 +12,10 @@ const Facet = ({
   display = _.get('_id'),
   UIComponents,
   layout,
-  currentInput = {},
   hasOptionSearch,
   overrideData
 }) => {
-  let [optionSearch, setOptionSearch] = React.useState(
-    _.has(`${title}.optionSearch`, currentInput.current)
-      ? _.get(`${title}.optionSearch`, currentInput.current)
-      : ''
-  )
+  let [optionSearch, setOptionSearch] = React.useState('')
   return (
     <UIComponents.CardBody>
       <div
@@ -34,14 +29,10 @@ const Facet = ({
             <UIComponents.Input
               type="text"
               placeholder={'Search Options'}
-              focus={_.has(`${title}.optionSearch`, currentInput.current)}
               {...(onChange
                 ? {
                     onChange: val => {
                       setOptionSearch(val)
-                      currentInput.current = {
-                        [`${title}.optionSearch`]: val
-                      }
                       debouncedOnChange({ optionSearch: val })
                     },
                     value: optionSearch

@@ -131,7 +131,6 @@ const Filters = ({
                       )?.display
                 }
                 UIComponents={UIComponents}
-                currentInput={currentInput}
                 overrideData={overrideData}
               />
             )}

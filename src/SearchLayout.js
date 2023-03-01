@@ -43,7 +43,6 @@ const SearchLayout = ({
     initialResults?.resultsCount?.count || 0
   )
   const [chartData, setChartData] = React.useState(initialResults.charts)
-  const currentInput = React.useRef(null)
   const chartWidths = React.useRef({})
 
   const UIComponents = _.defaults(DefaultUIComponents, ThemeComponents)
@@ -94,7 +93,6 @@ const SearchLayout = ({
           runSearch={runSearch}
           schema={schema}
           UIComponents={UIComponents}
-          currentInput={currentInput}
           onlyOneFilterOpenAtAtime={onlyOneFilterOpenAtAtime}
           layout={filterLayout}
           {...(FilterWrapper ? { Wrapper: FilterWrapper } : {})}
