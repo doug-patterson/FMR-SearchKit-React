@@ -57,7 +57,6 @@ const Filters = ({
   schema,
   UIComponents,
   runSearch,
-  currentInput,
   onlyOneFilterOpenAtAtime,
   layout = 'column',
   Wrapper = DefaultWrapper,

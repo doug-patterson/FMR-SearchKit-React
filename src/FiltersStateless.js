@@ -48,7 +48,6 @@ const FiltersStateless = ({
   schema,
   UIComponents,
   runSearch,
-  currentInput
 }) => (
   <div
     key={_.join(',', _.keys(schema.properties))}
@@ -86,7 +85,6 @@ const FiltersStateless = ({
               : _.get(filter.field, schema.properties)?.display
           }
           UIComponents={UIComponents}
-          currentInput={currentInput}
         />
       )
     }, _.reject('hide', filters))}
