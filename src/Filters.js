@@ -57,10 +57,10 @@ const Filters = ({
   schema,
   UIComponents,
   runSearch,
-  currentInput,
   onlyOneFilterOpenAtAtime,
   layout = 'column',
-  Wrapper = DefaultWrapper
+  Wrapper = DefaultWrapper,
+  overrideData
 }) => {
   return (
     <div
@@ -130,7 +130,7 @@ const Filters = ({
                       )?.display
                 }
                 UIComponents={UIComponents}
-                currentInput={currentInput}
+                overrideData={overrideData}
               />
             )}
           </FinalWrapper>

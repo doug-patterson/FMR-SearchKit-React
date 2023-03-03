@@ -16,9 +16,10 @@ const Results = ({
   page = 1,
   ResultsComponent = ResultsTable,
   Paginator = DefaultPaginator,
-  UIComponents
+  UIComponents,
+  overrideData
 }) => (
-  <div style={{ gridArea: 'results' }}>
+  <div className="fmr-results" style={{ gridArea: 'results' }}>
     <UIComponents.Box>
       <ResultsComponent
         {...{
@@ -29,11 +30,12 @@ const Results = ({
           setSortDir: newSortDir => runSearch({ sortDir: newSortDir, page: 1 }),
           schema,
           rows,
-          UIComponents
+          UIComponents,
+          overrideData
         }}
       />
       {pageSize > 0 && (
-        <UIComponents.Grid columns="auto 1fr auto">
+        <UIComponents.Grid className="fmr-results-controls" columns="auto 1fr auto">
           <UIComponents.Select
             options={[10, 20, 50, 100]}
             {...(runSearch

@@ -4,7 +4,6 @@ import SearchController from './SearchController'
 import HTTPSearchHOC from './HTTPSearchHOC'
 
 const _searchkit = ({
-  feathersOrigin,
   preparePage,
   runInitialSearch,
   overridesStateless,

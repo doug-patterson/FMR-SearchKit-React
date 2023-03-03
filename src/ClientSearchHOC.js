@@ -103,7 +103,7 @@ const ClientSearchWithOverrides = props => {
                   typeof window === 'object' && window.location.href
                 )
                 window.history.replaceState(
-                  { ...window.history.state, as: newUrl, url: newUrl },
+                  { ...window.history.state || {}, as: newUrl, url: newUrl },
                   '',
                   newUrl
                 )

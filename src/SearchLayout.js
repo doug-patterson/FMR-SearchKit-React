@@ -25,7 +25,8 @@ const SearchLayout = ({
   onlyOneFilterOpenAtAtime,
   FilterWrapper,
   mode = 'feathers',
-  onData = _.noop
+  onData = _.noop,
+  overrideData
 }) => {
   const [search, setSearch] = React.useState(initialSearch)
   const [filterOptions, setFilterOptions] = React.useState(
@@ -42,7 +43,6 @@ const SearchLayout = ({
     initialResults?.resultsCount?.count || 0
   )
   const [chartData, setChartData] = React.useState(initialResults.charts)
-  const currentInput = React.useRef(null)
   const chartWidths = React.useRef({})
 
   const UIComponents = _.defaults(DefaultUIComponents, ThemeComponents)
@@ -93,10 +93,10 @@ const SearchLayout = ({
           runSearch={runSearch}
           schema={schema}
           UIComponents={UIComponents}
-          currentInput={currentInput}
           onlyOneFilterOpenAtAtime={onlyOneFilterOpenAtAtime}
           layout={filterLayout}
           {...(FilterWrapper ? { Wrapper: FilterWrapper } : {})}
+          overrideData={overrideData}
         >
           {children}
         </Filters>
@@ -129,6 +129,7 @@ const SearchLayout = ({
             page={search.page}
             UIComponents={UIComponents}
             runSearch={runSearch}
+            overrideData={overrideData}
           />
         )}
       </Layout>

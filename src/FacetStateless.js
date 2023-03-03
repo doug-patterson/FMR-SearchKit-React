@@ -12,7 +12,6 @@ const FacetStateless = ({
   display = _.get('_id'),
   UIComponents,
   layout,
-  currentInput = {},
 }) => (
   <UIComponents.CardBody>
     <div
@@ -23,10 +22,7 @@ const FacetStateless = ({
         <UIComponents.Input
           type="text"
           placeholder={'Search Options'}
-          focus={_.has(`${title}.optionSearch`, currentInput.current)}
-          value={_.has(`${title}.optionSearch`, currentInput.current)
-            ? _.get(`${title}.optionSearch`, currentInput.current)
-            : ''}
+          value={''}
         />
       </div>
       {_.map(

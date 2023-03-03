@@ -10,7 +10,6 @@ const NumericFilter = ({
   onChange,
   name,
   UIComponents,
-  currentInput = {},
   layout
 }) => (
   <UIComponents.CardBody
@@ -22,16 +21,12 @@ const NumericFilter = ({
       <UIComponents.Input
         type="number"
         placeholder={'Min'}
-        focus={_.has(`${title}.from`, currentInput.current)}
         {...(onChange
           ? {
               onChange: val => {
-                currentInput.current = { [`${title}.from`]: val }
                 onChange({ from: val && _.toNumber(val) })
               },
-              value: _.has(`${title}.from`, currentInput.current)
-                ? _.get(`${title}.from`, currentInput.current)
-                : from || ''
+              value: from || ''
             }
           : {
               name: `${name}[from]`,
@@ -43,16 +38,12 @@ const NumericFilter = ({
       <UIComponents.Input
         type="number"
         placeholder={'Max'}
-        focus={_.has(`${title}.to`, currentInput.current)}
         {...(onChange
           ? {
               onChange: val => {
-                currentInput.current = { [`${title}.to`]: val }
                 onChange({ to: val && _.toNumber(val) })
               },
-              value: _.has(`${title}.to`, currentInput.current)
-                ? _.get(`${title}.to`, currentInput.current)
-                : to || ''
+              value: to || ''
             }
           : {
               name: `${name}[to]`,
