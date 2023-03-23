@@ -32,7 +32,8 @@
     "@nivo/pie": "^0.80.0",
     "date-fns": "^2.29.3",
     "lodash": "^4.17.21",
-    "react": "^18.2.0"
+    "react": "^18.2.0",
+    "typescript": "^5.0.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.19.3",
@@ -43,6 +44,7 @@
     "@rollup/plugin-babel": "^6.0.2",
     "@rollup/plugin-commonjs": "^23.0.2",
     "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-typescript": "^11.0.0",
     "autoprefixer": "^10.4.13",
     "rollup": "^3.2.5",
     "rollup-plugin-sourcemaps": "^0.6.3",

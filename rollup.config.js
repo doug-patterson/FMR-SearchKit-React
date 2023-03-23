@@ -3,9 +3,10 @@ const autoprefixer = require('autoprefixer')
 import babel from '@rollup/plugin-babel'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
+import typescript from '@rollup/plugin-typescript'
 
-const input = 'src/index.js'
-const client = 'src/client.js'
+const input = 'src/index.tsx'
+const client = 'src/client.ts'
 
 let MODE = [
   {
@@ -32,6 +33,7 @@ MODE.map((m) => {
         },
         external: ["react", /@babel\/runtime/],
         plugins: [
+            typescript({ lib: ['es2015'] }),
             babel({
                 exclude: 'node_modules/**',
                 plugins: ['@babel/transform-runtime'],
