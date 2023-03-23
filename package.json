@@ -46,6 +46,7 @@
     "autoprefixer": "^10.4.13",
     "rollup": "^3.2.5",
     "rollup-plugin-sourcemaps": "^0.6.3",
-    "rollup-plugin-styles": "^4.0.0"
+    "rollup-plugin-styles": "^4.0.0",
+    "ts-migrate": "^0.1.35"
   }
 }
