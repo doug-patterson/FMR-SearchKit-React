@@ -30,7 +30,6 @@
     "@nivo/core": "^0.80.0",
     "@nivo/line": "^0.80.0",
     "@nivo/pie": "^0.80.0",
-    "@types/react": "^18.0.28",
     "date-fns": "^2.29.3",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
@@ -50,6 +49,7 @@
     "rollup": "^3.2.5",
     "rollup-plugin-sourcemaps": "^0.6.3",
     "rollup-plugin-styles": "^4.0.0",
-    "ts-migrate": "^0.1.35"
+    "ts-migrate": "^0.1.35",
+    "@types/react": "^18.0.28"
   }
 }
