@@ -1,4 +1,6 @@
+// @ts-expect-error TS(7016): Could not find a declaration file for module 'reac... Remove this comment to see the full error message
 import React from 'react'
+// @ts-expect-error TS(7016): Could not find a declaration file for module 'loda... Remove this comment to see the full error message
 import _ from 'lodash/fp'
 
 // this should maintain state and disable whatever inputs you aren't using
@@ -21,13 +23,15 @@ const DateTimeInterval = ({
   onChange,
   UIComponents,
   layout
-}) => (
+}: any) => (
+  // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
   <UIComponents.CardBody
     className={`fmr-date-time-intervals fmr-date-time-intervals--${
       layout === 'row' ? 'row' : 'column'
     }`}
   >
     {!disableInterval && (
+      // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
       <UIComponents.Select
         label={'Interval'}
         value={interval || ''}
@@ -60,7 +64,7 @@ const DateTimeInterval = ({
         ]}
         {...(onChange
           ? {
-              onChange: val => {
+              onChange: (val: any) => {
                 onChange({
                   interval: val,
                   from: null,
@@ -75,12 +79,13 @@ const DateTimeInterval = ({
       ></UIComponents.Select>
     )}
     {!disableFrom && (
+      // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
       <UIComponents.Input
         type="datetime-local"
         placeholder={'Start'}
         {...(onChange
           ? {
-              onChange: val => {
+              onChange: (val: any) => {
                 onChange({
                   from: val,
                   interval: null,
@@ -96,12 +101,13 @@ const DateTimeInterval = ({
       />
     )}
     {!disableTo && (
+      // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
       <UIComponents.Input
         type="datetime-local"
         placeholder={'End'}
         {...(onChange
           ? {
-              onChange: val => {
+              onChange: (val: any) => {
                 onChange({
                   to: val,
                   interval: null,

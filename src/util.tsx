@@ -1,10 +1,12 @@
+// @ts-expect-error TS(7016): Could not find a declaration file for module 'reac... Remove this comment to see the full error message
 import React from 'react'
+// @ts-expect-error TS(7016): Could not find a declaration file for module 'loda... Remove this comment to see the full error message
 import _ from 'lodash/fp'
 import { format } from 'date-fns'
 
 export const mapIndexed = _.convert({ cap: false }).map
 export const mapValuesIndexed = _.convert({ cap: false }).mapValues
-export const arrayToObject = _.curry((key, val, arr) =>
+export const arrayToObject = _.curry((key: any, val: any, arr: any) =>
   _.flow(_.keyBy(key), _.mapValues(val))(arr)
 )
 export const reduceIndexed = _.convert({ cap: false }).reduce
@@ -12,14 +14,17 @@ export const isFlatObject = _.flow(
   _.overSome,
   _.negate
 )([_.isPlainObject, _.isArray])
-export const singleObject = _.curry((key, value) => ({ [key]: value }))
+// @ts-expect-error TS(7006): Parameter 'key' implicitly has an 'any' type.
+export const singleObject = _.curry((key, value) => ({
+  [key]: value
+}))
 export const singleObjectRight = _.flip(singleObject)
-export const dotJoinWith = fn => x => _.join('.', _.filter(fn, x))
+export const dotJoinWith = (fn: any) => (x: any) => _.join('.', _.filter(fn, x))
 export const isEmptyObject = _.flow(_.keys, _.size, _.eq(0))
 
-export const flattenObject = (input, paths) =>
+export const flattenObject = (input: any, paths: any) =>
   reduceIndexed(
-    (output, value, key) =>
+    (output: any, value: any, key: any) =>
       _.merge(
         output,
         (isFlatObject(value) ? singleObjectRight : flattenObject)(
@@ -31,33 +36,39 @@ export const flattenObject = (input, paths) =>
     input
   )
 
-const defaultKeyValueDisplay = obj => (
-  <div>
-    {mapIndexed(
-      (v, k) => [
-        <div key={`${k}`}>
-          <span>{k}</span>: <span>{`${v}`}</span>
-        </div>
-      ],
-      obj
-    )}
-  </div>
-)
+// @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
+const defaultKeyValueDisplay = (obj: any) => <div>
+  {mapIndexed(
+    (v: any, k: any) => [
+      // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
+      <div key={`${k}`}>
+        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
+        <span>{k}</span>: <span>{`${v}`}</span>
+      // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
+      </div>
+    ],
+    obj
+  )}
+// @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
+</div>
 
-const arrayValueDisplay = val =>
-  _.isObject(val) ? defaultKeyValueDisplay(val) : `${val}`
+const arrayValueDisplay = (val: any) => _.isObject(val) ? defaultKeyValueDisplay(val) : `${val}`
 
-const defaultDisplay = prop => {
-  let fn = val => (val ? <span>{`${val._id || val}`}</span> : <span>{''}</span>)
+const defaultDisplay = (prop: any) => {
+  // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
+  let fn = (val: any) => val ? <span>{`${val._id || val}`}</span> : <span>{''}</span>
 
   switch (prop.bsonType) {
     case 'bool':
+      // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
       fn = bool => (bool ? <span>{'Yes'}</span> : <span>{'No'}</span>)
       break
     case 'date':
       fn = date => (
+        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
         <span>
           {date ? format(new Date(date), 'MM/dd/yyyy KK:mm:ss bb') : ''}
+        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
         </span>
       )
       break
@@ -66,13 +77,14 @@ const defaultDisplay = prop => {
       break
     case 'array':
       fn = arr => (
+        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
         <div>
           {_.map(
-            val => (
-              <div key={val?._id}>{arrayValueDisplay(val)}</div>
-            ),
+            // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
+            (val: any) => <div key={val?._id}>{arrayValueDisplay(val)}</div>,
             arr
           )}
+        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
         </div>
       )
       break
@@ -83,10 +95,14 @@ const defaultDisplay = prop => {
   return fn
 }
 
-const defaultDisplays = schema => ({
+const defaultDisplays = (schema: any) => ({
   ...schema,
+
   properties: _.mapValues(
-    prop => ({ display: defaultDisplay(prop), ...prop }),
+    (prop: any) => ({
+      display: defaultDisplay(prop),
+      ...prop
+    }),
     schema.properties
   )
 })
@@ -100,16 +116,17 @@ const breakpoints = [
   [1000, 'K']
 ]
 
-export const shortNum = val => {
+export const shortNum = (val: any) => {
   for (const breakpoint of breakpoints) {
     if (val > breakpoint[0]) {
+      // @ts-expect-error TS(2363): The right-hand side of an arithmetic operation mus... Remove this comment to see the full error message
       return `${(val / breakpoint[0]).toFixed(2)}${breakpoint[1]}`
     }
   }
   return val
 }
 
-export const setUpSchemas = (fullOverrides, schemas) => {
+export const setUpSchemas = (fullOverrides: any, schemas: any) => {
   let newSchemas = schemas
   const collections = _.keys(schemas)
   for (const key of collections) {
@@ -118,7 +135,10 @@ export const setUpSchemas = (fullOverrides, schemas) => {
       for (const prop in override.properties) {
         newSchemas = _.update(
           `${key}.properties.${prop}`,
-          field => ({ ...field, ...override.properties[prop] }),
+          (field: any) => ({
+            ...field,
+            ...override.properties[prop]
+          }),
           newSchemas
         )
       }
@@ -138,7 +158,7 @@ const filterToQueryElements = ({
   from,
   values,
   checked
-}) => {
+}: any) => {
   let elements = _.pickBy(_.identity, {
     to,
     from,
@@ -148,12 +168,12 @@ const filterToQueryElements = ({
 
   const valueElements = _.size(values)
     ? _.flow(
-        _.map(val => [val, 'on']),
+        _.map((val: any) => [val, 'on']),
         _.fromPairs
       )(values)
     : {}
 
-  elements = _.mapKeys(k => (k === key ? k : `${key}[${k}]`), {
+  elements = _.mapKeys((k: any) => k === key ? k : `${key}[${k}]`, {
     ...elements,
     ...valueElements
   })
@@ -168,53 +188,62 @@ const filterToQueryElements = ({
   return query
 }
 
-export const buildRoute = (search, currentUrl) => {
+export const buildRoute = (search: any, currentUrl: any) => {
   const filterQueries = _.compact(_.map(filterToQueryElements, search.filters))
   return `${currentUrl.split('?')[0]}?${_.join('&', filterQueries)}`
 }
 
 const facetValues = _.flow(
-  _.map(_.flow(_.split('['), _.last, val => val.replace(']', ''))),
-  values => ({ values })
+  _.map(_.flow(_.split('['), _.last, (val: any) => val.replace(']', ''))),
+  (values: any) => ({
+    values
+  })
 )
 
-const setFilterValues = type =>
-  ({
-    facet: facetValues,
-    arrayElementPropFacet: facetValues,
-    subqueryFacet: facetValues,
-    boolean: (keys, values) => ({
-      checked: _.get(_.first(keys), values) === 'on'
-    }),
-    fieldHasTruthyValue: (keys, values) => ({
-      checked: _.get(_.first(keys), values) === 'on'
-    }),
-    numeric: (keys, values) =>
-      _.pickBy(_.identity, {
-        from: _.get(_.find(_.includes('from'), keys), values) || null,
-        to: _.get(_.find(_.includes('to'), keys), values) || null
-      }),
-    dateTimeInterval: (keys, values) =>
-      _.pickBy(_.identity, {
-        interval: _.get(_.find(_.includes('interval'), keys), values) || null,
-        from: _.get(_.find(_.includes('from'), keys), values) || null,
-        to: _.get(_.find(_.includes('to'), keys), values) || null
-      })
-  }[type] || (() => ({})))
+// @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+const setFilterValues = (type: any) => ({
+  facet: facetValues,
+  arrayElementPropFacet: facetValues,
+  subqueryFacet: facetValues,
 
-export const includeSubmittedSearch = (initialSearch, values) => initialSearch ||
+  // @ts-expect-error TS(7006): Parameter 'keys' implicitly has an 'any' type.
+  boolean: (keys, values) => ({
+    checked: _.get(_.first(keys), values) === 'on'
+  }),
+
+  // @ts-expect-error TS(7006): Parameter 'keys' implicitly has an 'any' type.
+  fieldHasTruthyValue: (keys, values) => ({
+    checked: _.get(_.first(keys), values) === 'on'
+  }),
+
+  numeric: (keys: any, values: any) =>
+    _.pickBy(_.identity, {
+      from: _.get(_.find(_.includes('from'), keys), values) || null,
+      to: _.get(_.find(_.includes('to'), keys), values) || null
+    }),
+
+  dateTimeInterval: (keys: any, values: any) =>
+    _.pickBy(_.identity, {
+      interval: _.get(_.find(_.includes('interval'), keys), values) || null,
+      from: _.get(_.find(_.includes('from'), keys), values) || null,
+      to: _.get(_.find(_.includes('to'), keys), values) || null
+    })
+})[type] || (() => ({}))
+
+export const includeSubmittedSearch = (initialSearch: any, values: any) => initialSearch ||
   _.size(values)
     ? _.update(
         'filters',
-        _.map(filter => ({
+        _.map((filter: any) => ({
           ...filter,
+
           ...setFilterValues(filter.type)(
             ..._.flow(
               _.keys,
               _.filter(
-                k => k === filter.key || _.startsWith(`${filter.key}[`, k)
+                (k: any) => k === filter.key || _.startsWith(`${filter.key}[`, k)
               ),
-              filterValueKeys => [
+              (filterValueKeys: any) => [
                 filterValueKeys,
                 _.pick(filterValueKeys, values)
               ]
@@ -226,7 +255,8 @@ export const includeSubmittedSearch = (initialSearch, values) => initialSearch |
     : initialSearch
 
 
-const minorToMajorCurrencyUnitFactor = currencySymbol => ({
+// @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+const minorToMajorCurrencyUnitFactor = (currencySymbol: any) => ({
       CVE: 1,
       DJF: 1,
       GNF: 1,
@@ -252,7 +282,7 @@ export const formatCurrency = ({
   locale = 'en-US',
   currency = 'USD',
   ...rest
-}) => 
+}: any) => 
   amount ?
   new Intl.NumberFormat(locale, {
     style: 'currency',

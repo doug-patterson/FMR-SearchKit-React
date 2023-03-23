@@ -1,15 +1,27 @@
+// @ts-expect-error TS(7016): Could not find a declaration file for module 'reac... Remove this comment to see the full error message
 import React from 'react'
+// @ts-expect-error TS(6142): Module './DefaultUIComponents' was resolved to '/U... Remove this comment to see the full error message
 import * as DefaultUIComponents from './DefaultUIComponents'
 
+// @ts-expect-error TS(7016): Could not find a declaration file for module 'loda... Remove this comment to see the full error message
 import _ from 'lodash/fp'
+// @ts-expect-error TS(6142): Module './util' was resolved to '/Users/douglaspat... Remove this comment to see the full error message
 import { addDefaultDisplays } from './util'
 
+// @ts-expect-error TS(6142): Module './DefaultLayout' was resolved to '/Users/d... Remove this comment to see the full error message
 import DefaultLayout from './DefaultLayout'
+// @ts-expect-error TS(6142): Module './Results' was resolved to '/Users/douglas... Remove this comment to see the full error message
 import Results from './Results'
+// @ts-expect-error TS(6142): Module './Charts' was resolved to '/Users/douglasp... Remove this comment to see the full error message
 import Charts from './Charts'
+// @ts-expect-error TS(6142): Module './Filters' was resolved to '/Users/douglas... Remove this comment to see the full error message
 import Filters from './Filters'
 
-const Layout = ({ layoutStyle, children }) => (
+const Layout = ({
+  layoutStyle,
+  children
+}: any) => (
+  // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
   <DefaultLayout style={layoutStyle}>{children}</DefaultLayout>
 )
 
@@ -27,11 +39,13 @@ const SearchLayout = ({
   mode = 'feathers',
   onData = _.noop,
   overrideData
-}) => {
+}: any) => {
   const [search, setSearch] = React.useState(initialSearch)
   const [filterOptions, setFilterOptions] = React.useState(
     _.map(
-      ({ key }) => ({
+      ({
+        key
+      }: any) => ({
         key,
         options: initialResults[key]
       }),
@@ -53,7 +67,7 @@ const SearchLayout = ({
     return 'Schema not found'
   }
 
-  const runSearch = async patch => {
+  const runSearch = async (patch: any) => {
     const updatedSearch = {
       ...search,
       ...patch
@@ -69,7 +83,9 @@ const SearchLayout = ({
     }
 
     const newFilterOptions = _.map(
-      ({ key }) => ({
+      ({
+        key
+      }: any) => ({
         key,
         options: filterResults[key]
       }),
@@ -85,8 +101,11 @@ const SearchLayout = ({
   }
 
   return (
+    // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
     <UIComponents.Box>
+      // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
       <Layout layoutStyle={layoutStyle}>
+        // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
         <Filters
           filters={search.filters}
           filterOptions={filterOptions}
@@ -100,6 +119,7 @@ const SearchLayout = ({
         >
           {children}
         </Filters>
+        // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
         <Charts
           charts={search.charts}
           chartWidths={chartWidths}
@@ -113,6 +133,7 @@ const SearchLayout = ({
           )}
         />
         {search.pageSize !== 0 && (
+          // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
           <Results
             include={_.without(
               initialSearch.omitFromResults,
