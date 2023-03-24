@@ -1,59 +1,41 @@
 'use client'
 
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'reac... Remove this comment to see the full error message
 import React from 'react'
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'loda... Remove this comment to see the full error message
 import _ from 'lodash/fp'
 import useOutsideClick from './hooks/useOutsideClick'
 import { ResponsiveLine } from '@nivo/line'
 import { ResponsiveCalendar } from '@nivo/calendar'
 import { ResponsivePie } from '@nivo/pie'
 import { ResponsiveBar } from '@nivo/bar'
-// @ts-expect-error TS(6142): Module './util' was resolved to '/Users/douglaspat... Remove this comment to see the full error message
 import { formatCurrency } from './util'
 import { parse, format, addDays, addWeeks, addMonths } from 'date-fns'
 
 const americanDate = _.flow(
   _.split('/'),
-  (values: any) => _.size(values) < 3 ? [values[0], '', values[1]] : values,
-  // @ts-expect-error TS(7031): Binding element 'day' implicitly has an 'any' type... Remove this comment to see the full error message
+  (values: any) => (_.size(values) < 3 ? [values[0], '', values[1]] : values),
   ([day, month, year]) =>
     `${month || ''}${month ? '/' : ''}${day || ''}${day ? '/' : ''}${year}`
 )
 
-const americanDates = _.map(({
+const americanDates = _.map(({ id, data }: any) => ({
   id,
-  data
-}: any) => ({
-  id,
-  data: _.map(({
-    x,
-    y
-  }: any) => ({ x: americanDate(x), y }), data)
+  data: _.map(({ x, y }: any) => ({ x: americanDate(x), y }), data)
 }))
 
-export const Menu = ({
-  label,
-  open,
-  items
-}: any) => {
+export const Menu = ({ label, open, items }: any) => {
   const ref = React.useRef()
   const [isOpen, setIsOpen] = React.useState(open)
   useOutsideClick(ref, () => setIsOpen(false))
 
   return (
-    // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
     <div
       className={`fmr-menu${open ? ' open' : ''}`}
       style={{ position: 'relative' }}
     >
-      // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
       <div onClick={() => setIsOpen(!isOpen)} className="fmr-menu-label">
         {label}
-      // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
       </div>
       {isOpen && (
-        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
         <div
           ref={ref}
           className="fmr-sort"
@@ -62,23 +44,21 @@ export const Menu = ({
           }}
         >
           {_.map(
-            // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
-            (item: any) => <button
-              key={item.label}
-              onClick={_.over([item.onClick, () => setIsOpen(false)])}
-              className="fmr-sort-button"
-            >
-              {item.label}
-            // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
-            </button>,
+            (item: any) => (
+              <button
+                key={item.label}
+                onClick={_.over([item.onClick, () => setIsOpen(false)])}
+                className="fmr-sort-button"
+              >
+                {item.label}
+              </button>
+            ),
             items
           )}
-        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
         </div>
       )}
-    // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
     </div>
-  );
+  )
 }
 
 export const CheckBox = ({
@@ -90,11 +70,9 @@ export const CheckBox = ({
 }: any) => {
   const isRowLayout = layout === 'row'
   return (
-    // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
     <label
       className={`fmr-checkbox fmr-checkbox--${isRowLayout ? 'row' : 'column'}`}
     >
-      // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
       <input
         type="checkbox"
         checked={checked}
@@ -106,30 +84,25 @@ export const CheckBox = ({
           : {})}
       />
       {textMiddle && (
-        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
         <span
           className={`fmr-checkbox__text-middle fmr-checkbox__text-middle--${
             isRowLayout ? 'row' : 'column'
           }`}
         >
           {textMiddle}
-        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
         </span>
       )}
       {textRight && (
-        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
         <span
           className={`fmr-checkbox__text-right fmr-checkbox__text-right--${
             isRowLayout ? 'row' : 'column'
           }`}
         >
           {textRight}
-        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
         </span>
       )}
-    // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
     </label>
-  );
+  )
 }
 
 export const Input = ({
@@ -150,7 +123,6 @@ export const Input = ({
   }, [focus, inputEl])
 
   return (
-    // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
     <input
       className="fmr-input"
       ref={inputEl}
@@ -160,23 +132,20 @@ export const Input = ({
       type={type}
       {...props}
     />
-  );
+  )
 }
 
-// @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
-let getPeriodAdder = (period: any) => ({
-  day: (date: any) => addDays(date, 1),
-  week: (date: any) => addWeeks(date, 1),
-  month: (date: any) => addMonths(date, 1)
-})[period]
+let getPeriodAdder = (period: any) =>
+  ({
+    day: (date: any) => addDays(date, 1),
+    week: (date: any) => addWeeks(date, 1),
+    month: (date: any) => addMonths(date, 1)
+  }[period])
 
-let getDateFormatString = (period: any) => period === 'month' ? 'M/yyyy' : 'd/M/yyyy'
+let getDateFormatString = (period: any) =>
+  period === 'month' ? 'M/yyyy' : 'd/M/yyyy'
 
-const getInterveningPoints = ({
-  period,
-  previous,
-  point
-}: any) => {
+const getInterveningPoints = ({ period, previous, point }: any) => {
   let addPeriod = getPeriodAdder(period)
 
   let dateFormatString = getDateFormatString(period)
@@ -198,29 +167,26 @@ const getInterveningPoints = ({
       y: 0
     }),
     interveningDates
-  );
+  )
 }
 
-const addZeroPeriods = (period: any) => _.reduce((acc: any, point: any) => {
-  let previous = _.last(acc)
-  if (!previous) {
-    acc.push(point)
-  } else {
-    acc.push(...getInterveningPoints({ period, previous, point }), point)
-  }
+const addZeroPeriods = (period: any) =>
+  _.reduce((acc: any, point: any) => {
+    let previous = _.last(acc)
+    if (!previous) {
+      acc.push(point)
+    } else {
+      acc.push(...getInterveningPoints({ period, previous, point }), point)
+    }
 
-  return acc
-}, [])
+    return acc
+  }, [])
 
 const firstXValue = _.flow(_.get('data'), _.first, _.get('x'))
 const lastXValue = _.flow(_.get('data'), _.last, _.get('x'))
 
 const extendEndpoints =
-  ({
-    start,
-    end,
-    period
-  }: any) =>
+  ({ start, end, period }: any) =>
   (line: any) => {
     let extendedLine = line
     let dateFormatString = getDateFormatString(period)
@@ -229,7 +195,8 @@ const extendEndpoints =
     end = parse(end, dateFormatString, new Date())
 
     if (
-      _.flow(_.first, _.get('x'), (date: any) => parse(date, dateFormatString, new Date())
+      _.flow(_.first, _.get('x'), (date: any) =>
+        parse(date, dateFormatString, new Date())
       )(line) > start
     ) {
       extendedLine = [
@@ -238,7 +205,8 @@ const extendEndpoints =
       ]
     }
     if (
-      _.flow(_.last, _.get('x'), (date: any) => parse(date, dateFormatString, new Date())
+      _.flow(_.last, _.get('x'), (date: any) =>
+        parse(date, dateFormatString, new Date())
       )(line) < end
     ) {
       extendedLine = [
@@ -255,10 +223,7 @@ const addZeroPeriodsToAllLines = (period: any) => (lines: any) => {
   let end = _.flow(_.maxBy(lastXValue), lastXValue)(lines)
 
   return _.map(
-    ({
-      id,
-      data
-    }: any) => ({
+    ({ id, data }: any) => ({
       id,
       data: _.flow(
         extendEndpoints({ start, end, period }),
@@ -266,17 +231,13 @@ const addZeroPeriodsToAllLines = (period: any) => (lines: any) => {
       )(data)
     }),
     lines
-  );
+  )
 }
 
 const monthDayYear = _.flow(_.split('/'), _.size, _.eq(3))
 const monthYearOnly = _.flow(_.split('/'), _.size, _.eq(2))
 
-const formatAxisBottomDate = ({
-  iteratee,
-  start,
-  end
-}: any) => {
+const formatAxisBottomDate = ({ iteratee, start, end }: any) => {
   if (monthDayYear(iteratee)) {
     const day = format(new Date(iteratee), 'd')
     if (start === iteratee) return format(new Date(start), 'MMM d')
@@ -316,7 +277,6 @@ export const DateLineSingle = ({
   axisLeft
 }: any) => {
   return (
-    // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
     <ResponsiveLine
       data={_.flow(addZeroPeriodsToAllLines(period), americanDates)(data)}
       curve="linear"
@@ -340,13 +300,14 @@ export const DateLineSingle = ({
       }}
       enableArea={true}
       enablePoints={false}
-      yFormat={(value: any) => isCurrency
-        ? formatCurrency({
-            amount: value,
-            currency,
-            minimumFractionDigits: 0
-          })
-        : value
+      yFormat={(value: any) =>
+        isCurrency
+          ? formatCurrency({
+              amount: value,
+              currency,
+              minimumFractionDigits: 0
+            })
+          : value
       }
       axisTop={null}
       axisRight={null}
@@ -355,13 +316,14 @@ export const DateLineSingle = ({
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        format: (value: any) => axisBottom?.formatDate
-          ? formatAxisBottomDate({
-              iteratee: value,
-              start: getFirstDateAndConvertToAmerican(_.first(data)),
-              end: getLastDateAndConvertToAmerican(_.first(data))
-            })
-          : value,
+        format: (value: any) =>
+          axisBottom?.formatDate
+            ? formatAxisBottomDate({
+                iteratee: value,
+                start: getFirstDateAndConvertToAmerican(_.first(data)),
+                end: getLastDateAndConvertToAmerican(_.first(data))
+              })
+            : value,
         ...axisBottom
       }}
       axisLeft={{
@@ -370,8 +332,9 @@ export const DateLineSingle = ({
         tickPadding: 5,
         tickRotation: 0,
         tickValues: 6,
-        format: (value: any) => isCurrency &&
-        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }),
+        format: (value: any) =>
+          isCurrency &&
+          formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }),
         ...axisLeft
       }}
       pointSize={10}
@@ -380,28 +343,20 @@ export const DateLineSingle = ({
       pointBorderColor={{ from: 'serieColor' }}
       pointLabelYOffset={-12}
       useMesh={true}
-      tooltip={({
-        point
-      }: any) => {
+      tooltip={({ point }: any) => {
         return (
-          // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
           <div className="tooltip-dateline">
-            // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
             <p className="tooltip-dateline__x">
               {formatTooltipDate(point?.data?.x) || point?.data?.x}
-            // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
             </p>
-            // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
             <p className="tooltip-dateline__y">
               {point?.data?.yFormatted || point?.data?.y}
-            // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
             </p>
-          // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
           </div>
         )
       }}
     />
-  );
+  )
 }
 
 export const DateLineMultiple = ({
@@ -415,15 +370,19 @@ export const DateLineMultiple = ({
   axisBottom,
   axisLeft
 }: any) => (
-  // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
   <ResponsiveLine
     data={_.flow(
       addZeroPeriodsToAllLines(period),
       americanDates
-    )(_.map((d: any) => ({
-      ...d,
-      data: _.map(_.omit('group'), d.data)
-    }), data))}
+    )(
+      _.map(
+        (d: any) => ({
+          ...d,
+          data: _.map(_.omit('group'), d.data)
+        }),
+        data
+      )
+    )}
     curve="linear"
     animate={true}
     height={height}
@@ -445,13 +404,14 @@ export const DateLineMultiple = ({
     }}
     enableArea={true}
     enablePoints={false}
-    yFormat={(value: any) => isCurrency
-      ? formatCurrency({
-          amount: value,
-          currency,
-          minimumFractionDigits: 0
-        })
-      : value
+    yFormat={(value: any) =>
+      isCurrency
+        ? formatCurrency({
+            amount: value,
+            currency,
+            minimumFractionDigits: 0
+          })
+        : value
     }
     axisTop={null}
     axisRight={null}
@@ -460,13 +420,14 @@ export const DateLineMultiple = ({
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      format: (value: any) => axisBottom?.formatDate
-        ? formatAxisBottomDate({
-            iteratee: value,
-            start: getFirstDateAndConvertToAmerican(_.first(data)),
-            end: getLastDateAndConvertToAmerican(_.first(data))
-          })
-        : value,
+      format: (value: any) =>
+        axisBottom?.formatDate
+          ? formatAxisBottomDate({
+              iteratee: value,
+              start: getFirstDateAndConvertToAmerican(_.first(data)),
+              end: getLastDateAndConvertToAmerican(_.first(data))
+            })
+          : value,
       ...axisBottom
     }}
     axisLeft={{
@@ -475,8 +436,9 @@ export const DateLineMultiple = ({
       tickPadding: 5,
       tickRotation: 0,
       tickValues: 6,
-      format: (value: any) => isCurrency &&
-      formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }),
+      format: (value: any) =>
+        isCurrency &&
+        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }),
       ...axisLeft
     }}
     pointSize={10}
@@ -485,23 +447,15 @@ export const DateLineMultiple = ({
     pointBorderColor={{ from: 'serieColor' }}
     pointLabelYOffset={-12}
     useMesh={true}
-    tooltip={({
-      point
-    }: any) => {
+    tooltip={({ point }: any) => {
       return (
-        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
         <div className="tooltip-dateline">
-          // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
           <p className="tooltip-dateline__x">
             {formatTooltipDate(point?.data?.x) || point?.data?.x}
-          // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
           </p>
-          // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
           <p className="tooltip-dateline__y">
             {point?.data?.yFormatted || point?.data?.y}
-          // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
           </p>
-        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
         </div>
       )
     }}
@@ -518,7 +472,6 @@ export const DateTimeLine = ({
   axisBottom,
   axisLeft
 }: any) => (
-  // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
   <ResponsiveLine
     data={
       isCurrency
@@ -544,9 +497,10 @@ export const DateTimeLine = ({
       stacked: true,
       reverse: false
     }}
-    yFormat={(value: any) => isCurrency
-      ? formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
-      : value
+    yFormat={(value: any) =>
+      isCurrency
+        ? formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
+        : value
     }
     axisTop={null}
     axisRight={null}
@@ -563,8 +517,9 @@ export const DateTimeLine = ({
       tickPadding: 5,
       tickValues: 6,
       tickRotation: 0,
-      format: (value: any) => isCurrency &&
-      formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }),
+      format: (value: any) =>
+        isCurrency &&
+        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }),
       ...axisLeft
     }}
     pointSize={10}
@@ -622,7 +577,6 @@ const fixDates = _.map((datum: any) => ({
 
 const americanDate2 = _.flow(
   _.split('-'),
-  // @ts-expect-error TS(7031): Binding element 'year' implicitly has an 'any' typ... Remove this comment to see the full error message
   ([year, month, day]) =>
     `${month || ''}${month ? '/' : ''}${day || ''}${day ? '/' : ''}${year}`
 )
@@ -639,7 +593,6 @@ export const QuantityByPeriodCalendar = ({
   colors,
   margins = { top: 20, right: 20, bottom: 20, left: 20 }
 }: any) => (
-  // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
   <ResponsiveCalendar
     data={fixDates(data)}
     // @ts-expect-error TS(2322): Type '{ data: any; height: any; from: any; to: any... Remove this comment to see the full error message
@@ -659,16 +612,10 @@ export const QuantityByPeriodCalendar = ({
     // date range filter in a search to startOfDay and endOfDay for the clicked day
     onClick={onClick}
     dayBorderColor="#ffffff"
-    tooltip={({
-      day,
-      value
-    }: any) => (
-      // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
+    tooltip={({ day, value }: any) => (
       <div style={{ backgroundColor: 'white', padding: 4 }}>
-        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
         <b>{americanDate2(day)}</b>: {isCurrency ? '$' : ''}
         {isCurrency ? _.toNumber(value).toFixed(2) : value}
-      // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
       </div>
     )}
   />
@@ -711,7 +658,6 @@ export const TopNPie = ({
   }, data)
 
   return (
-    // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
     <ResponsivePie
       data={data}
       // @ts-expect-error TS(2322): Type '{ data: any; height: any; margin: any; inner... Remove this comment to see the full error message
@@ -768,7 +714,7 @@ export const TopNPie = ({
   )
 }
 
-const formatDayAxisBottom = (day: any) => day ? day.charAt(0) : ''
+const formatDayAxisBottom = (day: any) => (day ? day.charAt(0) : '')
 
 export const DayOfWeekSummaryBars = ({
   data,
@@ -785,7 +731,6 @@ export const DayOfWeekSummaryBars = ({
   margin
 }: any) => {
   return (
-    // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
     <ResponsiveBar
       data={data}
       label={label}
@@ -844,20 +789,16 @@ export const DayOfWeekSummaryBars = ({
         from: 'color',
         modifiers: [['darker', 1.6]]
       }}
-      // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
-      tooltip={(value: any) => <div className="tooltip-day-of-week-summary-bar">
-        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
-        <p className="tooltip-day-of-week-summary-bar__x">
-          {value?.indexValue || value?.data?.x}
-        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
-        </p>
-        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
-        <p className="tooltip-day-of-week-summary-bar__y">
-          {value?.formattedValue || value?.data?.y}
-        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
-        </p>
-      // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
-      </div>}
+      tooltip={(value: any) => (
+        <div className="tooltip-day-of-week-summary-bar">
+          <p className="tooltip-day-of-week-summary-bar__x">
+            {value?.indexValue || value?.data?.x}
+          </p>
+          <p className="tooltip-day-of-week-summary-bar__y">
+            {value?.formattedValue || value?.data?.y}
+          </p>
+        </div>
+      )}
       {...(group && includeLegends
         ? {
             legends: [
@@ -887,10 +828,11 @@ export const DayOfWeekSummaryBars = ({
           }
         : {})}
     />
-  );
+  )
 }
 
-const addZeroHours = (hours: any) => _.map((x: any) => _.find({ x }, hours) || { x, y: 0 }, _.range(0, 24))
+const addZeroHours = (hours: any) =>
+  _.map((x: any) => _.find({ x }, hours) || { x, y: 0 }, _.range(0, 24))
 
 const decorateHour = (hour: any) => {
   if (hour === 0) return '12 am'
@@ -898,18 +840,12 @@ const decorateHour = (hour: any) => {
   return hour < 12 ? `${hour}:00 AM` : `${hour - 12}:00 PM`
 }
 
-const includeAllHours = _.map(({
-  id,
-  data
-}: any) => ({
+const includeAllHours = _.map(({ id, data }: any) => ({
   id,
   data: addZeroHours(data)
 }))
 
-const formatAxisBottomHour = ({
-  hour,
-  showOnlyEvenHours
-}: any) => {
+const formatAxisBottomHour = ({ hour, showOnlyEvenHours }: any) => {
   if (showOnlyEvenHours && hour % 2 !== 0) return ''
   if (hour === 0) return '12 am'
   if (hour === 12) return '12 pm'
@@ -929,7 +865,6 @@ export const HourOfDaySummaryLine = ({
   margin
 }: any) => {
   return (
-    // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
     <ResponsiveLine
       data={includeAllHours(data)}
       curve="linear"
@@ -954,13 +889,14 @@ export const HourOfDaySummaryLine = ({
       enableArea={true}
       enablePoints={false}
       xFormat={decorateHour}
-      yFormat={(value: any) => isCurrency
-        ? formatCurrency({
-            amount: value,
-            currency,
-            minimumFractionDigits: 0
-          })
-        : value
+      yFormat={(value: any) =>
+        isCurrency
+          ? formatCurrency({
+              amount: value,
+              currency,
+              minimumFractionDigits: 0
+            })
+          : value
       }
       axisTop={null}
       axisRight={null}
@@ -969,10 +905,11 @@ export const HourOfDaySummaryLine = ({
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        format: (value: any) => formatAxisBottomHour({
-          hour: value,
-          showOnlyEvenHours: axisBottom?.showOnlyEvenHours
-        }),
+        format: (value: any) =>
+          formatAxisBottomHour({
+            hour: value,
+            showOnlyEvenHours: axisBottom?.showOnlyEvenHours
+          }),
         ...axisBottom
       }}
       axisLeft={{
@@ -980,31 +917,24 @@ export const HourOfDaySummaryLine = ({
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        format: (value: any) => isCurrency &&
-        formatCurrency({
-          amount: value,
-          currency,
-          minimumFractionDigits: 0
-        }),
+        format: (value: any) =>
+          isCurrency &&
+          formatCurrency({
+            amount: value,
+            currency,
+            minimumFractionDigits: 0
+          }),
         ...axisLeft
       }}
       useMesh={true}
-      tooltip={({
-        point
-      }: any) => (
-        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
+      tooltip={({ point }: any) => (
         <div className="tooltip-hour-of-day-summary-line">
-          // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
           <p className="tooltip-hour-of-day-summary-line__x">
             {point?.data?.xFormatted || point?.data?.x}
-          // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
           </p>
-          // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
           <p className="tooltip-hour-of-day-summary-line__y">
             {point?.data?.yFormatted || point?.data?.y}
-          // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
           </p>
-        // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
         </div>
       )}
       {...(group && includeLegends
@@ -1038,5 +968,5 @@ export const HourOfDaySummaryLine = ({
           }
         : {})}
     />
-  );
+  )
 }

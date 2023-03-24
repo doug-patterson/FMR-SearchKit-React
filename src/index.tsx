@@ -1,10 +1,6 @@
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'reac... Remove this comment to see the full error message
 import React from 'react'
-// @ts-expect-error TS(6142): Module './util' was resolved to '/Users/douglaspat... Remove this comment to see the full error message
 export { includeSubmittedSearch } from './util'
-// @ts-expect-error TS(6142): Module './SearchController' was resolved to '/User... Remove this comment to see the full error message
 import SearchController from './SearchController'
-// @ts-expect-error TS(6142): Module './HTTPSearchHOC' was resolved to '/Users/d... Remove this comment to see the full error message
 import HTTPSearchHOC from './HTTPSearchHOC'
 
 const _searchkit = ({
@@ -14,28 +10,29 @@ const _searchkit = ({
   UIComponentsStateless,
   FeathersSearchClientRenderer
 }: any) => {
-  // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
-  const HydratedSearchController = (props: any) => <SearchController
-    {...props}
-    runInitialSearch={
-      runInitialSearch && !props.clientOnly ? runInitialSearch : null
-    }
-  />
+  const HydratedSearchController = (props: any) => (
+    <SearchController
+      {...props}
+      runInitialSearch={
+        runInitialSearch && !props.clientOnly ? runInitialSearch : null
+      }
+    />
+  )
 
-  // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
-  const FeathersSearch = (props: any) => <HydratedSearchController
-    {...props}
-    SearchLayout={
-      props.FeathersSearchClientRenderer || FeathersSearchClientRenderer
-    }
-  />
+  const FeathersSearch = (props: any) => (
+    <HydratedSearchController
+      {...props}
+      SearchLayout={
+        props.FeathersSearchClientRenderer || FeathersSearchClientRenderer
+      }
+    />
+  )
 
   const FeathersSearchPage = preparePage
     ? async (props: any) => {
         const { hydratedSearch, schemas } = await preparePage(props)
 
         return (
-          // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
           <FeathersSearch
             {...props}
             initialSearch={hydratedSearch}
@@ -46,28 +43,29 @@ const _searchkit = ({
       }
     : null
 
-  // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
-  const HydratedSearchControllerWithStatelessOverrides = (props: any) => <SearchController
-    {...props}
-    defaultOverrides={overridesStateless}
-    runInitialSearch={
-      runInitialSearch && !props.clientOnly ? runInitialSearch : null
-    }
-  />
+  const HydratedSearchControllerWithStatelessOverrides = (props: any) => (
+    <SearchController
+      {...props}
+      defaultOverrides={overridesStateless}
+      runInitialSearch={
+        runInitialSearch && !props.clientOnly ? runInitialSearch : null
+      }
+    />
+  )
 
-  // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
-  const HTTPSearch = (props: any) => <HydratedSearchControllerWithStatelessOverrides
-    {...props}
-    UIComponents={UIComponentsStateless}
-    SearchLayout={HTTPSearchHOC}
-  />
+  const HTTPSearch = (props: any) => (
+    <HydratedSearchControllerWithStatelessOverrides
+      {...props}
+      UIComponents={UIComponentsStateless}
+      SearchLayout={HTTPSearchHOC}
+    />
+  )
 
   const HTTPSearchPage = preparePage
     ? async (props: any) => {
         const { hydratedSearch, schemas } = await preparePage(props)
 
         return (
-          // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
           <HTTPSearch
             {...props}
             initialSearch={hydratedSearch}

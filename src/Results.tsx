@@ -1,10 +1,6 @@
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'reac... Remove this comment to see the full error message
 import React from 'react'
-// @ts-expect-error TS(6142): Module './Paginator' was resolved to '/Users/dougl... Remove this comment to see the full error message
 import DefaultPaginator from './Paginator'
-// @ts-expect-error TS(6142): Module './ResultsTableHOC' was resolved to '/Users... Remove this comment to see the full error message
 import ResultsTable from './ResultsTableHOC'
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'loda... Remove this comment to see the full error message
 import _ from 'lodash/fp'
 
 // we need to make the statless version of this have a normal select
@@ -23,17 +19,17 @@ const Results = ({
   UIComponents,
   overrideData
 }: any) => (
-  // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
   <div className="fmr-results" style={{ gridArea: 'results' }}>
-    // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
     <UIComponents.Box>
-      // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
       <ResultsComponent
         {...{
           include,
-          setInclude: (newInclude: any) => runSearch({ include: newInclude, page: 1 }),
-          setSortField: (newSortField: any) => runSearch({ sortField: newSortField, page: 1 }),
-          setSortDir: (newSortDir: any) => runSearch({ sortDir: newSortDir, page: 1 }),
+          setInclude: (newInclude: any) =>
+            runSearch({ include: newInclude, page: 1 }),
+          setSortField: (newSortField: any) =>
+            runSearch({ sortField: newSortField, page: 1 }),
+          setSortDir: (newSortDir: any) =>
+            runSearch({ sortDir: newSortDir, page: 1 }),
           schema,
           rows,
           UIComponents,
@@ -41,14 +37,16 @@ const Results = ({
         }}
       />
       {pageSize > 0 && (
-        // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
-        <UIComponents.Grid className="fmr-results-controls" columns="auto 1fr auto">
-          // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
+        <UIComponents.Grid
+          className="fmr-results-controls"
+          columns="auto 1fr auto"
+        >
           <UIComponents.Select
             options={[10, 20, 50, 100]}
             {...(runSearch
               ? {
-                  onChange: (option: any) => runSearch({ pageSize: _.toNumber(option) }),
+                  onChange: (option: any) =>
+                    runSearch({ pageSize: _.toNumber(option) }),
                   value: pageSize
                 }
               : {
@@ -57,9 +55,7 @@ const Results = ({
                 })}
             style={{ backgroundColor: 'white' }}
           />
-          // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
           <div />
-          // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
           <Paginator
             {...{
               page,
@@ -74,7 +70,6 @@ const Results = ({
         </UIComponents.Grid>
       )}
     </UIComponents.Box>
-  // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
   </div>
 )
 

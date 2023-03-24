@@ -1,22 +1,14 @@
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'reac... Remove this comment to see the full error message
 import React from 'react'
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'loda... Remove this comment to see the full error message
 import _ from 'lodash/fp'
-// @ts-expect-error TS(6142): Module './Results' was resolved to '/Users/douglas... Remove this comment to see the full error message
 import Results from './Results'
-// @ts-expect-error TS(6142): Module './util' was resolved to '/Users/douglaspat... Remove this comment to see the full error message
-import { formatCurrency, mapValuesIndexed } from './util'
+import { formatCurrency } from './util'
 
 const makeObject = (keys: any) => (row: any) => _.zipObject(keys, row)
 
 const makeSummaryColumn = _.map((row: any) => ({
   _id: row._id,
 
-  total: _.flow(
-    _.omit('_id'),
-    _.values,
-    _.sumBy(_.identity)
-  )(row),
+  total: _.flow(_.omit('_id'), _.values, _.sumBy(_.identity))(row),
 
   ..._.omit('_id', row)
 }))
@@ -30,10 +22,7 @@ const SummaryTable = ({
   ...props
 }: any) => {
   const names = _.flow(
-    _.map(({
-      _id,
-      name
-    }: any) => [_id, name]),
+    _.map(({ _id, name }: any) => [_id, name]),
     _.fromPairs
   )(data)
   data = _.map(_.omit(['name']), data)
@@ -44,11 +33,7 @@ const SummaryTable = ({
 
       ..._.flow(
         _.filter('sum'),
-        _.map(({
-          key,
-          sum
-        }: any) => [key, sum]),
-        // @ts-expect-error TS(7031): Binding element 'key' implicitly has an 'any' type... Remove this comment to see the full error message
+        _.map(({ key, sum }: any) => [key, sum]),
         _.map(([key, fields]) => [
           key,
           _.sumBy(
@@ -83,7 +68,6 @@ const SummaryTable = ({
   include = ['_id', 'total', ...keys]
 
   return (
-    // @ts-expect-error TS(17004): Cannot use JSX unless the '--jsx' flag is provided... Remove this comment to see the full error message
     <Results
       {...props}
       include={include}
@@ -97,28 +81,25 @@ const SummaryTable = ({
               static: true,
 
               label:
-                // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
                 k === 'null' || k === '_id' ? <span>&nbsp;</span> : names[k],
 
-              display: (k: any) => _.includes(k, originalInclude) ? (
-                // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
-                <span style={{ display: 'inline-block', minWidth: 120 }}>
-                  {_.startCase(k)}
-                // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
-                </span>
-              ) : k ? (
-                formatCurrency({ amount: k, currency })
-              ) : (
-                // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
-                <span>&nbsp;</span>
-              )
+              display: (k: any) =>
+                _.includes(k, originalInclude) ? (
+                  <span style={{ display: 'inline-block', minWidth: 120 }}>
+                    {_.startCase(k)}
+                  </span>
+                ) : k ? (
+                  formatCurrency({ amount: k, currency })
+                ) : (
+                  <span>&nbsp;</span>
+                )
             }),
             [..._.keys(_.first(data)), 'total']
           )
         )
       }}
     />
-  );
+  )
 }
 
 SummaryTable.displayName = 'SummaryTable'

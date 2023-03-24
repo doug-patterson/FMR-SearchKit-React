@@ -1,10 +1,6 @@
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'reac... Remove this comment to see the full error message
 import React from 'react'
 
-const ChevronDown = ({
-  className
-}: any) => (
-  // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
+const ChevronDown = ({ className }: any) => (
   <svg
     className={className}
     strokeWidth="2"
@@ -12,7 +8,6 @@ const ChevronDown = ({
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
     <path
       d="M6 9l6 6 6-6"
       stroke="currentColor"
@@ -20,7 +15,6 @@ const ChevronDown = ({
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-  // @ts-expect-error TS(7026): JSX element implicitly has type 'any' because no i... Remove this comment to see the full error message
   </svg>
 )
 
