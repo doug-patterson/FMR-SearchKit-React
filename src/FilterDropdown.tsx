@@ -1,17 +1,23 @@
 'use client'
 
-import React from 'react'
+import React, { ReactNode } from 'react'
 import _ from 'lodash/fp'
 import ChevronDown from './Icons/ChevronDown'
 import useOutsideClick from './hooks/useOutsideClick'
+
+type Props = {
+  children: ReactNode
+  filterKey: string
+  onlyOneFilterOpenAtAtime: boolean
+}
 
 export const FilterDropdown = ({
   filterKey,
   children,
   onlyOneFilterOpenAtAtime
-}: any) => {
+}: Props) => {
   const [isOpen, setIsOpen] = React.useState(false)
-  const ref = React.useRef()
+  const ref = React.useRef(null)
 
   useOutsideClick(ref, () =>
     onlyOneFilterOpenAtAtime ? setIsOpen(false) : null
