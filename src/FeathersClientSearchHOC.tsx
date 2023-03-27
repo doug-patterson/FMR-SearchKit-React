@@ -25,7 +25,11 @@ const FeathersSearchRenderer = (props: any) => {
 
   return (
     <ClientSearch
-      key={_.uniqueId() /* currently mode="route" doesn't work without this*/}
+      key={
+        _.uniqueId(
+          'client-search-'
+        ) /* currently mode="route" doesn't work without this*/
+      }
       {...props}
       defaultOverrides={props.overrides}
       UIComponents={_.merge(DefaultUIClientComponents, props.UIComponents)}
