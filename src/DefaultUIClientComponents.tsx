@@ -9,6 +9,7 @@ import { ResponsivePie } from '@nivo/pie'
 import { ResponsiveBar } from '@nivo/bar'
 import { formatCurrency } from './util'
 import { parse, format, addDays, addWeeks, addMonths } from 'date-fns'
+import { CheckBoxProps, InputProps } from './types'
 
 const americanDate = _.flow(
   _.split('/'),
@@ -67,7 +68,7 @@ export const CheckBox = ({
   textMiddle,
   textRight,
   layout
-}: any) => {
+}: CheckBoxProps) => {
   const isRowLayout = layout === 'row'
   return (
     <label
@@ -111,14 +112,13 @@ export const Input = ({
   placeholder,
   onChange,
   focus,
-  label,
   ...props
-}: any) => {
-  const inputEl = React.createRef()
+}: InputProps) => {
+  const inputEl = React.createRef<HTMLInputElement>()
 
   React.useEffect(() => {
     if (focus) {
-      inputEl.current.focus()
+      inputEl.current?.focus()
     }
   }, [focus, inputEl])
 
@@ -126,7 +126,9 @@ export const Input = ({
     <input
       className="fmr-input"
       ref={inputEl}
-      onChange={(e: any) => e && e.target && onChange(e.target.value)}
+      {...(onChange
+        ? { onChange: (e: any) => e.target && onChange(e.target.checked) }
+        : {})}
       placeholder={placeholder}
       value={value}
       type={type}

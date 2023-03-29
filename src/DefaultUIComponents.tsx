@@ -1,5 +1,6 @@
 import React from 'react'
 import _ from 'lodash/fp'
+import { CheckBoxProps, InputProps } from './types'
 //import { Line } from '@nivo/line'
 //import { Calendar } from '@nivo/calendar'
 //import { Pie } from '@nivo/pie'
@@ -70,7 +71,13 @@ export const Select = ({ value, options, onChange, name, ...props }: any) => (
   </select>
 )
 
-export const Input = ({ type, value, placeholder, name, ...props }: any) => (
+export const Input = ({
+  type,
+  value,
+  placeholder,
+  name,
+  ...props
+}: InputProps) => (
   <input
     className="fmr-input"
     name={name}
@@ -81,7 +88,7 @@ export const Input = ({ type, value, placeholder, name, ...props }: any) => (
   />
 )
 
-export const CheckBox = ({ checked, label, name = '' }: any) => {
+export const CheckBox = ({ checked, label, name = '' }: CheckBoxProps) => {
   const id = _.uniqueId('fmr-checkbox-')
 
   return (
