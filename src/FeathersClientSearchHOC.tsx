@@ -38,6 +38,6 @@ const FeathersSearchRenderer = (props: ClientRendererInit) => {
   )
 }
 
-export const FeathersClientSearchHOC = (props: ClientRendererProps) => (
+export const FeathersClientSearchHOC = (props: ClientRendererInit) => (
   <FeathersSearchRenderer {...props} />
 )
