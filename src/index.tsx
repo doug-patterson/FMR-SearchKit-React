@@ -2,6 +2,22 @@ import React from 'react'
 export { includeSubmittedSearch } from './util'
 import SearchController from './SearchController'
 import HTTPSearchHOC from './HTTPSearchHOC'
+import { Schema, Search, SearchResponse } from './types'
+
+type SearchkitSetupFunction = () => ({
+  hydratedSearch: Search
+  schemas: { [key: string]: Schema }
+})
+
+type InitialSearchRunner = (search: Search) => SearchResponse 
+
+interface SearchkitSetup {
+  preparePage: SearchkitSetupFunction
+  runInitialSearch: InitialSearchRunner
+  overridesStateless: any
+  UIComponentsStateless: any
+  FeathersSearchClientRenderer: any
+}
 
 const _searchkit = ({
   preparePage,
@@ -9,12 +25,12 @@ const _searchkit = ({
   overridesStateless,
   UIComponentsStateless,
   FeathersSearchClientRenderer
-}: any) => {
+}: SearchkitSetup) => {
   const HydratedSearchController = (props: any) => (
     <SearchController
       {...props}
       runInitialSearch={
-        runInitialSearch && !props.clientOnly ? runInitialSearch : null
+        !props.clientOnly ? runInitialSearch : null
       }
     />
   )
