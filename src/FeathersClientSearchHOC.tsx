@@ -37,7 +37,6 @@ const FeathersSearchRenderer = (props: any) => {
   )
 }
 
-// so we need to see what props this takes
 export const FeathersClientSearchHOC = (props: any) => (
   <FeathersSearchRenderer {...props} />
 )
