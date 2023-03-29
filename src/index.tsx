@@ -4,15 +4,15 @@ import SearchController from './SearchController'
 import HTTPSearchHOC from './HTTPSearchHOC'
 import { Schema, Search, SearchResponse } from './types'
 
-type SearchKitSetupFunction = () => ({
+type SearchkitSetupFunction = () => ({
   hydratedSearch: Search
   schemas: { [key: string]: Schema }
 })
 
-type InitialSearchRunner = (search: Search) => SearchResponse
+type InitialSearchRunner = (search: Search) => SearchResponse 
 
 interface SearchkitSetup {
-  preparePage: SearchKitSetupFunction
+  preparePage: SearchkitSetupFunction
   runInitialSearch: InitialSearchRunner
   overridesStateless: any
   UIComponentsStateless: any
@@ -24,7 +24,7 @@ const _searchkit = ({
   preparePage,
   runInitialSearch,
   overridesStateless,
-  UIComponentsStateless, // `any` for now
+  UIComponentsStateless,
   FeathersSearchClientRenderer
 }: SearchkitSetup) => {
   const HydratedSearchController = (props: any) => (
@@ -32,7 +32,7 @@ const _searchkit = ({
     <SearchController
       {...props}
       runInitialSearch={
-        runInitialSearch && !props.clientOnly ? runInitialSearch : null
+        !props.clientOnly ? runInitialSearch : null
       }
     />
   )

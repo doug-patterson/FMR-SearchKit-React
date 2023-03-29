@@ -17,7 +17,6 @@ export interface Schema {
 
 type FacetValue = string | number
 
-
 // temporary: this should be a disjunction of stricter types for the individual
 // filters
 interface Filter {
@@ -96,20 +95,28 @@ export interface Search {
   }
 }
 
-interface Results {
+type ChartResults = any
 
+interface FacetOption {
+  _id: string
+  count: number
+  checked: boolean
+  value: string | number | { [key: string]: string | number }
 }
 
-interface ChartResults {
+type FacetOptions = FacetOption[]
 
-}
+// right now Facet is the only Filter type that has results
+type FilterResults = FacetOptions
 
-interface FilterResults {
+type ResultsCount = { _id: null, count: number }
 
-}
+type Results = any[]
 
 export interface SearchResponse {
   results: Results
-  charts: ChartResults[]
-  [key: string]: FilterResults
+  resultsCount: ResultsCount
+  charts: ChartResults
+  // we should eventually put filter data on a `filters` key so we don't have to do this
+  [key: string]: FilterResults | Results | ResultsCount | ChartResults
 }
