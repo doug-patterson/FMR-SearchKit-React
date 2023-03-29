@@ -83,7 +83,7 @@ interface ResultsLookup {
 }
 
 export interface Search {
-  id?: string,
+  id: string,
   collection: string
   filters?: Filter[]
   pageSize?: number
@@ -113,10 +113,48 @@ type ResultsCount = { _id: null, count: number }
 
 type Results = any[]
 
+interface SchemaPropOverride {
+  label: string,
+  display: string,
+  properties: {
+    [key: string]: SchemaPropOverride
+  }
+}
+
+interface SchemaOverride {
+  properties: {
+    [key: string]: SchemaPropOverride
+  }
+}
+
+export interface SchemaOverrides {
+  [key: string]: SchemaOverride
+}
+
 export interface SearchResponse {
   results: Results
   resultsCount: ResultsCount
   charts: ChartResults
   // we should eventually put filter data on a `filters` key so we don't have to do this
   [key: string]: FilterResults | Results | ResultsCount | ChartResults
+}
+
+type SearchConstraint = (search: Search) => Search
+type SearchConstraints = {
+  [id: string]: SearchConstraint[]
+}
+
+export interface ClientRendererInit {
+  initialSearch: Search
+  schemas: { [key: string]: Schema }
+  overrides?: SchemaOverrides
+  defaultOverrides?: SchemaOverrides
+  UIComponents?: any
+  clientOnly?: boolean
+  mode?: string
+  getApp: any
+  getSchemas: any
+  useRouter: any
+  collapseableFilters?: boolean
+  constraints: SearchConstraints
 }

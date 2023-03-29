@@ -6,6 +6,7 @@ import { FilterDropdown as FilterWrapper } from './FilterDropdown'
 import _ from 'lodash/fp'
 import { setUpSchemas } from './util'
 import { buildRoute } from './util'
+import { ClientRendererInit } from './types'
 
 const tld = (hostname: any) =>
   hostname === 'localhost'
@@ -36,7 +37,7 @@ const initApp = async (
   )};max-age=2592000;`
 }
 
-const ClientSearchWithOverrides = (props: any) => {
+const ClientSearchWithOverrides = (props: ClientRendererInit) => {
   const [app, setApp] = React.useState(null)
   const [schemas, setSchemas] = React.useState(props.schemas)
   const [initialResults, setInitialResults] = React.useState(null)
@@ -80,7 +81,7 @@ const ClientSearchWithOverrides = (props: any) => {
         {...(props.collapseableFilters ? { FilterWrapper } : {})}
         execute={async (search: any) => {
           const constrainedSearch = _.size(
-            _.get(props.initialSearch?.id, props.constraints)
+            _.get(props.initialSearch.id, props.constraints)
           )
             ? _.flow(..._.get(props.initialSearch.id, props.constraints))(
                 search
