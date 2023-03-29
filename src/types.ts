@@ -15,10 +15,11 @@ export interface Schema {
 
 }
 
-// temporary: this should be a disjunction of stricter types for the individual
-// filters
 type FacetValue = string | number
 
+
+// temporary: this should be a disjunction of stricter types for the individual
+// filters
 interface Filter {
   key: string
   type: string
