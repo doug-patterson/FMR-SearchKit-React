@@ -156,5 +156,6 @@ export interface ClientRendererInit {
   getSchemas: any
   useRouter: any
   collapseableFilters?: boolean
-  constraints: SearchConstraints
+  constraints?: SearchConstraints,
+  isPage?: boolean
 }
