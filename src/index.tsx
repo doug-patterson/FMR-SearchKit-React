@@ -19,7 +19,6 @@ interface SearchkitSetup {
   FeathersSearchClientRenderer: any
 }
 
-// we start by tping the props of this function argument
 const _searchkit = ({
   preparePage,
   runInitialSearch,
@@ -28,7 +27,6 @@ const _searchkit = ({
   FeathersSearchClientRenderer
 }: SearchkitSetup) => {
   const HydratedSearchController = (props: any) => (
-    // so do we need to convert this to use useEffect to do its async stuff?
     <SearchController
       {...props}
       runInitialSearch={
