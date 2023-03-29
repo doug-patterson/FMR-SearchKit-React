@@ -64,6 +64,7 @@ interface SalesTableRow {
   
 }
 
+// should be a disjunction of interfaces for the particular charts
 interface Chart {
   key: string
   type: string
