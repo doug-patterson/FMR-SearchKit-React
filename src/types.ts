@@ -15,6 +15,8 @@ export interface Schema {
 
 }
 
+// temporary: this should be a disjunction of stricter types for the individual
+// filters
 type FacetValue = string | number
 
 interface Filter {
