@@ -50,7 +50,7 @@ const SearchLayout = ({
   schemas = addDefaultDisplays(schemas)
   const schema = schemas[initialSearch.collection]
   if (!schema) {
-    return 'Schema not found'
+    return <span>Schema not found</span>
   }
 
   const runSearch = async (patch: any) => {

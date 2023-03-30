@@ -167,6 +167,10 @@ export interface ClientRendererInit {
   isPage?: boolean
 }
 
+
+// this will need to wait for Feathers 5
+export type FeathersClientObject = any
+
 export interface GridProps {
   children: ReactNode
   rows: CSSProperties['gridTemplateRows']
