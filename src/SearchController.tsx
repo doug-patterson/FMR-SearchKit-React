@@ -1,7 +1,8 @@
 import React from 'react'
 import _ from 'lodash/fp'
+import { ClientRendererInit } from './types'
 
-const SearchController = async (props: any) => {
+const SearchController = async (props: ClientRendererInit) => {
   let initialResults
 
   if (props.runInitialSearch) {
@@ -9,7 +10,7 @@ const SearchController = async (props: any) => {
   }
 
   return (
-    <props.SearchLayout
+    (!props.runInitialSearch || initialResults) && <props.SearchLayout
       initialResults={initialResults}
       {..._.omit(['runInitialSearch'], props)}
     />

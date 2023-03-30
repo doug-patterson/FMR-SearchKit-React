@@ -40,11 +40,13 @@ const initApp = async (
   )};max-age=2592000;`
 }
 
+type InitialResultsObjectType = SearchResponse | null
+
 const ClientSearchWithOverrides = (props: ClientRendererInit) => {
   const initialFeathersAppObject: FeathersClientObject | null = null
   const [app, setApp] = React.useState(initialFeathersAppObject)
   const [schemas, setSchemas] = React.useState(props.schemas)
-  const initialResultsObject: SearchResponse | null = null
+  const initialResultsObject: InitialResultsObjectType = null
   const [initialResults, setInitialResults] = React.useState(initialResultsObject)
 
   const router = props.useRouter()
@@ -79,7 +81,7 @@ const ClientSearchWithOverrides = (props: ClientRendererInit) => {
     schemas && (
       <SearchLayout
         {...props}
-        {...(initialResults ? { initialResults } : {})}
+        initialResults={initialResults}
         schemas={setUpSchemas(
           _.merge(props.defaultOverrides, props.overrides),
           schemas
@@ -101,6 +103,8 @@ const ClientSearchWithOverrides = (props: ClientRendererInit) => {
                 typeof window === 'object' && window.location.href
               )
             )
+            // feed the type-checker
+            return [search, { results: [], resultsCount: 0 }]
           } else {
             const result = await app.service('search').create(constrainedSearch)
             if (typeof window === 'object') {
@@ -125,6 +129,6 @@ const ClientSearchWithOverrides = (props: ClientRendererInit) => {
   )
 }
 
-const ClientSearchHOC = (props: any) => <ClientSearchWithOverrides {...props} />
+const ClientSearchHOC = (props: ClientRendererInit) => <ClientSearchWithOverrides {...props} />
 
 export default ClientSearchHOC

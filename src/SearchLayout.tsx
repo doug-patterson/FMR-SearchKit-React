@@ -9,13 +9,15 @@ import Results from './Results'
 import Charts from './Charts'
 import Filters from './Filters'
 
+import { SearchLayoutProps } from './types'
+
 const Layout = ({ layoutStyle, children }: any) => (
   <DefaultLayout style={layoutStyle}>{children}</DefaultLayout>
 )
 
 const SearchLayout = ({
   initialSearch,
-  initialResults = {},
+  initialResults,
   children,
   UIComponents: ThemeComponents,
   schemas,
@@ -27,13 +29,13 @@ const SearchLayout = ({
   mode = 'feathers',
   onData = _.noop,
   overrideData
-}: any) => {
+}: SearchLayoutProps) => {
   const [search, setSearch] = React.useState(initialSearch)
   const [filterOptions, setFilterOptions] = React.useState(
     _.map(
       ({ key }: any) => ({
         key,
-        options: initialResults[key]
+        options: _.get('key', initialResults)
       }),
       initialSearch.filters
     ) || _.map(_.pick('key'), initialSearch.filters)
@@ -42,7 +44,7 @@ const SearchLayout = ({
   const [resultsCount, setResultsCount] = React.useState(
     initialResults?.resultsCount?.count || 0
   )
-  const [chartData, setChartData] = React.useState(initialResults.charts)
+  const [chartData, setChartData] = React.useState(_.get('charts', initialResults))
   const chartWidths = React.useRef({})
 
   const UIComponents = _.defaults(DefaultUIComponents, ThemeComponents)
@@ -59,14 +61,16 @@ const SearchLayout = ({
       ...patch
     }
 
+
+    if (mode === 'route') {
+      execute(updatedSearch)
+      return
+    }
+
     const [
       { results, resultsCount: newResultsCount, charts, ...filterResults },
       constrainedSearch
-    ] = (await execute(updatedSearch)) || {}
-
-    if (mode === 'route') {
-      return
-    }
+    ] = await execute(updatedSearch)
 
     const newFilterOptions = _.map(
       ({ key }: any) => ({
@@ -108,19 +112,19 @@ const SearchLayout = ({
           schemas={schemas}
           schema={_.update(
             'properties',
-            _.omit(initialSearch.omitFromResults),
+            _.omit(initialSearch.omitFromResults || ['']),
             schema
           )}
         />
         {search.pageSize !== 0 && (
           <Results
             include={_.without(
-              initialSearch.omitFromResults,
+              initialSearch.omitFromResults || [''],
               search.include || _.keys(schema.properties)
             )}
             schema={_.update(
               'properties',
-              _.omit(initialSearch.omitFromResults),
+              _.omit(initialSearch.omitFromResults || ['']),
               schema
             )}
             rows={rows}

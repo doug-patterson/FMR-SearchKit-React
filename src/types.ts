@@ -18,8 +18,12 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   focus: boolean
 }
 
-export interface Schema {
+type SchemaProperty = any // there are some commonalities - fill this in
 
+export interface Schema {
+  bsonType: string,
+  additionalProperties?: boolean
+  properties: { [key: string]: SchemaProperty }
 }
 
 type FacetValue = string | number
@@ -95,6 +99,7 @@ export interface Search {
   filters?: Filter[]
   pageSize?: number
   page?: number
+  include?: string[]
   omitFromResults?: string[]
   charts: Chart[]
   lookup: {
@@ -151,6 +156,25 @@ type SearchConstraints = {
   [id: string]: SearchConstraint[]
 }
 
+export interface SearchLayoutProps {
+  initialSearch: Search,
+  initialResults: SearchResponse | null,
+  children?: JSX.Element[],
+  UIComponents?: any,
+  schemas: { [id: string]: Schema },
+  // possibly undefined because if mode === 'route' this calls the router and returns nothing
+  execute: ((search: Search) => Promise<[SearchResponse, Search]>),
+  layoutStyle?: any,
+  filterLayout?: string,
+  onlyOneFilterOpenAtAtime?: boolean,
+  FilterWrapper?: any,
+  mode?: string,
+  onData?: any,
+  // this can be anything - to be passed in from the consuming project for use
+  // in override display functions
+  overrideData?: any
+}
+
 export interface ClientRendererInit {
   initialSearch: Search
   schemas: { [key: string]: Schema }
@@ -165,6 +189,8 @@ export interface ClientRendererInit {
   collapseableFilters?: boolean
   constraints?: SearchConstraints,
   isPage?: boolean
+  runInitialSearch?: (search: Search) => SearchResponse,
+  SearchLayout: (props: SearchLayoutProps) => JSX.Element
 }
 
 
