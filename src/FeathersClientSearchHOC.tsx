@@ -4,9 +4,9 @@ import React from 'react'
 import ClientSearch from './ClientSearchHOC'
 import * as DefaultUIClientComponents from './DefaultUIClientComponents'
 import _ from 'lodash/fp'
-import { ClientRendererInit } from './types'
+import { SearchLayoutInit } from './types'
 
-const FeathersSearchRenderer = (props: ClientRendererInit) => {
+const FeathersSearchRenderer = (props: SearchLayoutInit) => {
   const offset = new Date().getTimezoneOffset()
 
   props.initialSearch.filters = _.map(
@@ -38,6 +38,6 @@ const FeathersSearchRenderer = (props: ClientRendererInit) => {
   )
 }
 
-export const FeathersClientSearchHOC = (props: ClientRendererInit) => (
+export const FeathersClientSearchHOC = (props: SearchLayoutInit) => (
   <FeathersSearchRenderer {...props} />
 )

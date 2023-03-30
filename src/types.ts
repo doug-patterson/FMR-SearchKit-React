@@ -175,7 +175,7 @@ export interface SearchLayoutProps {
   overrideData?: any
 }
 
-export interface ClientRendererInit {
+export interface SearchLayoutInit {
   initialSearch: Search
   schemas: { [key: string]: Schema }
   overrides?: SchemaOverrides
@@ -192,6 +192,7 @@ export interface ClientRendererInit {
   runInitialSearch?: (search: Search) => Promise<SearchResponse>,
   SearchLayout: (props: SearchLayoutProps) => JSX.Element,
   execute: (search: Search) => Promise<[SearchResponse, Search]>,
+  FeathersSearchClientRenderer: any
 }
 
 

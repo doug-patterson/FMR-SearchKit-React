@@ -6,7 +6,7 @@ import { FilterDropdown as FilterWrapper } from './FilterDropdown'
 import _ from 'lodash/fp'
 import { setUpSchemas } from './util'
 import { buildRoute } from './util'
-import { ClientRendererInit, FeathersClientObject, SearchResponse, Search, Schema } from './types'
+import { SearchLayoutInit, FeathersClientObject, SearchResponse, Search, Schema } from './types'
 
 const tld = (hostname: string) =>
   hostname === 'localhost'
@@ -42,7 +42,7 @@ const initApp = async (
 
 type InitialResultsObjectType = SearchResponse | null
 
-const ClientSearchWithOverrides = (props: ClientRendererInit) => {
+const ClientSearchWithOverrides = (props: SearchLayoutInit) => {
   const initialFeathersAppObject: FeathersClientObject | null = null
   const [app, setApp] = React.useState(initialFeathersAppObject)
   const [schemas, setSchemas] = React.useState(props.schemas)
@@ -129,6 +129,6 @@ const ClientSearchWithOverrides = (props: ClientRendererInit) => {
   )
 }
 
-const ClientSearchHOC = (props: ClientRendererInit) => <ClientSearchWithOverrides {...props} />
+const ClientSearchHOC = (props: SearchLayoutInit) => <ClientSearchWithOverrides {...props} />
 
 export default ClientSearchHOC
