@@ -101,7 +101,6 @@ interface ArraySizeSearchNode extends SearchNode {
   to: number | null
 }
 
-// replace Filter with this 
 export type Filter = 
   BooleanFilterSearchNode
   | FieldHasTruthyValueSearchNode
