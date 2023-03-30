@@ -1,4 +1,6 @@
 import { BarDatum, BarSvgProps } from '@nivo/bar'
+import { CalendarSvgProps } from '@nivo/calendar'
+import { DefaultRawDatum, PieSvgProps } from '@nivo/pie'
 import {
   ButtonHTMLAttributes,
   CSSProperties,
@@ -209,4 +211,21 @@ export interface DayOfWeekSummaryBarsProps extends BarSvgProps<BarDatum> {
   axisBottom?: {
     tickFirstCharOnly: boolean
   } & BarSvgProps<BarDatum>['axisBottom']
+}
+
+export interface TopNPieProps extends PieSvgProps<DefaultRawDatum> {
+  chartKey: string
+  field: string
+  schema: string
+  legend: string
+}
+
+export interface QuantityByPeriodCalendarProps extends CalendarSvgProps {
+  isCurrency?: boolean
+  margins?: {
+    top: number
+    right: number
+    bottom: number
+    left: number
+  }
 }

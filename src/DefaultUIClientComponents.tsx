@@ -13,7 +13,9 @@ import {
   CheckBoxProps,
   DayOfWeekSummaryBarsProps,
   InputProps,
-  MenuProps
+  MenuProps,
+  QuantityByPeriodCalendarProps,
+  TopNPieProps
 } from './types'
 import { map } from 'remeda'
 
@@ -599,7 +601,7 @@ export const QuantityByPeriodCalendar = ({
   height,
   colors,
   margins = { top: 20, right: 20, bottom: 20, left: 20 }
-}: any) => (
+}: QuantityByPeriodCalendarProps) => (
   <ResponsiveCalendar
     data={fixDates(data)}
     // @ts-expect-error TS(2322): Type '{ data: any; height: any; from: any; to: any... Remove this comment to see the full error message
@@ -646,9 +648,10 @@ export const TopNPie = ({
   height,
   chartKey,
   margin
-}: any) => {
+}: TopNPieProps) => {
   const getId = uniqueIdMaker({})
 
+  // TODO
   data = _.map((datum: any) => {
     const display = _.get(
       ['properties', chartKey, 'properties', field, 'display'],
