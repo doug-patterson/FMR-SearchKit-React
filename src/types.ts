@@ -187,7 +187,7 @@ export interface SearchLayoutProps {
   UIComponents?: any,
   schemas: { [id: string]: Schema },
   // possibly undefined because if mode === 'route' this calls the router and returns nothing
-  execute: ((search: Search) => Promise<[SearchResponse, Search]>),
+  execute: (search: Search) => Promise<[SearchResponse, Search]>,
   layoutStyle?: any,
   filterLayout?: string,
   onlyOneFilterOpenAtAtime?: boolean,
