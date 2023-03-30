@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { MouseEventHandler } from 'react'
 import _ from 'lodash/fp'
 import useOutsideClick from './hooks/useOutsideClick'
 import { ResponsiveLine } from '@nivo/line'
@@ -9,7 +9,13 @@ import { ResponsivePie } from '@nivo/pie'
 import { ResponsiveBar } from '@nivo/bar'
 import { formatCurrency } from './util'
 import { parse, format, addDays, addWeeks, addMonths } from 'date-fns'
-import { CheckBoxProps, InputProps } from './types'
+import {
+  CheckBoxProps,
+  DayOfWeekSummaryBarsProps,
+  InputProps,
+  MenuProps
+} from './types'
+import { map } from 'remeda'
 
 const americanDate = _.flow(
   _.split('/'),
@@ -23,8 +29,8 @@ const americanDates = _.map(({ id, data }: any) => ({
   data: _.map(({ x, y }: any) => ({ x: americanDate(x), y }), data)
 }))
 
-export const Menu = ({ label, open, items }: any) => {
-  const ref = React.useRef()
+export const Menu = ({ label, open, items }: MenuProps) => {
+  const ref = React.useRef(null)
   const [isOpen, setIsOpen] = React.useState(open)
   useOutsideClick(ref, () => setIsOpen(false))
 
@@ -44,18 +50,15 @@ export const Menu = ({ label, open, items }: any) => {
             position: 'absolute'
           }}
         >
-          {_.map(
-            (item: any) => (
-              <button
-                key={item.label}
-                onClick={_.over([item.onClick, () => setIsOpen(false)])}
-                className="fmr-sort-button"
-              >
-                {item.label}
+          {map(items, item => {
+            const label = String(item.label)
+            const onClick = () => item.onClick(() => setIsOpen(false))
+            return (
+              <button key={label} onClick={onClick} className="fmr-sort-button">
+                {label}
               </button>
-            ),
-            items
-          )}
+            )
+          })}
         </div>
       )}
     </div>
@@ -137,18 +140,18 @@ export const Input = ({
   )
 }
 
-let getPeriodAdder = (period: any) =>
+const getPeriodAdder = (period: string) =>
   ({
     day: (date: any) => addDays(date, 1),
     week: (date: any) => addWeeks(date, 1),
     month: (date: any) => addMonths(date, 1)
   }[period])
 
-let getDateFormatString = (period: any) =>
+const getDateFormatString = (period: string) =>
   period === 'month' ? 'M/yyyy' : 'd/M/yyyy'
 
-const getInterveningPoints = ({ period, previous, point }: any) => {
-  let addPeriod = getPeriodAdder(period)
+const getInterveningPoints = ({ period = '', previous = {}, point = {} }) => {
+  const addPeriod = getPeriodAdder(period)
 
   let dateFormatString = getDateFormatString(period)
   let previousDate = parse(previous.x, dateFormatString, new Date())
@@ -236,24 +239,26 @@ const addZeroPeriodsToAllLines = (period: any) => (lines: any) => {
   )
 }
 
-const monthDayYear = _.flow(_.split('/'), _.size, _.eq(3))
-const monthYearOnly = _.flow(_.split('/'), _.size, _.eq(2))
+const monthDayYear = (date: string) => date.split('/').length === 3
+const monthYearOnly = (date: string) => date.split('/').length === 2
 
-const formatAxisBottomDate = ({ iteratee, start, end }: any) => {
-  if (monthDayYear(iteratee)) {
-    const day = format(new Date(iteratee), 'd')
-    if (start === iteratee) return format(new Date(start), 'MMM d')
-    if (end === iteratee) return format(new Date(end), 'MMM d')
-    if (day === '1') return format(new Date(iteratee), 'MMM d')
-    return day
-  }
-  if (monthYearOnly(iteratee)) {
-    const [month, year] = _.split('/', iteratee)
-    return format(new Date(+year, +month - 1, 1), 'MMM yyyy')
+const formatAxisBottomDate = ({ date = '', start = '', end = '' }) => {
+  if (date && typeof date === 'string') {
+    if (monthDayYear(date)) {
+      const day = format(new Date(date), 'd')
+      if (start === date) return format(new Date(start), 'MMM d')
+      if (end === date) return format(new Date(end), 'MMM d')
+      if (day === '1') return format(new Date(date), 'MMM d')
+      return day
+    }
+    if (monthYearOnly(date)) {
+      const [month, year] = _.split('/', date)
+      return format(new Date(+year, +month - 1, 1), 'MMM yyyy')
+    }
   }
 }
 
-const formatTooltipDate = (date: any) => {
+const formatTooltipDate = (date: string) => {
   if (monthDayYear(date)) {
     return format(new Date(date), 'MMM d, yyyy')
   }
@@ -318,10 +323,10 @@ export const DateLineSingle = ({
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        format: (value: any) =>
+        format: value =>
           axisBottom?.formatDate
             ? formatAxisBottomDate({
-                iteratee: value,
+                date: value,
                 start: getFirstDateAndConvertToAmerican(_.first(data)),
                 end: getLastDateAndConvertToAmerican(_.first(data))
               })
@@ -425,7 +430,7 @@ export const DateLineMultiple = ({
       format: (value: any) =>
         axisBottom?.formatDate
           ? formatAxisBottomDate({
-              iteratee: value,
+              date: value,
               start: getFirstDateAndConvertToAmerican(_.first(data)),
               end: getLastDateAndConvertToAmerican(_.first(data))
             })
@@ -731,7 +736,7 @@ export const DayOfWeekSummaryBars = ({
   axisBottom,
   axisLeft,
   margin
-}: any) => {
+}: DayOfWeekSummaryBarsProps) => {
   return (
     <ResponsiveBar
       data={data}

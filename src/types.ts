@@ -1,7 +1,9 @@
+import { BarDatum, BarSvgProps } from '@nivo/bar'
 import {
   ButtonHTMLAttributes,
   CSSProperties,
   InputHTMLAttributes,
+  MouseEventHandler,
   OptionHTMLAttributes,
   ReactNode,
   SelectHTMLAttributes
@@ -18,9 +20,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   focus: boolean
 }
 
-export interface Schema {
-
-}
+export interface Schema {}
 
 type FacetValue = string | number
 
@@ -67,7 +67,6 @@ interface SalesTableRow {
   unwind?: boolean
   hide?: boolean
   negative?: boolean
-  
 }
 
 // should be a disjunction of interfaces for the particular charts
@@ -90,7 +89,7 @@ interface ResultsLookup {
 }
 
 export interface Search {
-  id: string,
+  id: string
   collection: string
   filters?: Filter[]
   pageSize?: number
@@ -116,13 +115,13 @@ type FacetOptions = FacetOption[]
 // right now Facet is the only Filter type that has results
 type FilterResults = FacetOptions
 
-type ResultsCount = { _id: null, count: number }
+type ResultsCount = { _id: null; count: number }
 
 type Results = any[]
 
 interface SchemaPropOverride {
-  label: string,
-  display: string,
+  label: string
+  display: string
   properties: {
     [key: string]: SchemaPropOverride
   }
@@ -163,7 +162,7 @@ export interface ClientRendererInit {
   getSchemas: any
   useRouter: any
   collapseableFilters?: boolean
-  constraints?: SearchConstraints,
+  constraints?: SearchConstraints
   isPage?: boolean
 }
 
@@ -193,4 +192,21 @@ export interface NavItemProps {
   label: string
   onClick: () => void
   icon: JSX.Element
+}
+
+export interface MenuProps {
+  label: string
+  open: boolean
+  onClick: (func: () => void) => React.SetStateAction<boolean>
+  items: MenuProps[]
+}
+
+export interface DayOfWeekSummaryBarsProps extends BarSvgProps<BarDatum> {
+  includeLegends?: boolean
+  currency?: string
+  isCurrency?: boolean
+  group?: string
+  axisBottom?: {
+    tickFirstCharOnly: boolean
+  } & BarSvgProps<BarDatum>['axisBottom']
 }
