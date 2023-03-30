@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import _ from 'lodash/fp'
 import { mapIndexed, mapValuesIndexed } from './util'
 
@@ -45,7 +45,7 @@ const updateFilters = (filters: Filter[] ) => (idx: number) => (patch: any): Fil
 
 interface WrapperProps {
   filterKey: string
-  children: JSX.Element[] | JSX.Element | false | undefined
+  children: ReactNode
   UIComponents: any
   onlyOneFilterOpenAtATime?: boolean
 }
