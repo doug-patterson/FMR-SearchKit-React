@@ -189,8 +189,9 @@ export interface ClientRendererInit {
   collapseableFilters?: boolean
   constraints?: SearchConstraints,
   isPage?: boolean
-  runInitialSearch?: (search: Search) => SearchResponse,
-  SearchLayout: (props: SearchLayoutProps) => JSX.Element
+  runInitialSearch?: (search: Search) => Promise<SearchResponse>,
+  SearchLayout: (props: SearchLayoutProps) => JSX.Element,
+  execute: (search: Search) => Promise<[SearchResponse, Search]>,
 }
 
 
