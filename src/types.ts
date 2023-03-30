@@ -213,6 +213,7 @@ export interface DayOfWeekSummaryBarsProps extends BarSvgProps<BarDatum> {
   } & BarSvgProps<BarDatum>['axisBottom']
 }
 
+// TODO: investigate the field types here:
 export interface TopNPieProps extends PieSvgProps<DefaultRawDatum> {
   chartKey: string
   field: string
