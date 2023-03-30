@@ -1,11 +1,11 @@
 import { BarDatum, BarSvgProps } from '@nivo/bar'
 import { CalendarSvgProps } from '@nivo/calendar'
+import { LineProps, LineSvgProps } from '@nivo/line'
 import { DefaultRawDatum, PieSvgProps } from '@nivo/pie'
 import {
   ButtonHTMLAttributes,
   CSSProperties,
   InputHTMLAttributes,
-  MouseEventHandler,
   OptionHTMLAttributes,
   ReactNode,
   SelectHTMLAttributes
@@ -203,7 +203,7 @@ export interface MenuProps {
   items: MenuProps[]
 }
 
-export interface DayOfWeekSummaryBarsProps extends BarSvgProps<BarDatum> {
+export interface BarProps extends BarSvgProps<BarDatum> {
   includeLegends?: boolean
   currency?: string
   isCurrency?: boolean
@@ -214,14 +214,14 @@ export interface DayOfWeekSummaryBarsProps extends BarSvgProps<BarDatum> {
 }
 
 // TODO: investigate the field types here:
-export interface TopNPieProps extends PieSvgProps<DefaultRawDatum> {
+export interface PieProps extends PieSvgProps<DefaultRawDatum> {
   chartKey: string
   field: string
   schema: string
   legend: string
 }
 
-export interface QuantityByPeriodCalendarProps extends CalendarSvgProps {
+export interface CalendarProps extends CalendarSvgProps {
   isCurrency?: boolean
   margins?: {
     top: number
@@ -229,4 +229,22 @@ export interface QuantityByPeriodCalendarProps extends CalendarSvgProps {
     bottom: number
     left: number
   }
+}
+
+export interface DateLineProps extends LineSvgProps {
+  isCurrency?: boolean
+  currency?: string
+  height?: number
+  includeLegends?: boolean
+  group?: string
+}
+
+export interface DateLineByPeriodProps extends DateLineProps {
+  period: string
+}
+
+export interface DateLineHourOfDaySummaryProps extends DateLineProps {
+  axisBottom: {
+    showOnlyEvenHours?: boolean
+  } & DateLineProps['axisBottom']
 }
