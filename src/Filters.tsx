@@ -7,6 +7,8 @@ import Facet from './Facet'
 import NumericFilter from './NumericFilter'
 import DateTimeInterval from './DateTimeInterval'
 
+import { Filter, Schema } from './types'
+
 const NoComponent = () => 'no filter found'
 const UseWithHide = () => (
   <div>
@@ -14,7 +16,7 @@ const UseWithHide = () => (
   </div>
 )
 
-const getFilterComponent = (type: any) =>
+const getFilterComponent = (type: string) =>
   ({
     none: NoComponent,
     facet: Facet,
@@ -28,11 +30,11 @@ const getFilterComponent = (type: any) =>
     dateTimeInterval: DateTimeInterval
   }[type || 'none'])
 
-const updateFilters = (filters: any) => (idx: any) => (patch: any) =>
+const updateFilters = (filters: Filter[] ) => (idx: number) => (patch: any): Filter[] =>
   [
     ..._.slice(0, idx, filters),
     mapValuesIndexed(
-      (v: any, k: any) => (_.has(k, patch) ? _.get(k, patch) : v),
+      (v: any, k: string) => (_.has(k, patch) ? _.get(k, patch) : v),
       _.clone(filters[idx])
     ),
     ..._.slice(idx + 1, Infinity, filters)
@@ -41,14 +43,36 @@ const updateFilters = (filters: any) => (idx: any) => (patch: any) =>
 // we need to handle the search button better - needs to move up to the main
 // layout and potentially be accompanied by sort controls and column pickers
 
-const DefaultWrapper = ({ filterKey, children, UIComponents }: any) => (
+interface WrapperProps {
+  filterKey: string
+  children: JSX.Element[] | JSX.Element | false | undefined
+  UIComponents: any
+  onlyOneFilterOpenAtATime?: boolean
+}
+
+const DefaultWrapper = ({ filterKey, children, UIComponents }: WrapperProps) => (
   <UIComponents.Card>
     <UIComponents.CardHeader>{_.startCase(filterKey)}</UIComponents.CardHeader>
     <>{children}</>
   </UIComponents.Card>
 )
 
-const unsetOptionSearches = _.map(_.set('optionSearch', ''))
+const unsetOptionSearches: (filters: any) => any = _.map(_.set('optionSearch', ''))
+
+interface FiltersComponentProps {
+  children: JSX.Element[] | JSX.Element | undefined
+  filters: Filter[]
+  filterOptions: { [key: string]: any }
+  schema: Schema
+  UIComponents: any
+  runSearch: (patch: any) => Promise<void>
+  onlyOneFilterOpenAtATime: boolean
+  layout: string
+  Wrapper?: (props: any) => JSX.Element
+  overrideData: any
+}
+
+const FragmentWrapperComponent = ({ children }: WrapperProps) => <>{children}</>
 
 const Filters = ({
   children,
@@ -57,11 +81,11 @@ const Filters = ({
   schema,
   UIComponents,
   runSearch,
-  onlyOneFilterOpenAtAtime,
+  onlyOneFilterOpenAtATime,
   layout = 'column',
   Wrapper = DefaultWrapper,
   overrideData
-}: any) => {
+}: FiltersComponentProps) => {
   return (
     <div
       key={_.join(',', _.keys(schema.properties))}
@@ -78,11 +102,11 @@ const Filters = ({
       )}
       {children}
       {mapIndexed((filter: any, idx: any) => {
-        const Component = getFilterComponent(filter.type)
-        const FinalWrapper = filter.hide ? React.Fragment : Wrapper
+        const Component: any = getFilterComponent(filter.type)
+        const FinalWrapper = filter.hide ? FragmentWrapperComponent : Wrapper
         return (
           <FinalWrapper
-            onlyOneFilterOpenAtAtime={onlyOneFilterOpenAtAtime}
+            onlyOneFilterOpenAtATime={onlyOneFilterOpenAtATime}
             filterKey={filter.key}
             UIComponents={UIComponents}
           >

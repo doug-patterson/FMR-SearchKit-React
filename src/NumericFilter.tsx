@@ -2,7 +2,6 @@ import React from 'react'
 import _ from 'lodash/fp'
 
 const NumericFilter = ({
-  title,
   from,
   to,
   disableFrom,

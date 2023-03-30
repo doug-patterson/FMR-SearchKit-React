@@ -23,8 +23,8 @@ const SearchLayout = ({
   schemas,
   execute,
   layoutStyle,
-  filterLayout,
-  onlyOneFilterOpenAtAtime,
+  filterLayout = 'column',
+  onlyOneFilterOpenAtATime = false,
   FilterWrapper,
   mode = 'feathers',
   onData = _.noop,
@@ -92,12 +92,12 @@ const SearchLayout = ({
     <UIComponents.Box>
       <Layout layoutStyle={layoutStyle}>
         <Filters
-          filters={search.filters}
+          filters={search.filters || []}
           filterOptions={filterOptions}
           runSearch={runSearch}
           schema={schema}
           UIComponents={UIComponents}
-          onlyOneFilterOpenAtAtime={onlyOneFilterOpenAtAtime}
+          onlyOneFilterOpenAtATime={onlyOneFilterOpenAtATime}
           layout={filterLayout}
           {...(FilterWrapper ? { Wrapper: FilterWrapper } : {})}
           overrideData={overrideData}

@@ -26,58 +26,92 @@ export interface Schema {
   properties: { [key: string]: SchemaProperty }
 }
 
-export interface BooleanFilterSearchNode {
-  type: 'boolean'
+interface SearchNode {
+  type: string
   key: string
   field: string
+}
+
+interface BooleanFilterSearchNode extends SearchNode {
+  type: 'boolean'
   checked?: boolean
   hide?: boolean
+}
+
+interface FieldHasTruthyValueSearchNode extends SearchNode {
+  type: 'fieldHasTruthyValue'
+  checked: boolean
+  negate: boolean
+}
+interface PropExistsSearchNode extends SearchNode {
+  type: 'propExists'
+  negate: boolean
 }
 
 type FacetValue = string | number
 
-export interface FacetFilterSearchNode {
-  type: 'facet'
-  key: string
-  field: string
+interface BaseFacetSearchNode {
+  values?: FacetValue[]
   idPath?: string
   isMongoId?: boolean
   hide?: boolean
-  values: FacetValue[]
   optionSearch?: string
+  exclude?: boolean
+  include?: string[]
+}
+
+interface FacetFilterSearchNode extends BaseFacetSearchNode {
+  type: 'facet'
+}
+
+interface ArrayElementPropFacetSearchNode extends BaseFacetSearchNode {
+  type: 'arrayElementPropFacet'
+  prop: string
+}
+
+interface SubqueryFacetSearchNode extends BaseFacetSearchNode {
+  type: 'subqueryFacet'
+  subqueryCollection: string
+  subqueryKey: string
+  optionsAreMongoIds: boolean
+  subqueryField: string
+  subqueryIdPath: string
+  subqueryFieldIsArray: boolean
+  subqueryLocalField: string
+  subqueryLocalIdPath: string
+}
+
+interface DateTimeIntervalSearchNode extends SearchNode {
+  type: 'dateTimeInterval'
+  from: Date | null
+  to: Date | null
+  interval: string
+  offset: number
+}
+
+interface NumericFilterSearchNode extends SearchNode {
+  type: 'numeric'
+  from: number | null,
+  to: number | null
+}
+
+interface ArraySizeSearchNode extends SearchNode {
+  type: 'arraySize'
+  from: number | null
+  to: number | null
 }
 
 // replace Filter with this 
-type CorrectFilter = 
+export type Filter = 
   BooleanFilterSearchNode
+  | FieldHasTruthyValueSearchNode
+  | PropExistsSearchNode
   | FacetFilterSearchNode
-
-// temporary: this should be a disjunction of stricter types for the individual
-// filters
-interface Filter {
-  key: string
-  type: string
-  field: string
-  idPath?: string
-  label?: string
-  values?: FacetValue[]
-  checked?: boolean
-  from?: Date
-  to?: Date
-  interval?: string
-  isMongoId?: boolean
-  offset?: number
-  optionSearch?: string
-  include?: string[]
-  subqueryCollection?: string
-  subqueryKey?: string
-  optionsAreMongoIds?: boolean
-  subqueryField?: string
-  subqueryIdPath?: string
-  subqueryFieldIsArray?: boolean
-  subqueryLocalField?: string
-  subqueryLocalIdPath?: string
-}
+  | ArrayElementPropFacetSearchNode
+  | SubqueryFacetSearchNode
+  | DateTimeIntervalSearchNode
+  | NumericFilterSearchNode
+  | ArraySizeSearchNode
 
 interface TotalsBarColumn {
   key: string
@@ -189,7 +223,7 @@ export interface SearchLayoutProps {
   execute: (search: Search) => Promise<[SearchResponse, Search]>,
   layoutStyle?: any,
   filterLayout?: string,
-  onlyOneFilterOpenAtAtime?: boolean,
+  onlyOneFilterOpenAtATime?: boolean,
   FilterWrapper?: any,
   mode?: string,
   onData?: any,
