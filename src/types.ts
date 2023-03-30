@@ -26,7 +26,31 @@ export interface Schema {
   properties: { [key: string]: SchemaProperty }
 }
 
+export interface BooleanFilterSearchNode {
+  type: 'boolean'
+  key: string
+  field: string
+  checked?: boolean
+  hide?: boolean
+}
+
 type FacetValue = string | number
+
+export interface FacetFilterSearchNode {
+  type: 'facet'
+  key: string
+  field: string
+  idPath?: string
+  isMongoId?: boolean
+  hide?: boolean
+  values: FacetValue[]
+  optionSearch?: string
+}
+
+// replace Filter with this 
+type CorrectFilter = 
+  BooleanFilterSearchNode
+  | FacetFilterSearchNode
 
 // temporary: this should be a disjunction of stricter types for the individual
 // filters
