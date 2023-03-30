@@ -1,6 +1,6 @@
 import { BarDatum, BarSvgProps } from '@nivo/bar'
 import { CalendarSvgProps } from '@nivo/calendar'
-import { LineProps, LineSvgProps } from '@nivo/line'
+import { LineSvgProps } from '@nivo/line'
 import { DefaultRawDatum, PieSvgProps } from '@nivo/pie'
 import {
   ButtonHTMLAttributes,

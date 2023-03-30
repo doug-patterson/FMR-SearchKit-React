@@ -1,6 +1,6 @@
 'use client'
 
-import React, { MouseEventHandler } from 'react'
+import React from 'react'
 import _ from 'lodash/fp'
 import useOutsideClick from './hooks/useOutsideClick'
 import { ResponsiveLine } from '@nivo/line'
