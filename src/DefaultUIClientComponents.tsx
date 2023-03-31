@@ -244,22 +244,20 @@ const addZeroPeriodsToAllLines = (period: any) => (lines: any) => {
   )
 }
 
-const monthDayYear = (date: string) => date.split('/').length === 3
-const monthYearOnly = (date: string) => date.split('/').length === 2
+const monthDayYear = _.flow(_.split('/'), _.size, _.eq(3))
+const monthYearOnly = _.flow(_.split('/'), _.size, _.eq(2))
 
 const formatAxisBottomDate = ({ date = '', start = '', end = '' }) => {
-  if (date && typeof date === 'string') {
-    if (monthDayYear(date)) {
-      const day = format(new Date(date), 'd')
-      if (start === date) return format(new Date(start), 'MMM d')
-      if (end === date) return format(new Date(end), 'MMM d')
-      if (day === '1') return format(new Date(date), 'MMM d')
-      return day
-    }
-    if (monthYearOnly(date)) {
-      const [month, year] = _.split('/', date)
-      return format(new Date(+year, +month - 1, 1), 'MMM yyyy')
-    }
+  if (monthDayYear(date)) {
+    const day = format(new Date(date), 'd')
+    if (start === date) return format(new Date(start), 'MMM d')
+    if (end === date) return format(new Date(end), 'MMM d')
+    if (day === '1') return format(new Date(date), 'MMM d')
+    return day
+  }
+  if (monthYearOnly(date)) {
+    const [month, year] = _.split('/', date)
+    return format(new Date(+year, +month - 1, 1), 'MMM yyyy')
   }
 }
 
@@ -328,7 +326,7 @@ export const DateLineSingle = ({
         tickPadding: 5,
         tickRotation: 0,
         format: value =>
-          axisBottom?.formatDate
+          axisBottom.formatDate
             ? formatAxisBottomDate({
                 date: value,
                 start: getFirstDateAndConvertToAmerican(_.first(data)),
@@ -430,7 +428,7 @@ export const DateLineMultiple = ({
       tickPadding: 5,
       tickRotation: 0,
       format: (value: any) =>
-        axisBottom?.formatDate
+        axisBottom.formatDate
           ? formatAxisBottomDate({
               date: value,
               start: getFirstDateAndConvertToAmerican(_.first(data)),

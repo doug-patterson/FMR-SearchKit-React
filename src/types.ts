@@ -241,6 +241,9 @@ export interface DateLineProps extends LineSvgProps {
 
 export interface DateLineByPeriodProps extends DateLineProps {
   period: string
+  axisBottom: {
+    formatDate?: boolean
+  } & DateLineProps['axisBottom']
 }
 
 export interface DateLineHourOfDaySummaryProps extends DateLineProps {
