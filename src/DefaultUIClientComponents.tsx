@@ -20,7 +20,6 @@ import {
   MenuProps,
   PieProps
 } from './types'
-import { map } from 'remeda'
 
 const americanDate = _.flow(
   _.split('/'),
@@ -55,7 +54,7 @@ export const Menu = ({ label, open, items }: MenuProps) => {
             position: 'absolute'
           }}
         >
-          {map(items, item => {
+          {_.map(item => {
             const label = String(item.label)
             const onClick = () => item.onClick(() => setIsOpen(false))
             return (
@@ -63,7 +62,7 @@ export const Menu = ({ label, open, items }: MenuProps) => {
                 {label}
               </button>
             )
-          })}
+          }, items)}
         </div>
       )}
     </div>
