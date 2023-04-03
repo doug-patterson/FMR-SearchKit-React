@@ -9,7 +9,17 @@ import { ResponsivePie } from '@nivo/pie'
 import { ResponsiveBar } from '@nivo/bar'
 import { formatCurrency } from './util'
 import { parse, format, addDays, addWeeks, addMonths } from 'date-fns'
-import { CheckBoxProps, InputProps } from './types'
+import {
+  BarProps,
+  CalendarProps,
+  CheckBoxProps,
+  DateLineByPeriodProps,
+  DateLineHourOfDaySummaryProps,
+  DateLineProps,
+  InputProps,
+  MenuProps,
+  PieProps
+} from './types'
 
 const americanDate = _.flow(
   _.split('/'),
@@ -23,8 +33,8 @@ const americanDates = _.map(({ id, data }: any) => ({
   data: _.map(({ x, y }: any) => ({ x: americanDate(x), y }), data)
 }))
 
-export const Menu = ({ label, open, items }: any) => {
-  const ref = React.useRef()
+export const Menu = ({ label, open, items }: MenuProps) => {
+  const ref = React.useRef(null)
   const [isOpen, setIsOpen] = React.useState(open)
   useOutsideClick(ref, () => setIsOpen(false))
 
@@ -44,18 +54,15 @@ export const Menu = ({ label, open, items }: any) => {
             position: 'absolute'
           }}
         >
-          {_.map(
-            (item: any) => (
-              <button
-                key={item.label}
-                onClick={_.over([item.onClick, () => setIsOpen(false)])}
-                className="fmr-sort-button"
-              >
-                {item.label}
+          {_.map(item => {
+            const label = String(item.label)
+            const onClick = () => item.onClick(() => setIsOpen(false))
+            return (
+              <button key={label} onClick={onClick} className="fmr-sort-button">
+                {label}
               </button>
-            ),
-            items
-          )}
+            )
+          }, items)}
         </div>
       )}
     </div>
@@ -137,14 +144,14 @@ export const Input = ({
   )
 }
 
-let getPeriodAdder = (period: any) =>
+let getPeriodAdder = (period: string) =>
   ({
     day: (date: any) => addDays(date, 1),
     week: (date: any) => addWeeks(date, 1),
     month: (date: any) => addMonths(date, 1)
   }[period])
 
-let getDateFormatString = (period: any) =>
+let getDateFormatString = (period: string) =>
   period === 'month' ? 'M/yyyy' : 'd/M/yyyy'
 
 const getInterveningPoints = ({ period, previous, point }: any) => {
@@ -239,21 +246,21 @@ const addZeroPeriodsToAllLines = (period: any) => (lines: any) => {
 const monthDayYear = _.flow(_.split('/'), _.size, _.eq(3))
 const monthYearOnly = _.flow(_.split('/'), _.size, _.eq(2))
 
-const formatAxisBottomDate = ({ iteratee, start, end }: any) => {
-  if (monthDayYear(iteratee)) {
-    const day = format(new Date(iteratee), 'd')
-    if (start === iteratee) return format(new Date(start), 'MMM d')
-    if (end === iteratee) return format(new Date(end), 'MMM d')
-    if (day === '1') return format(new Date(iteratee), 'MMM d')
+const formatAxisBottomDate = ({ date = '', start = '', end = '' }) => {
+  if (monthDayYear(date)) {
+    const day = format(new Date(date), 'd')
+    if (start === date) return format(new Date(start), 'MMM d')
+    if (end === date) return format(new Date(end), 'MMM d')
+    if (day === '1') return format(new Date(date), 'MMM d')
     return day
   }
-  if (monthYearOnly(iteratee)) {
-    const [month, year] = _.split('/', iteratee)
+  if (monthYearOnly(date)) {
+    const [month, year] = _.split('/', date)
     return format(new Date(+year, +month - 1, 1), 'MMM yyyy')
   }
 }
 
-const formatTooltipDate = (date: any) => {
+const formatTooltipDate = (date: string) => {
   if (monthDayYear(date)) {
     return format(new Date(date), 'MMM d, yyyy')
   }
@@ -277,13 +284,13 @@ export const DateLineSingle = ({
   margin,
   axisBottom,
   axisLeft
-}: any) => {
+}: DateLineByPeriodProps) => {
   return (
     <ResponsiveLine
       data={_.flow(addZeroPeriodsToAllLines(period), americanDates)(data)}
       curve="linear"
       animate={true}
-      height={height}
+      {...(height ? { height } : {})}
       colors={colors ? colors : { scheme: 'set2' }}
       margin={{
         top: 50,
@@ -314,14 +321,13 @@ export const DateLineSingle = ({
       axisTop={null}
       axisRight={null}
       axisBottom={{
-        orient: 'bottom',
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        format: (value: any) =>
-          axisBottom?.formatDate
+        format: value =>
+          axisBottom.formatDate
             ? formatAxisBottomDate({
-                iteratee: value,
+                date: value,
                 start: getFirstDateAndConvertToAmerican(_.first(data)),
                 end: getLastDateAndConvertToAmerican(_.first(data))
               })
@@ -329,7 +335,6 @@ export const DateLineSingle = ({
         ...axisBottom
       }}
       axisLeft={{
-        orient: 'left',
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
@@ -371,7 +376,7 @@ export const DateLineMultiple = ({
   margin,
   axisBottom,
   axisLeft
-}: any) => (
+}: DateLineByPeriodProps) => (
   <ResponsiveLine
     data={_.flow(
       addZeroPeriodsToAllLines(period),
@@ -418,14 +423,13 @@ export const DateLineMultiple = ({
     axisTop={null}
     axisRight={null}
     axisBottom={{
-      orient: 'bottom',
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
       format: (value: any) =>
-        axisBottom?.formatDate
+        axisBottom.formatDate
           ? formatAxisBottomDate({
-              iteratee: value,
+              date: value,
               start: getFirstDateAndConvertToAmerican(_.first(data)),
               end: getLastDateAndConvertToAmerican(_.first(data))
             })
@@ -433,7 +437,6 @@ export const DateLineMultiple = ({
       ...axisBottom
     }}
     axisLeft={{
-      orient: 'left',
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
@@ -467,97 +470,114 @@ export const DateLineMultiple = ({
 export const DateTimeLine = ({
   data,
   isCurrency,
-  height,
   colors,
+  height,
   currency,
   margin,
   axisBottom,
   axisLeft
-}: any) => (
-  <ResponsiveLine
-    data={
-      isCurrency
-        ? formatCurrency({ amount: data, currency, minimumFractionDigits: 0 })
-        : data
-    }
-    curve="linear"
-    animate={true}
-    height={height}
-    colors={colors ? colors : { scheme: 'paired' }}
-    margin={{
-      top: 50,
-      right: 110,
-      bottom: 50,
-      left: 60,
-      ...margin
-    }}
-    xScale={{ type: 'point' }}
-    yScale={{
-      type: 'linear',
-      min: 'auto',
-      max: 'auto',
-      stacked: true,
-      reverse: false
-    }}
-    yFormat={(value: any) =>
-      isCurrency
-        ? formatCurrency({ amount: value, currency, minimumFractionDigits: 0 })
-        : value
-    }
-    axisTop={null}
-    axisRight={null}
-    axisBottom={{
-      orient: 'bottom',
-      tickSize: 5,
-      tickPadding: 5,
-      tickRotation: -20,
-      ...axisBottom
-    }}
-    axisLeft={{
-      orient: 'left',
-      tickSize: 5,
-      tickPadding: 5,
-      tickValues: 6,
-      tickRotation: 0,
-      format: (value: any) =>
-        isCurrency &&
-        formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }),
-      ...axisLeft
-    }}
-    pointSize={10}
-    pointColor={{ theme: 'background' }}
-    pointBorderWidth={2}
-    pointBorderColor={{ from: 'serieColor' }}
-    pointLabelYOffset={-12}
-    useMesh={true}
-    legends={[
-      {
-        anchor: 'bottom-right',
-        direction: 'column',
-        justify: false,
-        translateX: 100,
-        translateY: 0,
-        itemsSpacing: 0,
-        itemDirection: 'left-to-right',
-        itemWidth: 80,
-        itemHeight: 20,
-        itemOpacity: 0.75,
-        symbolSize: 12,
-        symbolShape: 'circle',
-        symbolBorderColor: 'rgba(0, 0, 0, .5)',
-        effects: [
-          {
-            on: 'hover',
-            style: {
-              itemBackground: 'rgba(0, 0, 0, .03)',
-              itemOpacity: 1
-            }
-          }
-        ]
+}: DateLineProps) => {
+  // TODO:
+  // The data prop expects the below type, therefore we'll need to modify how we handle
+  // currencies. I'll cast it to 'any' for now.
+  // interface Serie {
+  //   id: string | number
+  //   data: Datum[]
+  //   [key: string]: any
+  // }
+
+  return (
+    <ResponsiveLine
+      data={
+        isCurrency
+          ? (formatCurrency({
+              amount: data,
+              currency,
+              minimumFractionDigits: 0
+            }) as any)
+          : data
       }
-    ]}
-  />
-)
+      curve="linear"
+      animate={true}
+      {...(height ? { height } : {})}
+      colors={colors ? colors : { scheme: 'paired' }}
+      margin={{
+        top: 50,
+        right: 110,
+        bottom: 50,
+        left: 60,
+        ...margin
+      }}
+      xScale={{ type: 'point' }}
+      yScale={{
+        type: 'linear',
+        min: 'auto',
+        max: 'auto',
+        stacked: true,
+        reverse: false
+      }}
+      yFormat={(value: any) =>
+        isCurrency
+          ? formatCurrency({
+              amount: value,
+              currency,
+              minimumFractionDigits: 0
+            })
+          : value
+      }
+      axisTop={null}
+      axisRight={null}
+      axisBottom={{
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: -20,
+        ...axisBottom
+      }}
+      axisLeft={{
+        tickSize: 5,
+        tickPadding: 5,
+        tickValues: 6,
+        tickRotation: 0,
+        format: (value: any) =>
+          isCurrency &&
+          formatCurrency({ amount: value, currency, minimumFractionDigits: 0 }),
+        ...axisLeft
+      }}
+      pointSize={10}
+      pointColor={{ theme: 'background' }}
+      pointBorderWidth={2}
+      pointBorderColor={{ from: 'serieColor' }}
+      pointLabelYOffset={-12}
+      useMesh={true}
+      legends={[
+        {
+          anchor: 'bottom-right',
+          direction: 'column',
+          justify: false,
+          translateX: 100,
+          translateY: 0,
+          itemsSpacing: 0,
+          itemDirection: 'left-to-right',
+          itemWidth: 80,
+          itemHeight: 20,
+          itemOpacity: 0.75,
+          symbolSize: 12,
+          symbolShape: 'circle',
+          symbolBorderColor: 'rgba(0, 0, 0, .5)',
+          effects: [
+            {
+              on: 'hover',
+              style: {
+                itemBackground: 'rgba(0, 0, 0, .03)',
+                itemOpacity: 1
+              }
+            }
+          ]
+        }
+      ]}
+    />
+  )
+}
 
 const addLeadingZeros = (finishedLength: any) => (str: any) => {
   const zeros = _.join('', _.times(_.constant('0'), finishedLength))
@@ -594,7 +614,7 @@ export const QuantityByPeriodCalendar = ({
   height,
   colors,
   margins = { top: 20, right: 20, bottom: 20, left: 20 }
-}: any) => (
+}: CalendarProps) => (
   <ResponsiveCalendar
     data={fixDates(data)}
     // @ts-expect-error TS(2322): Type '{ data: any; height: any; from: any; to: any... Remove this comment to see the full error message
@@ -641,9 +661,10 @@ export const TopNPie = ({
   height,
   chartKey,
   margin
-}: any) => {
+}: PieProps) => {
   const getId = uniqueIdMaker({})
 
+  // TODO
   data = _.map((datum: any) => {
     const display = _.get(
       ['properties', chartKey, 'properties', field, 'display'],
@@ -731,7 +752,7 @@ export const DayOfWeekSummaryBars = ({
   axisBottom,
   axisLeft,
   margin
-}: any) => {
+}: BarProps) => {
   return (
     <ResponsiveBar
       data={data}
@@ -865,13 +886,13 @@ export const HourOfDaySummaryLine = ({
   axisBottom,
   axisLeft,
   margin
-}: any) => {
+}: DateLineHourOfDaySummaryProps) => {
   return (
     <ResponsiveLine
       data={includeAllHours(data)}
       curve="linear"
       animate={true}
-      height={height}
+      {...(height ? { height } : {})}
       colors={colors ? colors : { scheme: 'paired' }}
       margin={{
         top: 50,
@@ -903,7 +924,6 @@ export const HourOfDaySummaryLine = ({
       axisTop={null}
       axisRight={null}
       axisBottom={{
-        orient: 'bottom',
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
@@ -915,7 +935,6 @@ export const HourOfDaySummaryLine = ({
         ...axisBottom
       }}
       axisLeft={{
-        orient: 'left',
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,

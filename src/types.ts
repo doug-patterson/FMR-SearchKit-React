@@ -1,3 +1,7 @@
+import { BarDatum, BarSvgProps } from '@nivo/bar'
+import { CalendarSvgProps } from '@nivo/calendar'
+import { LineSvgProps } from '@nivo/line'
+import { DefaultRawDatum, PieSvgProps } from '@nivo/pie'
 import {
   ButtonHTMLAttributes,
   CSSProperties,
@@ -21,7 +25,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 type SchemaProperty = any // there are some commonalities - fill this in
 
 export interface Schema {
-  bsonType: string,
+  bsonType: string
   additionalProperties?: boolean
   properties: { [key: string]: SchemaProperty }
 }
@@ -91,7 +95,7 @@ interface DateTimeIntervalSearchNode extends SearchNode {
 
 interface NumericFilterSearchNode extends SearchNode {
   type: 'numeric'
-  from: number | null,
+  from: number | null
   to: number | null
 }
 
@@ -101,8 +105,8 @@ interface ArraySizeSearchNode extends SearchNode {
   to: number | null
 }
 
-export type Filter = 
-  BooleanFilterSearchNode
+export type Filter =
+  | BooleanFilterSearchNode
   | FieldHasTruthyValueSearchNode
   | PropExistsSearchNode
   | FacetFilterSearchNode
@@ -128,7 +132,6 @@ interface SalesTableRow {
   unwind?: boolean
   hide?: boolean
   negative?: boolean
-  
 }
 
 // should be a disjunction of interfaces for the particular charts
@@ -151,7 +154,7 @@ interface ResultsLookup {
 }
 
 export interface Search {
-  id: string,
+  id: string
   collection: string
   filters?: Filter[]
   pageSize?: number
@@ -178,13 +181,13 @@ type FacetOptions = FacetOption[]
 // right now Facet is the only Filter type that has results
 type FilterResults = FacetOptions
 
-type ResultsCount = { _id: null, count: number }
+type ResultsCount = { _id: null; count: number }
 
 type Results = any[]
 
 interface SchemaPropOverride {
-  label: string,
-  display: string,
+  label: string
+  display: string
   properties: {
     [key: string]: SchemaPropOverride
   }
@@ -214,18 +217,18 @@ type SearchConstraints = {
 }
 
 export interface SearchLayoutProps {
-  initialSearch: Search,
-  initialResults: SearchResponse | null,
-  children?: JSX.Element[],
-  UIComponents?: any,
-  schemas: { [id: string]: Schema },
-  execute: (search: Search) => Promise<[SearchResponse, Search]>,
-  layoutStyle?: any,
-  filterLayout?: string,
-  onlyOneFilterOpenAtATime?: boolean,
-  FilterWrapper?: any,
-  mode?: string,
-  onData?: any,
+  initialSearch: Search
+  initialResults: SearchResponse | null
+  children?: JSX.Element[]
+  UIComponents?: any
+  schemas: { [id: string]: Schema }
+  execute: (search: Search) => Promise<[SearchResponse, Search]>
+  layoutStyle?: any
+  filterLayout?: string
+  onlyOneFilterOpenAtATime?: boolean
+  FilterWrapper?: any
+  mode?: string
+  onData?: any
   // this can be anything - to be passed in from the consuming project for use
   // in override display functions
   overrideData?: any
@@ -243,14 +246,13 @@ export interface SearchLayoutInit {
   getSchemas: any
   useRouter: any
   collapseableFilters?: boolean
-  constraints?: SearchConstraints,
+  constraints?: SearchConstraints
   isPage?: boolean
-  runInitialSearch?: (search: Search) => Promise<SearchResponse>,
-  SearchLayout: (props: SearchLayoutProps) => JSX.Element,
-  execute: (search: Search) => Promise<[SearchResponse, Search]>,
+  runInitialSearch?: (search: Search) => Promise<SearchResponse>
+  SearchLayout: (props: SearchLayoutProps) => JSX.Element
+  execute: (search: Search) => Promise<[SearchResponse, Search]>
   FeathersSearchClientRenderer: any
 }
-
 
 // this will need to wait for Feathers 5
 export type FeathersClientObject = any
@@ -281,4 +283,60 @@ export interface NavItemProps {
   label: string
   onClick: () => void
   icon: JSX.Element
+}
+
+export interface MenuProps {
+  label: string
+  open: boolean
+  onClick: (func: () => void) => React.SetStateAction<boolean>
+  items: MenuProps[]
+}
+
+export interface BarProps extends BarSvgProps<BarDatum> {
+  includeLegends?: boolean
+  currency?: string
+  isCurrency?: boolean
+  group?: string
+  axisBottom?: {
+    tickFirstCharOnly: boolean
+  } & BarSvgProps<BarDatum>['axisBottom']
+}
+
+// TODO: investigate the field types here:
+export interface PieProps extends PieSvgProps<DefaultRawDatum> {
+  chartKey: string
+  field: string
+  schema: string
+  legend: string
+}
+
+export interface CalendarProps extends CalendarSvgProps {
+  isCurrency?: boolean
+  margins?: {
+    top: number
+    right: number
+    bottom: number
+    left: number
+  }
+}
+
+export interface DateLineProps extends LineSvgProps {
+  isCurrency?: boolean
+  currency?: string
+  height?: number
+  includeLegends?: boolean
+  group?: string
+}
+
+export interface DateLineByPeriodProps extends DateLineProps {
+  period: string
+  axisBottom: {
+    formatDate?: boolean
+  } & DateLineProps['axisBottom']
+}
+
+export interface DateLineHourOfDaySummaryProps extends DateLineProps {
+  axisBottom: {
+    showOnlyEvenHours?: boolean
+  } & DateLineProps['axisBottom']
 }
