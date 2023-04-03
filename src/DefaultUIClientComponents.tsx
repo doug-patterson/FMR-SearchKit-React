@@ -154,7 +154,7 @@ let getPeriodAdder = (period: string) =>
 let getDateFormatString = (period: string) =>
   period === 'month' ? 'M/yyyy' : 'd/M/yyyy'
 
-let getInterveningPoints = ({ period, previous, point }: any) => {
+const getInterveningPoints = ({ period, previous, point }: any) => {
   let addPeriod = getPeriodAdder(period)
 
   let dateFormatString = getDateFormatString(period)
