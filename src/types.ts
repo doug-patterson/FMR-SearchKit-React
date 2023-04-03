@@ -18,38 +18,99 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   focus: boolean
 }
 
-export interface Schema {
+type SchemaProperty = any // there are some commonalities - fill this in
 
+export interface Schema {
+  bsonType: string,
+  additionalProperties?: boolean
+  properties: { [key: string]: SchemaProperty }
+}
+
+interface SearchNode {
+  type: string
+  key: string
+  field: string
+}
+
+interface BooleanFilterSearchNode extends SearchNode {
+  type: 'boolean'
+  checked?: boolean
+  hide?: boolean
+}
+
+interface FieldHasTruthyValueSearchNode extends SearchNode {
+  type: 'fieldHasTruthyValue'
+  checked: boolean
+  negate: boolean
+}
+interface PropExistsSearchNode extends SearchNode {
+  type: 'propExists'
+  negate: boolean
 }
 
 type FacetValue = string | number
 
-// temporary: this should be a disjunction of stricter types for the individual
-// filters
-interface Filter {
-  key: string
-  type: string
-  field: string
-  idPath?: string
-  label?: string
+interface BaseFacetSearchNode {
   values?: FacetValue[]
-  checked?: boolean
-  from?: Date
-  to?: Date
-  interval?: string
+  idPath?: string
   isMongoId?: boolean
-  offset?: number
+  hide?: boolean
   optionSearch?: string
+  exclude?: boolean
   include?: string[]
-  subqueryCollection?: string
-  subqueryKey?: string
-  optionsAreMongoIds?: boolean
-  subqueryField?: string
-  subqueryIdPath?: string
-  subqueryFieldIsArray?: boolean
-  subqueryLocalField?: string
-  subqueryLocalIdPath?: string
 }
+
+interface FacetFilterSearchNode extends BaseFacetSearchNode {
+  type: 'facet'
+}
+
+interface ArrayElementPropFacetSearchNode extends BaseFacetSearchNode {
+  type: 'arrayElementPropFacet'
+  prop: string
+}
+
+interface SubqueryFacetSearchNode extends BaseFacetSearchNode {
+  type: 'subqueryFacet'
+  subqueryCollection: string
+  subqueryKey: string
+  optionsAreMongoIds: boolean
+  subqueryField: string
+  subqueryIdPath: string
+  subqueryFieldIsArray: boolean
+  subqueryLocalField: string
+  subqueryLocalIdPath: string
+}
+
+interface DateTimeIntervalSearchNode extends SearchNode {
+  type: 'dateTimeInterval'
+  from: Date | null
+  to: Date | null
+  interval: string
+  offset: number
+}
+
+interface NumericFilterSearchNode extends SearchNode {
+  type: 'numeric'
+  from: number | null,
+  to: number | null
+}
+
+interface ArraySizeSearchNode extends SearchNode {
+  type: 'arraySize'
+  from: number | null
+  to: number | null
+}
+
+export type Filter = 
+  BooleanFilterSearchNode
+  | FieldHasTruthyValueSearchNode
+  | PropExistsSearchNode
+  | FacetFilterSearchNode
+  | ArrayElementPropFacetSearchNode
+  | SubqueryFacetSearchNode
+  | DateTimeIntervalSearchNode
+  | NumericFilterSearchNode
+  | ArraySizeSearchNode
 
 interface TotalsBarColumn {
   key: string
@@ -95,6 +156,7 @@ export interface Search {
   filters?: Filter[]
   pageSize?: number
   page?: number
+  include?: string[]
   omitFromResults?: string[]
   charts: Chart[]
   lookup: {
@@ -151,7 +213,25 @@ type SearchConstraints = {
   [id: string]: SearchConstraint[]
 }
 
-export interface ClientRendererInit {
+export interface SearchLayoutProps {
+  initialSearch: Search,
+  initialResults: SearchResponse | null,
+  children?: JSX.Element[],
+  UIComponents?: any,
+  schemas: { [id: string]: Schema },
+  execute: (search: Search) => Promise<[SearchResponse, Search]>,
+  layoutStyle?: any,
+  filterLayout?: string,
+  onlyOneFilterOpenAtATime?: boolean,
+  FilterWrapper?: any,
+  mode?: string,
+  onData?: any,
+  // this can be anything - to be passed in from the consuming project for use
+  // in override display functions
+  overrideData?: any
+}
+
+export interface SearchLayoutInit {
   initialSearch: Search
   schemas: { [key: string]: Schema }
   overrides?: SchemaOverrides
@@ -165,7 +245,15 @@ export interface ClientRendererInit {
   collapseableFilters?: boolean
   constraints?: SearchConstraints,
   isPage?: boolean
+  runInitialSearch?: (search: Search) => Promise<SearchResponse>,
+  SearchLayout: (props: SearchLayoutProps) => JSX.Element,
+  execute: (search: Search) => Promise<[SearchResponse, Search]>,
+  FeathersSearchClientRenderer: any
 }
+
+
+// this will need to wait for Feathers 5
+export type FeathersClientObject = any
 
 export interface GridProps {
   children: ReactNode
