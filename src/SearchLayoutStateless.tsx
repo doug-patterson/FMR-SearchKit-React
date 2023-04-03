@@ -7,15 +7,17 @@ import Results from './Results'
 import ResultsTableStateless from './ResultsTableStateless'
 import PaginatorStatic from './PaginatorStatic'
 import Filters from './FiltersStateless'
+import { SearchLayoutProps } from './types'
 
-const SearchLayoutStateless = ({
+// server components that return a Promise need to be typed with `any`
+const SearchLayoutStateless: any = ({
   initialSearch,
-  initialResults = {},
+  initialResults,
   children,
   UIComponents: ThemeComponents,
   schemas,
   layoutStyle
-}: any) => {
+}: SearchLayoutProps) => {
   const UIComponents = _.defaults(DefaultUIComponents, ThemeComponents)
 
   const Layout = ({ children }: any) => (
@@ -32,7 +34,7 @@ const SearchLayoutStateless = ({
     _.map(
       ({ key }: any) => ({
         key,
-        options: initialResults[key]
+        options: _.get('key', initialResults)
       }),
       initialSearch.filters
     ) || _.map(_.pick('key'), initialSearch.filters)
@@ -52,16 +54,16 @@ const SearchLayoutStateless = ({
           <Results
             {...{
               include: _.without(
-                initialSearch.omitFromResults,
+                initialSearch.omitFromResults || [],
                 initialSearch.include
               ),
               schema: _.update(
                 'properties',
-                _.omit(initialSearch.omitFromResults),
+                _.omit(initialSearch.omitFromResults || []),
                 schema
               ),
-              rows: initialResults.results,
-              resultsCount: initialSearch.resultsCount,
+              rows: _.get('results', initialResults),
+              resultsCount: _.get('resultsCount', initialSearch),
               pageSize: initialSearch.pageSize,
               page: initialSearch.page,
               UIComponents,

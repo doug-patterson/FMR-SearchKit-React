@@ -2,21 +2,21 @@ import React from 'react'
 export { includeSubmittedSearch } from './util'
 import SearchController from './SearchController'
 import HTTPSearchHOC from './HTTPSearchHOC'
-import { Schema, Search, SearchResponse } from './types'
+import { Schema, Search, SearchResponse, SearchLayoutInit, SchemaOverrides } from './types'
 
-type SearchkitSetupFunction = () => ({
+type SearchkitSetupFunction = (props: SearchLayoutInit) => Promise<{
   hydratedSearch: Search
   schemas: { [key: string]: Schema }
-})
+}>
 
 type InitialSearchRunner = (search: Search) => SearchResponse 
 
 interface SearchkitSetup {
   preparePage: SearchkitSetupFunction
   runInitialSearch: InitialSearchRunner
-  overridesStateless: any
+  overridesStateless: SchemaOverrides
   UIComponentsStateless: any
-  FeathersSearchClientRenderer: any
+  FeathersSearchClientRenderer: JSX.Element
 }
 
 const _searchkit = ({
@@ -26,7 +26,7 @@ const _searchkit = ({
   UIComponentsStateless,
   FeathersSearchClientRenderer
 }: SearchkitSetup) => {
-  const HydratedSearchController = (props: any) => (
+  const HydratedSearchController = (props: SearchLayoutInit) => (
     <SearchController
       {...props}
       runInitialSearch={
@@ -35,7 +35,7 @@ const _searchkit = ({
     />
   )
 
-  const FeathersSearch = (props: any) => (
+  const FeathersSearch = (props: SearchLayoutInit) => (
     <HydratedSearchController
       {...props}
       SearchLayout={
@@ -45,7 +45,7 @@ const _searchkit = ({
   )
 
   const FeathersSearchPage = preparePage
-    ? async (props: any) => {
+    ? async (props: SearchLayoutInit) => {
         const { hydratedSearch, schemas } = await preparePage(props)
 
         return (
@@ -59,17 +59,17 @@ const _searchkit = ({
       }
     : null
 
-  const HydratedSearchControllerWithStatelessOverrides = (props: any) => (
+  const HydratedSearchControllerWithStatelessOverrides = (props: SearchLayoutInit) => (
     <SearchController
       {...props}
       defaultOverrides={overridesStateless}
       runInitialSearch={
-        runInitialSearch && !props.clientOnly ? runInitialSearch : null
+        !props.clientOnly ? runInitialSearch : null
       }
     />
   )
 
-  const HTTPSearch = (props: any) => (
+  const HTTPSearch = (props: SearchLayoutInit) => (
     <HydratedSearchControllerWithStatelessOverrides
       {...props}
       UIComponents={UIComponentsStateless}
@@ -78,7 +78,7 @@ const _searchkit = ({
   )
 
   const HTTPSearchPage = preparePage
-    ? async (props: any) => {
+    ? async (props: SearchLayoutInit) => {
         const { hydratedSearch, schemas } = await preparePage(props)
 
         return (

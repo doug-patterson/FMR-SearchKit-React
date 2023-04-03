@@ -6,25 +6,28 @@ import { FilterDropdown as FilterWrapper } from './FilterDropdown'
 import _ from 'lodash/fp'
 import { setUpSchemas } from './util'
 import { buildRoute } from './util'
-import { ClientRendererInit } from './types'
+import { SearchLayoutInit, FeathersClientObject, SearchResponse, Search, Schema } from './types'
 
-const tld = (hostname: any) =>
+const tld = (hostname: string) =>
   hostname === 'localhost'
     ? 'localhost'
     : _.flow(_.split('.'), ([, ...rest]) => [...rest], _.join('.'))(hostname)
 
 const initApp = async (
-  setApp: any,
-  setInitialResults: any,
-  initialSearch: any,
-  getApp: any,
-  getSchemas: any,
-  setSchemas: any
+  setApp: (app: FeathersClientObject) => void,
+  setInitialResults: (results: any) => void,
+  initialSearch: Search,
+  getApp: () => FeathersClientObject,
+  getSchemas: () => { [id: string]: Schema },
+  setSchemas: (schemas: { [id: string]: Schema }) => void,
+  initialSchemas: { [id: string]: Schema }
 ) => {
-  const [app, schemas] = await Promise.all([
+  const hasInitialSchemas: boolean = !!initialSchemas
+  const [app, schemas] = hasInitialSchemas ? [await getApp(), null] :  await Promise.all([
     getApp(),
-    setSchemas && getSchemas()
+    getSchemas()
   ])
+
   setApp(app)
   if (setInitialResults) {
     setInitialResults(await app.service('search').create(initialSearch))
@@ -37,10 +40,14 @@ const initApp = async (
   )};max-age=2592000;`
 }
 
-const ClientSearchWithOverrides = (props: ClientRendererInit) => {
-  const [app, setApp] = React.useState(null)
+type InitialResultsObjectType = SearchResponse | null
+
+const ClientSearchWithOverrides = (props: SearchLayoutInit) => {
+  const initialFeathersAppObject: FeathersClientObject | null = null
+  const [app, setApp] = React.useState(initialFeathersAppObject)
   const [schemas, setSchemas] = React.useState(props.schemas)
-  const [initialResults, setInitialResults] = React.useState(null)
+  const initialResultsObject: InitialResultsObjectType = null
+  const [initialResults, setInitialResults] = React.useState(initialResultsObject)
 
   const router = props.useRouter()
 
@@ -51,11 +58,12 @@ const ClientSearchWithOverrides = (props: ClientRendererInit) => {
     const setUp = async () => {
       initApp(
         setApp,
-        props.clientOnly ? setInitialResults : null,
+        setInitialResults,
         props.initialSearch,
         props.getApp,
         props.getSchemas,
-        !props.schemas && setSchemas
+        setSchemas,
+        props.schemas
       )
     }
     setUp()
@@ -73,7 +81,7 @@ const ClientSearchWithOverrides = (props: ClientRendererInit) => {
     schemas && (
       <SearchLayout
         {...props}
-        {...(initialResults ? { initialResults } : {})}
+        initialResults={initialResults}
         schemas={setUpSchemas(
           _.merge(props.defaultOverrides, props.overrides),
           schemas
@@ -83,7 +91,7 @@ const ClientSearchWithOverrides = (props: ClientRendererInit) => {
           const constrainedSearch = _.size(
             _.get(props.initialSearch.id, props.constraints)
           )
-            ? _.flow(..._.get(props.initialSearch.id, props.constraints))(
+            ? _.flow(..._.get(props.initialSearch.id, props.constraints) || [])(
                 search
               )
             : search
@@ -95,6 +103,8 @@ const ClientSearchWithOverrides = (props: ClientRendererInit) => {
                 typeof window === 'object' && window.location.href
               )
             )
+            // feed the type-checker
+            return [search, { results: [], resultsCount: 0 }]
           } else {
             const result = await app.service('search').create(constrainedSearch)
             if (typeof window === 'object') {
@@ -119,6 +129,6 @@ const ClientSearchWithOverrides = (props: ClientRendererInit) => {
   )
 }
 
-const ClientSearchHOC = (props: any) => <ClientSearchWithOverrides {...props} />
+const ClientSearchHOC = (props: SearchLayoutInit) => <ClientSearchWithOverrides {...props} />
 
 export default ClientSearchHOC

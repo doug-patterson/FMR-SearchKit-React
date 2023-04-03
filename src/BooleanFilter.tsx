@@ -1,6 +1,15 @@
 import React from 'react'
 import _ from 'lodash/fp'
 
+interface BooleanFilterComponentProps {
+  checked: boolean,
+  onChange: (event: any) => any,
+  name: string,
+  UIComponents: any,
+  layout: string,
+  label: string
+}
+
 const BooleanFilter = ({
   checked,
   onChange,
@@ -8,7 +17,7 @@ const BooleanFilter = ({
   UIComponents,
   layout,
   label
-}: any) => (
+}: BooleanFilterComponentProps) => (
   <UIComponents.CardBody>
     <UIComponents.CheckBox
       checked={checked}
