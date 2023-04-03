@@ -8,19 +8,19 @@ import useOutsideClick from './hooks/useOutsideClick'
 type Props = {
   children: ReactNode
   filterKey: string
-  onlyOneFilterOpenAtAtime: boolean
+  onlyOneFilterOpenAtATime: boolean
 }
 
 export const FilterDropdown = ({
   filterKey,
   children,
-  onlyOneFilterOpenAtAtime
+  onlyOneFilterOpenAtATime
 }: Props) => {
   const [isOpen, setIsOpen] = React.useState(false)
   const ref = React.useRef(null)
 
   useOutsideClick(ref, () =>
-    onlyOneFilterOpenAtAtime ? setIsOpen(false) : null
+    onlyOneFilterOpenAtATime ? setIsOpen(false) : null
   )
 
   return (
