@@ -144,18 +144,18 @@ export const Input = ({
   )
 }
 
-const getPeriodAdder = (period: string) =>
+let getPeriodAdder = (period: string) =>
   ({
     day: (date: any) => addDays(date, 1),
     week: (date: any) => addWeeks(date, 1),
     month: (date: any) => addMonths(date, 1)
   }[period])
 
-const getDateFormatString = (period: string) =>
+let getDateFormatString = (period: string) =>
   period === 'month' ? 'M/yyyy' : 'd/M/yyyy'
 
-const getInterveningPoints = ({ period = '', previous = {}, point = {} }) => {
-  const addPeriod = getPeriodAdder(period)
+let getInterveningPoints = ({ period, previous, point }: any) => {
+  let addPeriod = getPeriodAdder(period)
 
   let dateFormatString = getDateFormatString(period)
   let previousDate = parse(previous.x, dateFormatString, new Date())
