@@ -1,5 +1,6 @@
 import React from 'react'
 import _ from 'lodash/fp'
+import { FacetProps, FacetOption } from './types'
 
 // we'll need to make a stateless facet for the pure server rendered search
 
@@ -14,7 +15,7 @@ const Facet = ({
   layout,
   hasOptionSearch,
   overrideData
-}: any) => {
+}: FacetProps) => {
   let [optionSearch, setOptionSearch] = React.useState('')
   return (
     <UIComponents.CardBody>
@@ -31,38 +32,44 @@ const Facet = ({
               placeholder={'Search Options'}
               {...(onChange
                 ? {
-                    onChange: (val: any) => {
+                    onChange: (val: string) => {
                       setOptionSearch(val)
                       debouncedOnChange({ optionSearch: val })
                     },
                     value: optionSearch
                   }
                 : {
-                    name: `${name}[optionSearch]`,
+                    name: `${name}[optionSearch]`, // name is never declared. what's its purpose here?
                     defaultValue: optionSearch
                   })}
             />
           </div>
         )}
         {_.map(
-          ({ _id, checked, count, value, lookup }: any) => (
+          ({ _id, checked, count, value, lookup }: FacetOption) => (
             <React.Fragment key={`${_id}-${checked ? 'checked' : 'unchecked'}`}>
               <UIComponents.CheckBox
                 layout={layout}
                 checked={checked}
                 textMiddle={display(
-                  _.isString(value) ? value : { ...value, ...lookup, _id },
+                  _.isString(value)
+                    ? value
+                    : {
+                        ...(_.isObject(value) ? { ...value } : {}),
+                        ...lookup,
+                        _id
+                      },
                   null,
                   overrideData
                 )}
                 textRight={count}
                 {...(onChange
                   ? {
-                      onChange: (checked: any) => {
+                      onChange: (checked: boolean) => {
                         const newValues = checked
                           ? _.concat(values, _id)
                           : _.without([_id], values)
-                        onChange({ values: newValues })
+                        onChange({ values: _.compact(newValues) })
                       }
                     }
                   : {

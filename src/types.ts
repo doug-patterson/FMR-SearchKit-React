@@ -169,14 +169,28 @@ export interface Search {
 
 type ChartResults = any
 
-interface FacetOption {
+export interface FacetOption {
   _id: string
   count: number
   checked: boolean
   value: string | number | { [key: string]: string | number }
+  lookup?: Record<string, ResultsLookup>
 }
 
 type FacetOptions = FacetOption[]
+
+export interface FacetProps {
+  title: string
+  options: FacetOptions
+  values?: FacetValue[]
+  onChange?: ({ values }: { values: FacetValue[] }) => void
+  debouncedOnChange: ({ optionSearch }: { optionSearch?: any }) => void
+  display?: any
+  UIComponents?: any
+  layout?: string
+  hasOptionSearch: boolean
+  overrideData?: any
+}
 
 // right now Facet is the only Filter type that has results
 type FilterResults = FacetOptions
